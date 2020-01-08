@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.hairless</groupId>
+    <artifactId>plink</artifactId>
+    <packaging>pom</packaging>
+    <version>0.1</version>
+
+    <name>Plink</name>
+    <url>https://github.com/hairless/plink</url>
+    <description>Platform for Flink</description>
+
+    <modules>
+        <module>plink-common</module>
+        <module>plink-model</module>
+        <module>plink-dao</module>
+        <module>plink-service</module>
+        <module>plink-web</module>
+        <module>plink-rpc</module>
+        <module>plink-schedule</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <junit.version>4.13</junit.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Junit -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
