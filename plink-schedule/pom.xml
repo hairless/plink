@@ -5,13 +5,19 @@
     <parent>
         <artifactId>plink</artifactId>
         <groupId>com.github.hairless</groupId>
-        <version>0.1</version>
+        <version>0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>plink-schedule</artifactId>
 
     <dependencies>
+        <!--project modules-->
+        <dependency>
+            <groupId>com.github.hairless</groupId>
+            <artifactId>plink-service</artifactId>
+        </dependency>
+
         <!-- Junit -->
         <dependency>
             <groupId>junit</groupId>
