@@ -28,6 +28,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <junit.version>4.13</junit.version>
         <java.version>1.8</java.version>
+        <spring.boot.version>2.2.2.RELEASE</spring.boot.version>
     </properties>
 
     <dependencyManagement>
@@ -67,6 +68,15 @@
                 <groupId>com.github.hairless</groupId>
                 <artifactId>plink-web</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <!--spring boots modules-->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- Junit -->
