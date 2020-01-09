@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --dest ../plink-web/src/main/resources/static",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
