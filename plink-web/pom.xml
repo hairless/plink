@@ -17,7 +17,17 @@
             <groupId>com.github.hairless</groupId>
             <artifactId>plink-service</artifactId>
         </dependency>
-        
+
+        <!--spring boot jars-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <!-- Junit -->
         <dependency>
             <groupId>junit</groupId>
