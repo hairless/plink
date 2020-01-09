@@ -1,2 +1,6 @@
 server:
   port: 8666
+
+spring:
+  thymeleaf:
+    prefix: "classpath:/static/"
