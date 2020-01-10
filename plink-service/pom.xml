@@ -25,7 +25,13 @@
             <groupId>com.github.hairless</groupId>
             <artifactId>plink-rpc</artifactId>
         </dependency>
-        
+
+        <!-- util -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
         <!-- Junit -->
         <dependency>
             <groupId>junit</groupId>
