@@ -1,6 +1,10 @@
 server:
   port: 8666
 
+logging:
+  file:
+    name: log/app.log
+
 spring:
   thymeleaf:
     prefix: "classpath:/static/"
