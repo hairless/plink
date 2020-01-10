@@ -1,0 +1,15 @@
+CREATE DATABASE IF NOT EXISTS plink;
+
+USE plink;
+
+DROP TABLE IF EXISTS plink_test;
+CREATE TABLE `plink_test`(
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `message` VARCHAR(100) NOT NULL COMMENT '信息',
+  `ctime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '本条记录生成时间',
+  `mtime` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '记录最后修改时间',
+  PRIMARY KEY (`id`)
+)ENGINE=InnoDB  DEFAULT CHARSET=utf8 COMMENT='测试数据表';
+
+INSERT INTO `plink_test`(`message`) VALUES ('hello plink');
+INSERT INTO `plink_test`(`message`) VALUES ('hello plink plink');
