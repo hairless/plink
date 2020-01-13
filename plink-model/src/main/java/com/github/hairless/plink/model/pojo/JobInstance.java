@@ -1,6 +1,6 @@
 package com.github.hairless.plink.model.pojo;
 
-import com.github.hairless.plink.model.enums.InstanceStatusEnum;
+import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +29,7 @@ public class JobInstance extends BaseModel {
     private String config;
     /**
      * 状态
-     * {@link InstanceStatusEnum}
+     * {@link JobInstanceStatusEnum}
      */
     private Integer status;
     /**
