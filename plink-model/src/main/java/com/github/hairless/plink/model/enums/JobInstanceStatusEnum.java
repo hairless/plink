@@ -7,9 +7,10 @@ import lombok.Getter;
  *
  * @author silence
  * @date 2020/01/13
+ * {@link com.github.hairless.plink.model.pojo.JobInstance#status}
  */
 @Getter
-public enum InstanceStatusEnum {
+public enum JobInstanceStatusEnum {
     NEW(0, "新建"),
     STARTING(1, "启动中"),
     RUNNING(2, "运行中"),
@@ -22,7 +23,7 @@ public enum InstanceStatusEnum {
     private Integer value;
     private String desc;
 
-    InstanceStatusEnum(Integer value, String desc) {
+    JobInstanceStatusEnum(Integer value, String desc) {
         this.value = value;
         this.desc = desc;
     }

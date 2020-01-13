@@ -3,8 +3,11 @@ package com.github.hairless.plink.model.enums;
 import lombok.Getter;
 
 /**
+ * 任务类型枚举
+ *
  * @author silence
  * @date 2020/01/13
+ * {@link com.github.hairless.plink.model.pojo.Job#type}
  */
 @Getter
 public enum JobTypeEnum {
