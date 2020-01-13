@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "core-js": "^3.4.4",
+    "view-design": "^4.1.0-rc.3",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",
     "vue-property-decorator": "^8.3.0",
