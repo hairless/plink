@@ -23,7 +23,7 @@ CREATE TABLE `job` (
     `description` VARCHAR(1024) NOT NULL DEFAULT '' COMMENT '作业描述',
     `type` TINYINT(4) NOT NULL COMMENT '作业类型',
     `client_version` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '客户端版本',
-    `config` MEDIUMTEXT NOT NULL DEFAULT '' COMMENT '作业配置',
+    `config` MEDIUMTEXT NULL COMMENT '作业配置',
     `last_status` TINYINT(4) NULL COMMENT '最新实例的状态',
     `last_app_id` VARCHAR(100) NULL COMMENT '最新实例的app_id',
     `last_start_time` TIMESTAMP NULL COMMENT '最新实例的开始时间',
@@ -38,7 +38,7 @@ DROP TABLE IF EXISTS `job_instance`;
 CREATE TABLE job_instance (
     `id` BIGINT PRIMARY KEY NOT NULL AUTO_INCREMENT COMMENT 'ID',
     `job_id` BIGINT NOT NULL COMMENT '作业的ID, 即 job 表的 id',
-    `config` MEDIUMTEXT NOT NULL DEFAULT '' COMMENT '实例的配置',
+    `config` MEDIUMTEXT NULL COMMENT '实例的配置',
     `status` TINYINT(4) NOT NULL COMMENT '实例的状态',
     `app_id` VARCHAR(100) NULL COMMENT '实例的 app_id',
     `start_time` TIMESTAMP NULL COMMENT '实例的开始时间',
