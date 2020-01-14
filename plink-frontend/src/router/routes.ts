@@ -20,6 +20,7 @@ export default {
               component: () => import("@/pages/Overview.vue"),
               meta: { title: "平台概览", permission: true }
             },
+            //  List
             {
               path: "list",
               name: "JobList",
@@ -27,10 +28,17 @@ export default {
               meta: { title: "作业列表", permission: true }
             },
             {
-              path: "list",
+              path: "instanceList",
               name: "JobInstanceList",
               component: () => import("@/pages/job/JobInstanceList.vue"),
               meta: { title: "作业列表", permission: true }
+            },
+            // Edit
+            {
+              path: "edit",
+              name: "JobEdit",
+              component: () => import("@/pages/job/JobEdit.vue"),
+              meta: { title: "作业编辑", permission: true }
             }
           ]
         }

@@ -1,5 +1,5 @@
 <template>
-  <Menu active-name="1-2" theme="light" width="auto" :open-names="['1']">
+  <Menu active-name="2-1" theme="light" width="auto" :open-names="['2']">
     <MenuItem name="1">
       <Icon type="ios-navigate"></Icon>
       平台概览
@@ -9,8 +9,9 @@
         <Icon type="ios-navigate"></Icon>
         作业管理
       </template>
-      <MenuItem name="2-1">作业列表</MenuItem>
-      <MenuItem name="2-2">实例列表</MenuItem>
+      <MenuItem name="2-1" to="/job/list">作业列表</MenuItem>
+      <MenuItem name="2-2" to="/job/edit">作业编辑</MenuItem>
+      <MenuItem name="2-3" to="/job/instanceList">实例列表</MenuItem>
       <!--<MenuItem name="2-1">作业概览</MenuItem>
       <MenuItem name="2-2">新建作业</MenuItem>
       <MenuItem name="2-4">历史作业</MenuItem>-->
