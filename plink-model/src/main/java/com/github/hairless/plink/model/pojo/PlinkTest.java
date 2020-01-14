@@ -9,5 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PlinkTest extends BaseModel {
+    private static final long serialVersionUID = 1L;
     private String message;
 }

@@ -1,21 +1,21 @@
 <template>
   <div>
     <div v-if="type === 1">
-      <JobListCustom />
+      <JobEditCustom />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
-import JobListCustom from "@/components/job/JobListCustom.vue";
+import JobEditCustom from "@/components/job/JobEditCustom.vue";
 
 @Component({
   components: {
-    JobListCustom
+    JobEditCustom
   }
 })
-export default class JobList extends Vue {
+export default class JobEdit extends Vue {
   type: number = 1;
 }
 </script>

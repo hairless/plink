@@ -17,6 +17,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Job extends BaseModel {
+    private static final long serialVersionUID = 1L;
     /**
      * Flink作业名称，全局唯一
      */
