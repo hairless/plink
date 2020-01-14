@@ -17,6 +17,7 @@ import java.util.Date;
 @Setter
 @Builder
 public class JobInstance extends BaseModel {
+    private static final long serialVersionUID = 1L;
     /**
      * 作业id
      * {@link Job#id}
