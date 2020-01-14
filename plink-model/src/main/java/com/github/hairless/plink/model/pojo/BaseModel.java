@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Id;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -11,7 +12,8 @@ import java.util.Date;
  */
 @Getter
 @Setter
-public class BaseModel {
+public class BaseModel implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * 主键自增id
      */
