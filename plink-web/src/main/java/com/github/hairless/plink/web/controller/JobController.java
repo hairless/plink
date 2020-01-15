@@ -5,10 +5,7 @@ import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.service.impl.JobServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -34,7 +31,7 @@ public class JobController {
      * @return
      */
     @RequestMapping("/addJob")
-    public Result addJob(@RequestBody @Valid Job job) {
+    public Result addJob(@RequestBody  Job job) {
         return jobService.addJob(job);
     }
 
@@ -44,8 +41,8 @@ public class JobController {
      * @param idList
      * @return
      */
-    @RequestMapping("/deleteJob")
-    public Result deleteJob(@RequestParam @Valid List<String> idList) {
+    @RequestMapping(value="/deleteJob",method = RequestMethod.POST)
+    public Result deleteJob(@RequestParam @Valid List<Long> idList) {
         return jobService.deleteJob(idList);
     }
 
@@ -63,12 +60,12 @@ public class JobController {
     /**
      * 查询单个作业
      *
-     * @param id
+     * @param jobId
      * @return
      */
-    @RequestMapping("/queryJob")
-    public Result queryJob(@RequestParam @Valid String id) {
-        return jobService.queryJob(id);
+    @RequestMapping("/queryJob/{jobId}")
+    public Result queryJob(@PathVariable(value = "jobId")Long jobId) {
+        return jobService.queryJob(jobId);
     }
 
     /**
@@ -76,9 +73,12 @@ public class JobController {
      *
      * @return
      */
-    @RequestMapping("/selectJobAll")
-    public Result selectJobAll() {
-        return jobService.selectAll();
+    @RequestMapping("/queryJobAll")
+    public Result queryJobAll() {
+        //TODO 分页参数设置
+        return jobService.queryJobAll();
     }
 
+
+    //TODO 模糊查询
 }

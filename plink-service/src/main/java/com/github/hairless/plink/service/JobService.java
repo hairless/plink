@@ -13,12 +13,12 @@ import java.util.List;
 public interface JobService {
     Result addJob(Job job);
 
-    Result deleteJob(List<String> idList);
+    Result deleteJob(List<Long> idList);
 
     Result updateJob(Job job);
 
-    Result queryJob(String id);
+    Result queryJob(Long id);
 
-    Result selectAll();
+    Result queryJobAll();
 
 }

@@ -28,17 +28,17 @@ public class JobServiceImpl implements JobService {
     @Override
     public Result addJob(Job job) {
         try {
-            jobMapper.insert(job);
+             jobMapper.insertUseGeneratedKeys(job);
             log.info(job.getId() + ":插入成功");
         } catch (Exception e) {
             log.error(e.getMessage());
             return new Result(ResultCode.EXCEPTION, e.getMessage());
         }
-        return new Result(ResultCode.SUCCESS);
+        return new Result(ResultCode.SUCCESS,job);
     }
 
     @Override
-    public Result deleteJob(List<String> idList) {
+    public Result deleteJob(List<Long> idList) {
         try {
             idList.forEach(id -> {
                 jobMapper.deleteByPrimaryKey(id);
@@ -65,7 +65,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Result queryJob(String id) {
+    public Result queryJob(Long id) {
         Job job;
         try {
             job = jobMapper.selectByPrimaryKey(id);
@@ -77,7 +77,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Result selectAll() {
+    public Result queryJobAll() {
         PageHelper.startPage(1, 1);
         PageInfo<Job> jobPageInfo;
         try {
