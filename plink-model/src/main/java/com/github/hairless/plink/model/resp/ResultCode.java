@@ -1,4 +1,4 @@
-package com.github.hairless.plink.web.resp;
+package com.github.hairless.plink.model.resp;
 
 import lombok.Getter;
 
