@@ -13,7 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -115,6 +117,21 @@ public class JobServiceImpl implements JobService {
             return new Result<>(ResultCode.SUCCESS, new PageInfo<>(jobList));
         } catch (Exception e) {
             log.warn("query jobs fail! jobReq={}", JSON.toJSONString(jobReq), e);
+            return new Result<>(ResultCode.EXCEPTION, e);
+        }
+    }
+
+    @Override
+    public Result uploadJar(Long jobId, MultipartFile file) {
+        if (file==null||file.isEmpty()){
+            return new Result(ResultCode.FAILURE, "上传的文件为空");
+        }
+        String filename = file.getOriginalFilename();
+        try {
+            file.transferTo(new File("jar/" + jobId,filename));
+            return new Result<>(ResultCode.SUCCESS);
+        } catch (Exception e) {
+            log.warn("upload jar fail! fileName={}", filename, e);
             return new Result<>(ResultCode.EXCEPTION, e);
         }
     }

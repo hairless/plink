@@ -26,6 +26,12 @@
             <artifactId>plink-rpc</artifactId>
         </dependency>
 
+        <!--spring boot jars-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
         <!-- util -->
         <dependency>
             <groupId>org.projectlombok</groupId>

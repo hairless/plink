@@ -3,11 +3,12 @@ package com.github.hairless.plink.web.controller;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.req.JobReq;
 import com.github.hairless.plink.model.resp.Result;
-import com.github.hairless.plink.service.impl.JobServiceImpl;
+import com.github.hairless.plink.service.JobService;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -24,7 +25,7 @@ import java.util.List;
 @RequestMapping("/mng/job")
 public class JobController {
     @Autowired
-    private JobServiceImpl jobService;
+    private JobService jobService;
 
     /**
      * 添加作业
@@ -89,6 +90,16 @@ public class JobController {
     @RequestMapping("/queryJobs")
     public Result<PageInfo<Job>> queryJobs(@RequestBody JobReq jobReq) {
         return jobService.queryJobs(jobReq);
+    }
+
+    /**
+     * 查询作业列表
+     *
+     * @return
+     */
+    @RequestMapping("{jobId}/uploadJar")
+    public Result uploadJar(@PathVariable(value = "jobId") Long jobId,@RequestParam("file") MultipartFile file) {
+        return jobService.uploadJar(jobId,file);
     }
 
 }

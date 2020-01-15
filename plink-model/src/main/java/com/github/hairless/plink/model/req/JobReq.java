@@ -12,7 +12,6 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 public class JobReq extends Job {
     private static final long serialVersionUID = 1L;
