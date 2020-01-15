@@ -2,9 +2,7 @@ package com.github.hairless.plink.model.pojo;
 
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.enums.JobTypeEnum;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -17,7 +15,10 @@ import java.util.Date;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Job extends BaseModel {
+    private static final long serialVersionUID = 1L;
     /**
      * Flink作业名称，全局唯一
      */
