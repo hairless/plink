@@ -1,6 +1,5 @@
 package com.github.hairless.plink.web.controller;
 
-import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.service.impl.JobServiceImpl;
@@ -11,10 +10,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
  * job
+ *
  * @Author Trevor
  * @Create 2020/1/14 14:19
  */
@@ -28,82 +29,56 @@ public class JobController {
 
     /**
      * 添加作业
+     *
      * @param job
      * @return
      */
     @RequestMapping("/addJob")
-    public Result addJob(@RequestBody Job job) {
-        try {
-            jobService.addJob(job);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return new Result(ResultCode.EXCEPTION, e.getMessage());
-        }
-        return new Result(ResultCode.SUCCESS);
+    public Result addJob(@RequestBody @Valid Job job) {
+        return jobService.addJob(job);
     }
 
     /**
      * 删除作业
+     *
      * @param idList
      * @return
      */
     @RequestMapping("/deleteJob")
-    public Result deleteJob(@RequestParam List<String> idList) {
-        try {
-            jobService.deleteJob(idList);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return new Result(ResultCode.EXCEPTION, e.getMessage());
-        }
-        return new Result(ResultCode.SUCCESS);
+    public Result deleteJob(@RequestParam @Valid List<String> idList) {
+        return jobService.deleteJob(idList);
     }
 
     /**
      * 编辑作业
+     *
      * @param job
      * @return
      */
     @RequestMapping("/updateJob")
-    public Result updateJob(@RequestBody Job job) {
-        try {
-            jobService.updateJob(job);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return new Result(ResultCode.EXCEPTION, e.getMessage());
-        }
-        return new Result(ResultCode.SUCCESS);
+    public Result updateJob(@RequestBody @Valid Job job) {
+        return jobService.updateJob(job);
     }
 
     /**
      * 查询单个作业
+     *
      * @param id
      * @return
      */
     @RequestMapping("/queryJob")
-    public Result queryJob(@RequestParam String id) {
-        Job job;
-        try {
-            job = jobService.queryJob(id);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return new Result(ResultCode.EXCEPTION, e.getMessage());
-        }
-        return new Result(ResultCode.SUCCESS, job);
+    public Result queryJob(@RequestParam @Valid String id) {
+        return jobService.queryJob(id);
     }
 
     /**
      * 查询所有作业
+     *
      * @return
      */
     @RequestMapping("/selectJobAll")
     public Result selectJobAll() {
-        List<Job> jobList;
-        try {
-            jobList = jobService.selectAll();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return new Result(ResultCode.EXCEPTION, e.getMessage());
-        }
-        return new Result(ResultCode.SUCCESS, jobList);
+        return jobService.selectAll();
     }
+
 }

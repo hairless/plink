@@ -1,6 +1,7 @@
 package com.github.hairless.plink.service;
 
 import com.github.hairless.plink.model.pojo.Job;
+import com.github.hairless.plink.model.resp.Result;
 
 import java.util.List;
 
@@ -10,14 +11,14 @@ import java.util.List;
  */
 
 public interface JobService {
-    int addJob(Job job);
+    Result addJob(Job job);
 
-    int deleteJob(List<String> idList);
+    Result deleteJob(List<String> idList);
 
-    int updateJob(Job job);
+    Result updateJob(Job job);
 
-    Job queryJob(String id);
+    Result queryJob(String id);
 
-    List<Job> selectAll();
+    Result selectAll();
 
 }
