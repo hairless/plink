@@ -1,4 +1,4 @@
-package com.github.hairless.plink.model.enums;
+package com.github.hairless.plink.model.resp;
 
 import lombok.Getter;
 

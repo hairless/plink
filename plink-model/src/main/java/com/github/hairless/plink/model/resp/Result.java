@@ -1,7 +1,6 @@
-package com.github.hairless.plink.model.pojo;
+package com.github.hairless.plink.model.resp;
 
 
-import com.github.hairless.plink.model.enums.ResultCode;
 import lombok.Getter;
 import lombok.Setter;
 

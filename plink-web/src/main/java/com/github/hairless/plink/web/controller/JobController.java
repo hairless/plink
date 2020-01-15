@@ -1,8 +1,8 @@
 package com.github.hairless.plink.web.controller;
 
-import com.github.hairless.plink.model.enums.ResultCode;
+import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.model.pojo.Job;
-import com.github.hairless.plink.model.pojo.Result;
+import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.service.impl.JobServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
