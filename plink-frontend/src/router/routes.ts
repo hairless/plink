@@ -39,6 +39,13 @@ export default {
               name: "JobEdit",
               component: () => import("@/pages/job/JobEdit.vue"),
               meta: { title: "作业编辑", permission: true }
+            },
+            // Detail
+            {
+              path: "detail",
+              name: "JobDetail",
+              component: () => import("@/pages/job/JobDetail.vue"),
+              meta: { title: "作业详情", permission: true }
             }
           ]
         }
