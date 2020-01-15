@@ -12,7 +12,8 @@ import java.util.Date;
  * @author silence
  * @date 2020/01/13
  */
-@Data
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
