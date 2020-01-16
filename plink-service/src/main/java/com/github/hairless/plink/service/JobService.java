@@ -4,6 +4,7 @@ import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.req.JobReq;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.pagehelper.PageInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,4 +26,7 @@ public interface JobService {
 
     Result<PageInfo<Job>> queryJobs(JobReq jobReq);
 
+    Result uploadJar(Long jobId, MultipartFile file);
+
+    Result<List<String>> jarList(Long jobId);
 }
