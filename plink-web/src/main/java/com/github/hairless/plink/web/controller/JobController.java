@@ -51,11 +51,11 @@ public class JobController {
     /**
      * 删除作业
      *
-     * @param idList
+     * @param jobId
      * @return
      */
     @RequestMapping(value = "/deleteJob/{jobId}", method = RequestMethod.POST)
-    public Result deleteJob(@PathVariable(value = "jobId") Long jobId) {
+    public Result deleteJob(@PathVariable(value = "jobId")  @Valid Long jobId) {
         return jobService.deleteJob(jobId);
     }
 
