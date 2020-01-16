@@ -16,6 +16,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -33,7 +35,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public Result<Job> addJob(Job job) {
         try {
-            jobMapper.insertUseGeneratedKeys(job);
+            jobMapper.insertSelective(job);
             return new Result<>(ResultCode.SUCCESS, job);
         } catch (Exception e) {
             log.warn("add job fail! job={}", JSON.toJSONString(job), e);
@@ -109,7 +111,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public Result<PageInfo<Job>> queryJobs(JobReq jobReq) {
         if (jobReq == null) {
-            return new Result<>(ResultCode.FAILURE, "jobReq is null");
+            jobReq = new JobReq();
         }
         PageHelper.startPage(jobReq.getPageNum(), jobReq.getPageSize());
         try {
@@ -123,15 +125,39 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Result uploadJar(Long jobId, MultipartFile file) {
-        if (file==null||file.isEmpty()){
+        if (file == null || file.isEmpty()) {
             return new Result(ResultCode.FAILURE, "上传的文件为空");
         }
         String filename = file.getOriginalFilename();
         try {
-            file.transferTo(new File("jar/" + jobId,filename));
+            String parentDir = System.getProperty("user.dir");
+            File uploadPath = new File(parentDir + "/uploadJars/" + jobId);
+            if (!uploadPath.exists()) {
+                if (!uploadPath.mkdirs()) {
+                    return new Result<>(ResultCode.FAILURE, "make upload dir fail!");
+                }
+            }
+            File targetFile = new File(uploadPath, filename);
+            file.transferTo(targetFile);
             return new Result<>(ResultCode.SUCCESS);
         } catch (Exception e) {
             log.warn("upload jar fail! fileName={}", filename, e);
+            return new Result<>(ResultCode.EXCEPTION, e);
+        }
+    }
+
+    @Override
+    public Result<List<String>> jarList(Long jobId) {
+        String parentDir = System.getProperty("user.dir");
+        try {
+            File uploadPath = new File(parentDir + "/uploadJars/" + jobId);
+            if (uploadPath.exists()) {
+                String[] fileNames = uploadPath.list();
+                return new Result<>(ResultCode.SUCCESS, Arrays.asList(fileNames));
+            }
+            return new Result<>(ResultCode.SUCCESS, Collections.emptyList());
+        } catch (Exception e) {
+            log.warn("get jar list fail! jobId={}", jobId, e);
             return new Result<>(ResultCode.EXCEPTION, e);
         }
     }

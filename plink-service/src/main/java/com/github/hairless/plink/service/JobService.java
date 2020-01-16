@@ -27,4 +27,6 @@ public interface JobService {
     Result<PageInfo<Job>> queryJobs(JobReq jobReq);
 
     Result uploadJar(Long jobId, MultipartFile file);
+
+    Result<List<String>> jarList(Long jobId);
 }

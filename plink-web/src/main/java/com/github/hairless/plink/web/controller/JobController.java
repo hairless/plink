@@ -88,18 +88,25 @@ public class JobController {
      * @return
      */
     @RequestMapping("/queryJobs")
-    public Result<PageInfo<Job>> queryJobs(@RequestBody JobReq jobReq) {
+    public Result<PageInfo<Job>> queryJobs(@RequestBody(required = false) JobReq jobReq) {
         return jobService.queryJobs(jobReq);
     }
 
     /**
-     * 查询作业列表
-     *
-     * @return
+     * 任务上传jar
      */
     @RequestMapping("{jobId}/uploadJar")
-    public Result uploadJar(@PathVariable(value = "jobId") Long jobId,@RequestParam("file") MultipartFile file) {
-        return jobService.uploadJar(jobId,file);
+    public Result uploadJar(@PathVariable(value = "jobId") Long jobId, @RequestParam("file") MultipartFile file) {
+        return jobService.uploadJar(jobId, file);
     }
+
+    /**
+     * 任务获取jar列表
+     */
+    @RequestMapping("{jobId}/jarList")
+    public Result jarList(@PathVariable(value = "jobId") Long jobId) {
+        return jobService.jarList(jobId);
+    }
+
 
 }
