@@ -1,7 +1,6 @@
 package com.github.hairless.plink.model.req;
 
 import com.github.hairless.plink.model.pojo.Job;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,10 +11,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 public class JobReq extends Job {
     private static final long serialVersionUID = 1L;
-    private int pageSize = 1;
-    private int pageNum = 10;
+    private int pageNum = 1;
+    private int pageSize = 10;
 }
