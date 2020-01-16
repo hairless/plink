@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -56,7 +57,7 @@ public class JobController {
      * @return
      */
     @RequestMapping(value = "/deleteJob/{jobId}", method = RequestMethod.POST)
-    public Result deleteJob(@PathVariable(value = "jobId") Long jobId) {
+    public Result deleteJob(@PathVariable(value = "jobId") @NotNull Long jobId) {
         return jobService.deleteJob(jobId);
     }
 
@@ -78,7 +79,7 @@ public class JobController {
      * @return
      */
     @RequestMapping("/queryJob/{jobId}")
-    public Result<Job> queryJob(@PathVariable(value = "jobId") Long jobId) {
+    public Result<Job> queryJob(@PathVariable(value = "jobId") @NotNull Long jobId) {
         return jobService.queryJob(jobId);
     }
 
@@ -96,7 +97,7 @@ public class JobController {
      * 任务上传jar
      */
     @RequestMapping("{jobId}/uploadJar")
-    public Result uploadJar(@PathVariable(value = "jobId") Long jobId, @RequestParam("file") MultipartFile file) {
+    public Result uploadJar(@PathVariable(value = "jobId") @NotNull Long jobId, @RequestParam("file") MultipartFile file) {
         return jobService.uploadJar(jobId, file);
     }
 
@@ -104,7 +105,7 @@ public class JobController {
      * 任务获取jar列表
      */
     @RequestMapping("{jobId}/jarList")
-    public Result jarList(@PathVariable(value = "jobId") Long jobId) {
+    public Result jarList(@PathVariable(value = "jobId") @NotNull Long jobId) {
         return jobService.jarList(jobId);
     }
 
