@@ -1,9 +1,11 @@
 package com.github.hairless.plink.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.github.hairless.plink.common.PageInfoUtil;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.req.JobReq;
+import com.github.hairless.plink.model.resp.JobResp;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.service.JobService;
@@ -33,12 +35,13 @@ public class JobServiceImpl implements JobService {
     private JobMapper jobMapper;
 
     @Override
-    public Result<Job> addJob(Job job) {
+    public Result<JobResp> addJob(JobReq jobReq) {
         try {
-            jobMapper.insertSelective(job);
-            return new Result<>(ResultCode.SUCCESS, job);
+            jobReq.transform();
+            jobMapper.insertSelective(jobReq);
+            return new Result<>(ResultCode.SUCCESS, new JobResp().transform(jobReq));
         } catch (Exception e) {
-            log.warn("add job fail! job={}", JSON.toJSONString(job), e);
+            log.warn("add job fail! job={}", JSON.toJSONString(jobReq), e);
             return new Result<>(ResultCode.EXCEPTION, e);
         }
     }
@@ -75,33 +78,37 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Result updateJob(Job job) {
-        if (job == null) {
+    public Result updateJob(JobReq jobReq) {
+        if (jobReq == null) {
             return new Result(ResultCode.FAILURE, "job is null");
         }
-        if (job.getId() == null) {
+        if (jobReq.getId() == null) {
             return new Result(ResultCode.FAILURE, "jobId is null");
         }
         try {
-            int rowCnt = jobMapper.updateByPrimaryKey(job);
+            jobReq.transform();
+            int rowCnt = jobMapper.updateByPrimaryKeySelective(jobReq);
             if (rowCnt == 0) {
                 return new Result(ResultCode.FAILURE, "update job fail");
             }
             return new Result(ResultCode.SUCCESS);
         } catch (Exception e) {
-            log.warn("update job fail! job={}", JSON.toJSONString(job), e);
+            log.warn("update job fail! job={}", JSON.toJSONString(jobReq), e);
             return new Result(ResultCode.EXCEPTION, e);
         }
     }
 
     @Override
-    public Result<Job> queryJob(Long jobId) {
+    public Result<JobResp> queryJob(Long jobId) {
         if (jobId == null) {
             return new Result<>(ResultCode.FAILURE, "jobId is null");
         }
         try {
             Job job = jobMapper.selectByPrimaryKey(jobId);
-            return new Result<>(ResultCode.SUCCESS, job);
+            if (job == null) {
+                return new Result<>(ResultCode.FAILURE, "jobnot found");
+            }
+            return new Result<>(ResultCode.SUCCESS, new JobResp().transform(job));
         } catch (Exception e) {
             log.warn("query job fail! jobId={}", jobId, e);
             return new Result<>(ResultCode.EXCEPTION, e);
@@ -109,14 +116,15 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Result<PageInfo<Job>> queryJobs(JobReq jobReq) {
+    public Result<PageInfo<JobResp>> queryJobs(JobReq jobReq) {
         if (jobReq == null) {
             jobReq = new JobReq();
         }
         PageHelper.startPage(jobReq.getPageNum(), jobReq.getPageSize());
         try {
             List<Job> jobList = jobMapper.select(jobReq);
-            return new Result<>(ResultCode.SUCCESS, new PageInfo<>(jobList));
+            PageInfo<Job> jobPageInfo = new PageInfo<>(jobList);
+            return new Result<>(ResultCode.SUCCESS, PageInfoUtil.pageInfoTransform(jobPageInfo, JobResp.class));
         } catch (Exception e) {
             log.warn("query jobs fail! jobReq={}", JSON.toJSONString(jobReq), e);
             return new Result<>(ResultCode.EXCEPTION, e);

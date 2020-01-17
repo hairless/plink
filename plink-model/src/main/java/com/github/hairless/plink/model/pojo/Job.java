@@ -39,8 +39,7 @@ public class Job extends BaseModel {
     /**
      * 作业配置
      */
-    //TODO config对应配置类
-    private String config;
+    private String configJson;
     /**
      * 最新实例状态
      * {@link JobInstance#status}

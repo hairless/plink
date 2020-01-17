@@ -12,6 +12,17 @@
     <artifactId>plink-common</artifactId>
 
     <dependencies>
+        <!--project modules-->
+        <dependency>
+            <groupId>com.github.hairless</groupId>
+            <artifactId>plink-model</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper</artifactId>
+        </dependency>
+
         <!-- Junit -->
         <dependency>
             <groupId>junit</groupId>

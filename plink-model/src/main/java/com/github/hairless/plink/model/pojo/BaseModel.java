@@ -1,4 +1,5 @@
 package com.github.hairless.plink.model.pojo;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,8 +22,8 @@ public class BaseModel implements Serializable {
      * 主键自增id
      */
     @Id
-    @NotNull(message = "Id不能为空")
-    @Min(value = 1, message = "Id必须为正整数")
+    @NotNull(message = "Id must be not null")
+    @Min(value = 1, message = "Id must be a positive integer")
     private Long id;
     /**
      * 记录创建时间
