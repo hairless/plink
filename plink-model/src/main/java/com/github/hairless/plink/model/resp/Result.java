@@ -2,6 +2,7 @@ package com.github.hairless.plink.model.resp;
 
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.PrintWriter;
@@ -14,6 +15,7 @@ import java.io.StringWriter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 public class Result<T> implements Serializable {
     private static final long serialVersionUID = 1L;
     private Boolean success;

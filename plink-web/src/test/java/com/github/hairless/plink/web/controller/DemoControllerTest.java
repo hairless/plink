@@ -1,4 +1,4 @@
-package com.github.hairless.plink;
+package com.github.hairless.plink.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ public class DemoControllerTest extends BaseControllerTest {
 
 
     @Test
-    public void demoTestGet() {
+    public void demoTestGet() throws Exception {
         String result = get("/plinkTest?key1=val1");
         log.info(result);
     }
@@ -27,7 +27,7 @@ public class DemoControllerTest extends BaseControllerTest {
     }
 
     @Test
-    public void demoTestPost() {
+    public void demoTestPost() throws Exception {
         JSONObject param = new JSONObject();
         param.put("key1", "val1");
         param.put("key2", "val2");
