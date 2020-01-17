@@ -5,12 +5,28 @@
       <Row :gutter="10">
         <Col span="20">
           <span> ID : </span>
-          <Input v-model="jobQueryCondition.id" placeholder=""  style="width: 80px" size="small" />
+          <Input
+            v-model="jobQueryCondition.id"
+            placeholder=""
+            style="width: 80px"
+            size="small"
+          />
           <span> 名称 : </span>
-          <Input v-model="jobQueryCondition.name" placeholder="" style="width: 200px" size="small" />
+          <Input
+            v-model="jobQueryCondition.name"
+            placeholder=""
+            style="width: 200px"
+            size="small"
+          />
         </Col>
         <Col span="4" align="right">
-          <Button type="primary" size="small" style="margin-right: 10px;" @click="clickQuery">查询</Button>
+          <Button
+            type="primary"
+            size="small"
+            style="margin-right: 10px;"
+            @click="clickQuery"
+            >查询</Button
+          >
           <Button type="success" size="small" @click="clickCreate">新建</Button>
         </Col>
       </Row>
@@ -18,10 +34,16 @@
     <!-- Job List -->
     <div>
       <Table stripe ref="selection" :columns="jobListColumns" :data="jobList">
-        <template slot="operator">
+        <template slot-scope="{ row }" slot="operator">
           <div>
-            <Button type="info" size="small" @click="clickDetail">详情</Button>
-            <Button type="info" size="small" style="margin-left: 10px;" @click="clickEdit">编辑</Button>
+            <Button type="info" size="small" @click="clickDetail(row)">详情</Button>
+            <Button
+              type="info"
+              size="small"
+              style="margin-left: 10px;"
+              @click="clickEdit(row)"
+              >编辑</Button
+            >
           </div>
         </template>
       </Table>
@@ -31,12 +53,41 @@
       <Row :gutter="10">
         <Col span="8">
           <Button type="success" size="small" @click="clickStart">启动</Button>
-          <Button type="warning" size="small" style="margin-left: 10px;" @click="clickRestart">重启</Button>
-          <Button type="error" size="small" style="margin-left: 10px;" @click="clickStop">停止</Button>
-          <Button type="error" size="small" style="margin-left: 10px;" @click="clickDelete">删除</Button>
+          <Button
+            type="warning"
+            size="small"
+            style="margin-left: 10px;"
+            @click="clickRestart"
+            >重启</Button
+          >
+          <Button
+            type="error"
+            size="small"
+            style="margin-left: 10px;"
+            @click="clickStop"
+            >停止</Button
+          >
+          <Button
+            type="error"
+            size="small"
+            style="margin-left: 10px;"
+            @click="clickDelete"
+            >删除</Button
+          >
         </Col>
         <Col span="16" align="right">
-          <Page :total="100" show-total show-sizer show-elevator size="small" />
+          <Page
+            :total="page.total"
+            :current="page.pageNum"
+            :page-size="page.pageSize"
+            :page-size-opts="[5, 10, 20, 50, 100]"
+            @on-change="pageChange"
+            @on-page-size-change="pageSizeChange"
+            show-total
+            show-sizer
+            show-elevator
+            size="small"
+          />
         </Col>
       </Row>
     </div>
@@ -56,12 +107,16 @@
           </FormItem>
           <FormItem label="作业类型 : ">
             <Select v-model="jobCreateItems.type">
-              <Option value="ud-jar">自定义 Jar</Option>
-              <Option value="tl-jar">模板 Jar</Option>
+              <Option v-for="item in hintJobTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
           </FormItem>
           <FormItem label="作业描述 :">
-            <Input type="textarea" v-model="jobCreateItems.description" placeholder="" :rows="4" />
+            <Input
+              type="textarea"
+              v-model="jobCreateItems.description"
+              placeholder=""
+              :rows="4"
+            />
           </FormItem>
         </Form>
       </Modal>
@@ -71,9 +126,15 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import jobApi from "@/api/jobApi";
+import { JobModel } from "@/model/jobModel";
 
 @Component
 export default class JobList extends Vue {
+  // hint
+  hintJobTypeList: object[] = [
+    { value : 1, label : "自定义 / Jar"}
+  ];
   // Job Props
   jobListColumns: object[] = [
     {
@@ -131,68 +192,94 @@ export default class JobList extends Vue {
       width: 140
     }
   ];
-  jobList: object[] = [
-    {
-      id: 10001,
-      name: "作业1",
-      type: "自定义 / Jar",
-      description: "单词统计",
-      start_time: "2020-01-13 12:14:00",
-      stop_time: "2020-01-13 14:45:21",
-      last_status: "已停止",
-      _checked: true
-    },
-    {
-      id: 10002,
-      name: "作业2",
-      type: "自定义 / Jar",
-      description: "文件测试",
-      start_time: "2020-01-13 12:16:00",
-      stop_time: "2020-01-13 12:45:21",
-      last_status: "已停止"
-    }
-  ];
+  jobList: JobModel[] = [];
   // Job Query
+  page: object = {
+    total: 100,
+    pageNum: 1,
+    pageSize: 10
+  };
   jobQueryCondition: object = {
     id: "",
     name: ""
   };
   clickQuery() {
-    this.$Message.success("查询作业成功");
+    this.getJobList();
+  }
+  pageChange(num: number) {
+    this.page.pageNum = num;
+    this.getJobList();
+  }
+  pageSizeChange(size: number) {
+    this.page.pageSize = size;
+    this.getJobList();
   }
   // Job Create
   jobCreateModal: boolean = false;
-  jobCreateItems: object = {
+  jobCreateItems: JobModel = {
     name: "name",
+    type: 1,
     description: "desc"
   };
   clickCreate() {
     this.jobCreateModal = true;
   }
   clickCreateOk() {
-    this.$Message.success("新建作业成功");
+    jobApi
+      .addJob(this.jobCreateItems)
+      .then(res => {
+        this.getJobList();
+      })
+      .then(res => {
+        this.$Notice.success({
+          title: "新建作业成功"
+        });
+      });
   }
   clickCreateCancel() {
-    this.$Message.warning("取消新建作业");
+    this.$Notice.warning({
+      title: "取消新建作业"
+    });
   }
   // Job Click Actions
-  clickDetail() {
-    this.$Message.success("查看详情作业");
+  clickDetail(row: any) {
+    this.$router.push({
+      path: "/job/detail",
+      query: {
+        id: row.id
+      }
+    });
   }
-  clickEdit() {
-    this.$Message.success("编辑作业成功");
+  clickEdit(row: any) {
+    this.$router.push({
+      path: "/job/edit",
+      query: {
+        id: row.id
+      }
+    });
   }
   clickStart() {
-    this.$Message.success("启动作业成功");
+    this.$Notice.success("启动作业成功");
   }
   clickRestart() {
-    this.$Message.success("重启作业成功");
+    this.$Notice.success("重启作业成功");
   }
   clickStop() {
-    this.$Message.success("停止作业成功");
+    this.$Notice.success("停止作业成功");
   }
   clickDelete() {
-    this.$Message.success("删除作业成功");
+    this.$Notice.success("删除作业成功");
+  }
+
+  getJobList() {
+    jobApi.queryJobs(this.page).then((res: any) => {
+      this.jobList = res.list;
+      this.page.total = res.total;
+    });
+  }
+
+  mounted() {
+    this.getJobList();
   }
 }
 </script>
