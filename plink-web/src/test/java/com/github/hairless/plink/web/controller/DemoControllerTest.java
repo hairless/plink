@@ -1,7 +1,6 @@
 package com.github.hairless.plink.web.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.github.hairless.plink.web.controller.BaseControllerTest;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
