@@ -20,7 +20,6 @@ export default {
               component: () => import("@/pages/Overview.vue"),
               meta: { title: "平台概览", permission: true }
             },
-            //  List
             {
               path: "list",
               name: "JobList",
