@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 public enum JobTypeEnum {
-    CUSTOM(1,"自定义作业");
+    CUSTOM(1, "自定义作业");
 
     private Integer value;
     private String desc;
