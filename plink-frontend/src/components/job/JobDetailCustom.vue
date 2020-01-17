@@ -5,29 +5,29 @@
       <TabPane label="作业信息" name="basic">
         <Divider>基础信息</Divider>
         <Row :gutter="10">
-          <Col span="12">作业 ID : 1001</Col>
-          <Col span="12">作业名称 : WordCount</Col>
+          <Col span="12">作业 ID : {{ job.id }}</Col>
+          <Col span="12">作业名称 : {{ job.name }}</Col>
         </Row>
         <Row :gutter="10">
-          <Col span="12">作业类型 : 自定义 / Jar</Col>
-          <Col span="12">作业描述 : 单词统计测试</Col>
+          <Col span="12">作业类型 : {{ job.type }}</Col>
+          <Col span="12">作业描述 : {{ job.description }}</Col>
         </Row>
         <Row :gutter="10">
-          <Col span="12">创建时间 : 2020-01-15 19:01:05</Col>
-          <Col span="12">更新时间 : 2020-01-15 19:01:05</Col>
+          <Col span="12">创建时间 : {{ job.createTime }}</Col>
+          <Col span="12">更新时间 : {{ job.updateTime }}</Col>
         </Row>
         <Row :gutter="10">
-          <Col span="12">启动时间 : 2020-01-15 19:01:05</Col>
-          <Col span="12">结束时间 : 2020-01-15 19:01:05</Col>
+          <Col span="12">启动时间 : {{ job.lastStartTime }}</Col>
+          <Col span="12">结束时间 : {{ job.lastStopTime }}</Col>
         </Row>
         <Divider>作业配置</Divider>
         <Row :gutter="10">
-          <Col span="12">客户端版本 : 1.10</Col>
-          <Col span="12">执行文件 : wordcount.jar</Col>
+          <Col span="12">客户端版本 : {{ job.clientVersion }}</Col>
+          <Col span="12">执行文件 : {{ job.config.execFile }}</Col>
         </Row>
         <Row :gutter="10">
-          <Col span="12">MainClass : org.apache.flink.examples.WordCount</Col>
-          <Col span="12">程序参数 : --input xxx.txt</Col>
+          <Col span="12">MainClass : {{ job.config.mainClass }}</Col>
+          <Col span="12">程序参数 : {{ job.config.params }}</Col>
         </Row>
         <!--<Divider>运行参数</Divider>-->
       </TabPane>
@@ -37,7 +37,7 @@
           <Table stripe ref="selection" :columns="jobInstanceListColumns" :data="jobInstanceList">
             <template slot="operator">
               <div>
-                <Button type="info" size="small" @click="clickDetail">
+                <Button type="info" size="small">
                   详情
                 </Button>
               </div>
@@ -45,7 +45,7 @@
           </Table>
         </div>
         <!-- Job List Tools -->
-        <div style="margin-top: 10px; padding: 5px; background: #f8f8f9">
+        <!--<div style="margin-top: 10px; padding: 5px; background: #f8f8f9">
           <Row :gutter="10">
             <Col span="8">
               <Button type="error" size="small" style="margin-left: 10px;" @click="clickDelete">删除</Button>
@@ -54,7 +54,7 @@
               <Page :total="100" show-total show-sizer show-elevator size="small" />
             </Col>
           </Row>
-        </div>
+        </div>-->
       </TabPane>
       <TabPane label="运行参数" name="runtime" disabled>
         <!-- ... -->
@@ -72,25 +72,15 @@
 
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
+import jobApi from "@/api/jobApi";
+import { JobModel } from "@/model/jobModel";
 
 @Component
 export default class JobDetailCustom extends Vue {
-  job: any = {
-    name: "",
-    type: "",
-    description: "",
-    client_version: "",
-    config: {
-      app: {
-        exec_file: "",
-        main_class: "",
-        params: ""
-      },
-      runtime: {
-        // ...
-      }
-    }
+  rt: object = {
+    jobId: ""
   };
+  job: JobModel = {};
   // Job Instance List
   jobInstanceListColumns: object[] = [
     {
@@ -182,7 +172,31 @@ export default class JobDetailCustom extends Vue {
     this.$Message.success("删除");
   }
   clickEdit() {
-    this.$Message.success("编辑");
+    this.$router.push({
+      path: "/job/edit",
+      query: {
+        id: this.rt.jobId
+      }
+    });
+  }
+  // get
+  getJob() {
+    jobApi.queryJob({ jobId: this.rt.jobId }).then((res: any) => {
+      this.job = res;
+      if (!res.config) {
+        this.job.config = {}
+      }
+    });
+  }
+
+  parseRouter() {
+    let id = this.$route.query.id;
+    this.rt.jobId = id;
+  }
+
+  mounted() {
+    this.parseRouter();
+    this.getJob();
   }
 }
 </script>
