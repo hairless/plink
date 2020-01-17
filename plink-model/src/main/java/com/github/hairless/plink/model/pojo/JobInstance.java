@@ -1,7 +1,6 @@
 package com.github.hairless.plink.model.pojo;
 
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,9 +25,9 @@ public class JobInstance extends BaseModel {
     private Long jobId;
     /**
      * 实例启动时的镜像作业配置
-     * {@link Job#config}
+     * {@link Job#configJson}
      */
-    private String config;
+    private String configJson;
     /**
      * 状态
      * {@link JobInstanceStatusEnum}

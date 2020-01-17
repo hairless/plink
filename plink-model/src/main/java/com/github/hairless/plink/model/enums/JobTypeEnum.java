@@ -3,7 +3,7 @@ package com.github.hairless.plink.model.enums;
 import lombok.Getter;
 
 /**
- * 任务类型枚举
+ * 作业类型枚举
  *
  * @author silence
  * @date 2020/01/13
@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 public enum JobTypeEnum {
-    CUSTOM(1,"自定义任务");
+    CUSTOM(1, "自定义作业");
 
     private Integer value;
     private String desc;
