@@ -31,7 +31,7 @@
         <Form :model="jobEdit" :label-width="100" style="width:80%;">
           <FormItem label="客户端版本 :">
             <Select
-              v-model="jobEdit.client_version"
+              v-model="jobEdit.clientVersion"
               placeholder="请选择客户端版本"
             >
               <Option value="1.9.0">1.9.0</Option>
@@ -89,7 +89,7 @@ export default class JobEditCustom extends Vue {
   hintJobTypeList: object[] = [{ value: 1, label: "自定义 / Jar" }];
   hintExecFileList: object[] = [];
 
-  rt: object = {
+  rt: any = {
     jobId: ""
   };
   jobEdit: JobModel = {
@@ -128,7 +128,8 @@ export default class JobEditCustom extends Vue {
       this.jobEdit.name = res.name;
       this.jobEdit.type = res.type;
       this.jobEdit.description = res.description;
-      console.log("edit" + JSON.stringify(res));
+      this.jobEdit.clientVersion = res.clientVersion;
+      this.jobEdit.config = res.config;
     });
   }
 
@@ -142,7 +143,6 @@ export default class JobEditCustom extends Vue {
       this.hintExecFileList = t.map(x => {
         return { value: x.toString(), label: x.toString() };
       });
-      console.log("jar" + JSON.stringify(t));
     });
   }
 
