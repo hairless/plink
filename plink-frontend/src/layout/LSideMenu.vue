@@ -1,5 +1,5 @@
 <template>
-  <Menu active-name="2-1" theme="light" width="auto" :open-names="['2']">
+  <Menu active-name="1-2" theme="light" width="auto" :open-names="['1']">
     <MenuItem name="1">
       <Icon type="ios-navigate"></Icon>
       平台概览
