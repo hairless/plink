@@ -1,5 +1,7 @@
 package com.github.hairless.plink.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.arronlong.httpclientutil.exception.HttpProcessException;
 import com.github.hairless.plink.model.req.JobReq;
 import com.github.hairless.plink.model.resp.JobResp;
 import com.github.hairless.plink.model.resp.Result;
@@ -29,4 +31,7 @@ public interface JobService {
     Result uploadJar(Long jobId, MultipartFile file);
 
     Result<List<String>> jarList(Long jobId);
+
+    Result startJob(JSONObject jsonOBj) throws HttpProcessException;
+
 }

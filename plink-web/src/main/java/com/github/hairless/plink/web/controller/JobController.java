@@ -1,11 +1,14 @@
 package com.github.hairless.plink.web.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.arronlong.httpclientutil.exception.HttpProcessException;
 import com.github.hairless.plink.model.req.JobReq;
 import com.github.hairless.plink.model.resp.JobResp;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.service.JobService;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
+import netscape.javascript.JSObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 /**
  * job
@@ -31,7 +35,7 @@ public class JobController {
     /**
      * 添加作业
      *
-     * @param job
+     * @param jobReq
      * @return
      */
     @RequestMapping("/addJob")
@@ -53,7 +57,7 @@ public class JobController {
     /**
      * 删除作业
      *
-     * @param idList
+     * @param jobId
      * @return
      */
     @RequestMapping(value = "/deleteJob/{jobId}", method = RequestMethod.POST)
@@ -64,7 +68,7 @@ public class JobController {
     /**
      * 编辑作业
      *
-     * @param job
+     * @param jobReq
      * @return
      */
     @RequestMapping("/updateJob")
@@ -108,6 +112,19 @@ public class JobController {
     public Result jarList(@PathVariable(value = "jobId") @NotNull Long jobId) {
         return jobService.jarList(jobId);
     }
+
+    /**
+     *
+     *
+     * @param jsonObject
+     * @return
+     */
+    @RequestMapping(value = "/startJob/standaloneMode",method = RequestMethod.POST)
+    public Result startJobStandalone(@RequestBody JSONObject jsonObject) throws HttpProcessException {
+
+        return jobService.startJob(jsonObject);
+    }
+
 
 
 }

@@ -1,6 +1,9 @@
 package com.github.hairless.plink.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.arronlong.httpclientutil.exception.HttpProcessException;
+import com.github.hairless.plink.common.HttpUtil;
 import com.github.hairless.plink.common.PageInfoUtil;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.pojo.Job;
@@ -13,6 +16,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +37,9 @@ import java.util.List;
 public class JobServiceImpl implements JobService {
     @Autowired
     private JobMapper jobMapper;
+    //注入系统环境，拿到yml文件
+    @Autowired
+    private Environment env;
 
     @Override
     public Result<JobResp> addJob(JobReq jobReq) {
@@ -168,6 +175,37 @@ public class JobServiceImpl implements JobService {
             log.warn("get jar list fail! jobId={}", jobId, e);
             return new Result<>(ResultCode.EXCEPTION, e);
         }
+    }
+
+
+
+    @Override
+    public Result startJob(JSONObject jsonObject) {
+
+        String fLinkIp = env.getProperty("flink.restful.ip");
+        String fLinkPort = env.getProperty("flink.restful.port");
+        //本地jar包存放路径
+        String parentDir = System.getProperty("user.dir");
+        String jarPath = parentDir + "/uploadJars/"+jsonObject.getString("jarName");
+
+        //向flink平台提交jar
+        String resJson = null;
+        try {
+            resJson = HttpUtil.sendFlinkJar("http://" + fLinkIp + ":" + fLinkPort, jarPath);
+        } catch (HttpProcessException e) {
+            return new Result<>(ResultCode.EXCEPTION, e);
+        }
+        JSONObject flinkRestRes = JSONObject.parseObject(resJson);
+        if ( !flinkRestRes.getString("status").equals("success")) {
+            return new Result(ResultCode.EXCEPTION,flinkRestRes.getString("status"));
+        }
+        String filename = flinkRestRes.getString("filename");
+        String filenames [] = filename.split("/");
+        String id = filenames[filenames.length-1];
+
+        System.out.println(id);
+
+        return null;
     }
 
 }
