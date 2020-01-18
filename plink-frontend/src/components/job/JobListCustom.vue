@@ -194,7 +194,7 @@ export default class JobList extends Vue {
   ];
   jobList: JobModel[] = [];
   // Job Query
-  page: object = {
+  page: any = {
     total: 100,
     pageNum: 1,
     pageSize: 10
@@ -259,16 +259,16 @@ export default class JobList extends Vue {
     });
   }
   clickStart() {
-    this.$Notice.success("启动作业成功");
+    this.$Message.success("启动作业成功");
   }
   clickRestart() {
-    this.$Notice.success("重启作业成功");
+    this.$Message.success("重启作业成功");
   }
   clickStop() {
-    this.$Notice.success("停止作业成功");
+    this.$Message.success("停止作业成功");
   }
   clickDelete() {
-    this.$Notice.success("删除作业成功");
+    this.$Message.success("删除作业成功");
   }
 
   getJobList() {

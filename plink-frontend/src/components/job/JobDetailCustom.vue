@@ -77,10 +77,12 @@ import { JobModel } from "@/model/jobModel";
 
 @Component
 export default class JobDetailCustom extends Vue {
-  rt: object = {
+  rt: any = {
     jobId: ""
   };
-  job: JobModel = {};
+  job: JobModel = {
+    config: {}
+  };
   // Job Instance List
   jobInstanceListColumns: object[] = [
     {
@@ -183,9 +185,6 @@ export default class JobDetailCustom extends Vue {
   getJob() {
     jobApi.queryJob({ jobId: this.rt.jobId }).then((res: any) => {
       this.job = res;
-      if (!res.config) {
-        this.job.config = {}
-      }
     });
   }
 
