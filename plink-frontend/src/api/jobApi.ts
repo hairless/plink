@@ -9,7 +9,6 @@ const JAR_LIST_URL = "/mng/job/{jobId}/jarList";
 const UPLOAD_JAR__URL = "/mng/job/{jobId}/uploadJar";
 
 function queryJob(params: any) {
-  console.log(params);
   return get(QUERY_JOB_URL + params.jobId);
 }
 
