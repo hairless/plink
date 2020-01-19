@@ -1,14 +1,12 @@
 package com.github.hairless.plink.web.controller;
 
-import com.alibaba.fastjson.JSONObject;
-import com.arronlong.httpclientutil.exception.HttpProcessException;
 import com.github.hairless.plink.model.req.JobReq;
 import com.github.hairless.plink.model.resp.JobResp;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.service.JobService;
 import com.github.pagehelper.PageInfo;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import netscape.javascript.JSObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Map;
 
 /**
  * job
@@ -35,8 +32,7 @@ public class JobController {
     /**
      * 添加作业
      *
-     * @param jobReq
-     * @return
+     * @param jobReq 作业请求对象
      */
     @RequestMapping("/addJob")
     public Result<JobResp> addJob(@RequestBody JobReq jobReq) {
@@ -46,8 +42,7 @@ public class JobController {
     /**
      * 批量删除作业
      *
-     * @param idList
-     * @return
+     * @param idList 作业id列表
      */
     @RequestMapping(value = "/deleteJobs", method = RequestMethod.POST)
     public Result deleteJobs(@RequestBody List<Long> idList) {
@@ -57,8 +52,7 @@ public class JobController {
     /**
      * 删除作业
      *
-     * @param jobId
-     * @return
+     * @param jobId 作业id
      */
     @RequestMapping(value = "/deleteJob/{jobId}", method = RequestMethod.POST)
     public Result deleteJob(@PathVariable(value = "jobId") @NotNull Long jobId) {
@@ -68,8 +62,7 @@ public class JobController {
     /**
      * 编辑作业
      *
-     * @param jobReq
-     * @return
+     * @param jobReq 作业请求对象
      */
     @RequestMapping("/updateJob")
     public Result updateJob(@RequestBody @Valid JobReq jobReq) {
@@ -79,8 +72,7 @@ public class JobController {
     /**
      * 查询单个作业
      *
-     * @param jobId
-     * @return
+     * @param jobId 作业id
      */
     @RequestMapping("/queryJob/{jobId}")
     public Result<JobResp> queryJob(@PathVariable(value = "jobId") @NotNull Long jobId) {
@@ -89,8 +81,6 @@ public class JobController {
 
     /**
      * 查询作业列表
-     *
-     * @return
      */
     @RequestMapping("/queryJobs")
     public Result<PageInfo<JobResp>> queryJobs(@RequestBody(required = false) JobReq jobReq) {
@@ -114,17 +104,34 @@ public class JobController {
     }
 
     /**
+     * 作业启动接口
      *
-     *
-     * @param jsonObject
-     * @return
+     * @param jobId 作业id
      */
-    @RequestMapping(value = "/startJob/standaloneMode",method = RequestMethod.POST)
-    public Result startJobStandalone(@RequestBody JSONObject jsonObject) throws HttpProcessException {
-
-        return jobService.startJob(jsonObject);
+    @RequestMapping(value = "/startJob/{jobId}", method = RequestMethod.POST)
+    public Result startJob(@RequestBody @NonNull Long jobId) {
+        return jobService.startJob(jobId);
     }
 
+    /**
+     * 作业停止接口
+     *
+     * @param jobId 作业id
+     */
+    @RequestMapping(value = "/stopJob/{jobId}", method = RequestMethod.POST)
+    public Result stopJob(@RequestBody @NonNull Long jobId) {
+        return jobService.stopJob(jobId);
+    }
+
+    /**
+     * 作业重启接口
+     *
+     * @param jobId 作业id
+     */
+    @RequestMapping(value = "/reStartJob/{jobId}", method = RequestMethod.POST)
+    public Result reStartJob(@RequestBody @NonNull Long jobId) {
+        return jobService.reStartJob(jobId);
+    }
 
 
 }
