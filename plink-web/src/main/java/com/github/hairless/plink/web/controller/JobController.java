@@ -1,7 +1,7 @@
 package com.github.hairless.plink.web.controller;
 
-import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.req.JobReq;
+import com.github.hairless.plink.model.resp.JobResp;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.service.JobService;
 import com.github.pagehelper.PageInfo;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -34,8 +35,8 @@ public class JobController {
      * @return
      */
     @RequestMapping("/addJob")
-    public Result<Job> addJob(@RequestBody Job job) {
-        return jobService.addJob(job);
+    public Result<JobResp> addJob(@RequestBody JobReq jobReq) {
+        return jobService.addJob(jobReq);
     }
 
     /**
@@ -52,11 +53,11 @@ public class JobController {
     /**
      * 删除作业
      *
-     * @param jobId
+     * @param idList
      * @return
      */
     @RequestMapping(value = "/deleteJob/{jobId}", method = RequestMethod.POST)
-    public Result deleteJob(@PathVariable(value = "jobId")  @Valid Long jobId) {
+    public Result deleteJob(@PathVariable(value = "jobId") @NotNull Long jobId) {
         return jobService.deleteJob(jobId);
     }
 
@@ -67,8 +68,8 @@ public class JobController {
      * @return
      */
     @RequestMapping("/updateJob")
-    public Result updateJob(@RequestBody @Valid Job job) {
-        return jobService.updateJob(job);
+    public Result updateJob(@RequestBody @Valid JobReq jobReq) {
+        return jobService.updateJob(jobReq);
     }
 
     /**
@@ -78,7 +79,7 @@ public class JobController {
      * @return
      */
     @RequestMapping("/queryJob/{jobId}")
-    public Result<Job> queryJob(@PathVariable(value = "jobId") Long jobId) {
+    public Result<JobResp> queryJob(@PathVariable(value = "jobId") @NotNull Long jobId) {
         return jobService.queryJob(jobId);
     }
 
@@ -88,23 +89,23 @@ public class JobController {
      * @return
      */
     @RequestMapping("/queryJobs")
-    public Result<PageInfo<Job>> queryJobs(@RequestBody(required = false) JobReq jobReq) {
+    public Result<PageInfo<JobResp>> queryJobs(@RequestBody(required = false) JobReq jobReq) {
         return jobService.queryJobs(jobReq);
     }
 
     /**
-     * 任务上传jar
+     * 作业上传jar
      */
     @RequestMapping("{jobId}/uploadJar")
-    public Result uploadJar(@PathVariable(value = "jobId") Long jobId, @RequestParam("file") MultipartFile file) {
+    public Result uploadJar(@PathVariable(value = "jobId") @NotNull Long jobId, @RequestParam("file") MultipartFile file) {
         return jobService.uploadJar(jobId, file);
     }
 
     /**
-     * 任务获取jar列表
+     * 作业获取jar列表
      */
     @RequestMapping("{jobId}/jarList")
-    public Result jarList(@PathVariable(value = "jobId") Long jobId) {
+    public Result jarList(@PathVariable(value = "jobId") @NotNull Long jobId) {
         return jobService.jarList(jobId);
     }
 
