@@ -182,8 +182,8 @@ public class JobServiceImpl implements JobService {
     @Override
     public Result startJob(JSONObject jsonObject) {
 
-        String fLinkIp = env.getProperty("flink.restful.ip");
-        String fLinkPort = env.getProperty("flink.restful.port");
+        //flinkURL 例如：localhost:8081
+        String flinkURL = "http://"+env.getProperty("flink.restful.ip")+":"+env.getProperty("flink.restful.port");
         //本地jar包存放路径
         String parentDir = System.getProperty("user.dir");
         String jarPath = parentDir + "/uploadJars/"+jsonObject.getString("jarName");
@@ -191,21 +191,31 @@ public class JobServiceImpl implements JobService {
         //向flink平台提交jar
         String resJson = null;
         try {
-            resJson = HttpUtil.sendFlinkJar("http://" + fLinkIp + ":" + fLinkPort, jarPath);
+            resJson = HttpUtil.sendFlinkJar(flinkURL, jarPath);
         } catch (HttpProcessException e) {
             return new Result<>(ResultCode.EXCEPTION, e);
         }
-        JSONObject flinkRestRes = JSONObject.parseObject(resJson);
+        JSONObject flinkRestRes = JSON.parseObject(resJson);
         if ( !flinkRestRes.getString("status").equals("success")) {
             return new Result(ResultCode.EXCEPTION,flinkRestRes.getString("status"));
         }
         String filename = flinkRestRes.getString("filename");
         String filenames [] = filename.split("/");
+        //预留向mysql写表 id
         String id = filenames[filenames.length-1];
 
-        System.out.println(id);
+        String startHttpURL= flinkURL + "/v1/jars/"+id+"/run";
 
-        return null;
+        jsonObject.remove("jarName");
+        String senJobJsonRes = HttpUtil.sendPost(startHttpURL, jsonObject.toJSONString());
+
+        JSONObject jsonRes = JSON.parseObject(senJobJsonRes);
+        //预留向mysql写表 jobid
+        String jobid = (String) jsonRes.getOrDefault("jobid","FAIL");
+        if (jobid.equals("FAIL")){
+            return new Result(ResultCode.FAILURE,jobid);
+        }
+        return new Result(ResultCode.SUCCESS,jobid);
     }
 
 }
