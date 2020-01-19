@@ -11,21 +11,31 @@ import lombok.Getter;
  */
 @Getter
 public enum JobInstanceStatusEnum {
-    WAITING_START(0, "待启动"),
-    STARTING(1, "启动中"),
-    RUNNING(2, "运行中"),
-    START_FAILED(3, "启动失败"),
-    RUN_FAILED(4, "运行失败"),
-    STOPPED(5, "已停止"),
-    SUCCESS(6, "运行成功"),
-    UNKNOWN(-1, "未知");
+    WAITING_START(0, "待启动", false),
+    STARTING(1, "启动中", false),
+    RUNNING(2, "运行中", false),
+    START_FAILED(3, "启动失败", true),
+    RUN_FAILED(4, "运行失败", true),
+    STOPPED(5, "已停止", true),
+    SUCCESS(6, "运行成功", true);
 
     private Integer value;
     private String desc;
+    private boolean FinalState;
 
-    JobInstanceStatusEnum(Integer value, String desc) {
+    JobInstanceStatusEnum(Integer value, String desc, boolean finalState) {
         this.value = value;
         this.desc = desc;
+        FinalState = finalState;
     }
 
+    public static JobInstanceStatusEnum getEnum(Integer value) {
+        if (value == null)
+            return null;
+        for (JobInstanceStatusEnum jobInstanceStatusEnum : JobInstanceStatusEnum.values()) {
+            if (jobInstanceStatusEnum.getValue().equals(value))
+                return jobInstanceStatusEnum;
+        }
+        return null;
+    }
 }
