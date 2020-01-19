@@ -1,7 +1,7 @@
 package com.github.hairless.plink.model.resp;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.common.Transform;
 import com.github.hairless.plink.model.pojo.Job;
 import lombok.Getter;
@@ -19,15 +19,14 @@ import org.springframework.beans.BeanUtils;
 public class JobResp extends Job implements Transform<JobResp, Job> {
     private static final long serialVersionUID = 1L;
 
-    //TODO 属性确定后用FlinkConfig替代
-    private JSONObject config;
+    private FlinkConfig config;
 
     public JobResp transform(Job job) {
         BeanUtils.copyProperties(job, this);
         if (this.getConfigJson() != null) {
-            this.setConfig(JSON.parseObject(this.getConfigJson()));
+            this.setConfig(JSON.parseObject(this.getConfigJson(), FlinkConfig.class));
         } else {
-            this.setConfig(new JSONObject());
+            this.setConfig(new FlinkConfig());
         }
         return this;
     }

@@ -1,22 +1,22 @@
 package com.github.hairless.plink.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.arronlong.httpclientutil.exception.HttpProcessException;
-import com.github.hairless.plink.common.HttpUtil;
 import com.github.hairless.plink.common.PageInfoUtil;
+import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
+import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.pojo.Job;
+import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.model.req.JobReq;
 import com.github.hairless.plink.model.resp.JobResp;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.service.JobService;
+import com.github.hairless.plink.service.factory.FlinkClusterServiceFactory;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,9 +37,10 @@ import java.util.List;
 public class JobServiceImpl implements JobService {
     @Autowired
     private JobMapper jobMapper;
-    //注入系统环境，拿到yml文件
     @Autowired
-    private Environment env;
+    private JobInstanceMapper jobInstanceMapper;
+    @Autowired
+    private FlinkClusterServiceFactory flinkClusterServiceFactory;
 
     @Override
     public Result<JobResp> addJob(JobReq jobReq) {
@@ -177,45 +178,60 @@ public class JobServiceImpl implements JobService {
         }
     }
 
-
+    /**
+     * 由于作业启动可能会话费较长时间，所以采用异步启动的方式
+     * 后期做分布式拆分也比较方便，接口调用所在机器不一定是作业提交的机器
+     * 插入待启动实例记录，等待异步提交任务吊起
+     */
+    @Override
+    public Result startJob(Long jobId) {
+        Job job = jobMapper.selectByPrimaryKey(jobId);
+        if (job == null) {
+            return new Result(ResultCode.FAILURE, "jobId is not exist");
+        }
+        //TODO check job config
+        JobInstance jobInstance = new JobInstance();
+        jobInstance.setJobId(job.getId());
+        jobInstance.setConfigJson(job.getConfigJson());
+        jobInstance.setStatus(JobInstanceStatusEnum.WAITING_START.getValue());
+        int rowCnt = jobInstanceMapper.insertSelective(jobInstance);
+        if (rowCnt > 0) {
+            return new Result<>(ResultCode.SUCCESS);
+        } else {
+            return new Result<>(ResultCode.FAILURE, "insert job instance fail");
+        }
+    }
 
     @Override
-    public Result startJob(JSONObject jsonObject) {
-
-        //flinkURL 例如：localhost:8081
-        String flinkURL = "http://"+env.getProperty("flink.restful.ip")+":"+env.getProperty("flink.restful.port");
-        //本地jar包存放路径
-        String parentDir = System.getProperty("user.dir");
-        String jarPath = parentDir + "/uploadJars/"+jsonObject.getString("jarName");
-
-        //向flink平台提交jar
-        String resJson = null;
+    public Result stopJob(Long jobId) {
+        Job job = jobMapper.selectByPrimaryKey(jobId);
+        if (job == null) {
+            return new Result(ResultCode.FAILURE, "jobId is not exist");
+        }
         try {
-            resJson = HttpUtil.sendFlinkJar(flinkURL, jarPath);
-        } catch (HttpProcessException e) {
+            Boolean success = flinkClusterServiceFactory.getDefaultFlinkClusterService().cancelJob(new JobResp().transform(job));
+            if (success) {
+                return new Result<>(ResultCode.SUCCESS);
+            } else {
+                return new Result<>(ResultCode.FAILURE, "stop job fail");
+            }
+        } catch (Exception e) {
+            log.warn("stop job fail! jobId={}", jobId, e);
             return new Result<>(ResultCode.EXCEPTION, e);
         }
-        JSONObject flinkRestRes = JSON.parseObject(resJson);
-        if ( !flinkRestRes.getString("status").equals("success")) {
-            return new Result(ResultCode.EXCEPTION,flinkRestRes.getString("status"));
+    }
+
+    @Override
+    public Result reStartJob(Long jobId) {
+        Result stopResult = this.stopJob(jobId);
+        if (!stopResult.getSuccess()) {
+            return stopResult;
         }
-        String filename = flinkRestRes.getString("filename");
-        String filenames [] = filename.split("/");
-        //预留向mysql写表 id
-        String id = filenames[filenames.length-1];
-
-        String startHttpURL= flinkURL + "/v1/jars/"+id+"/run";
-
-        jsonObject.remove("jarName");
-        String senJobJsonRes = HttpUtil.sendPost(startHttpURL, jsonObject.toJSONString());
-
-        JSONObject jsonRes = JSON.parseObject(senJobJsonRes);
-        //预留向mysql写表 jobid
-        String jobid = (String) jsonRes.getOrDefault("jobid","FAIL");
-        if (jobid.equals("FAIL")){
-            return new Result(ResultCode.FAILURE,jobid);
+        Result startResult = this.startJob(jobId);
+        if (!startResult.getSuccess()) {
+            return startResult;
         }
-        return new Result(ResultCode.SUCCESS,jobid);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
 }

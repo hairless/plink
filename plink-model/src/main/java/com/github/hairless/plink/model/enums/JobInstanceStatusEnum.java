@@ -11,7 +11,7 @@ import lombok.Getter;
  */
 @Getter
 public enum JobInstanceStatusEnum {
-    NEW(0, "新建"),
+    WAITING_START(0, "待启动"),
     STARTING(1, "启动中"),
     RUNNING(2, "运行中"),
     START_FAILED(3, "启动失败"),
