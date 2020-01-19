@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.BeanUtils;
 
+import javax.validation.Valid;
+
 /**
  * @author: silence
  * @date: 2020/1/17
@@ -19,6 +21,7 @@ import org.springframework.beans.BeanUtils;
 public class JobResp extends Job implements Transform<JobResp, Job> {
     private static final long serialVersionUID = 1L;
 
+    @Valid
     private FlinkConfig config;
 
     public JobResp transform(Job job) {
