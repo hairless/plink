@@ -1,5 +1,6 @@
 package com.github.hairless.plink.web.handler;
 
+import com.github.hairless.plink.model.exception.ValidationException;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.model.resp.ResultCode;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +20,11 @@ import java.util.List;
 @Slf4j
 @RestControllerAdvice
 public class ControllerExceptionHandler {
+
+    @ExceptionHandler(ValidationException.class)
+    public Result handlerValidationException(ValidationException exception) {
+        return new Result(ResultCode.FAILURE, exception.getMessage());
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Result handlerNotValidException(MethodArgumentNotValidException exception) {

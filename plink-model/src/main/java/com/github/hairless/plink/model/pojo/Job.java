@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -22,6 +24,7 @@ public class Job extends BaseModel {
     /**
      * Flink作业名称，全局唯一
      */
+    @NotBlank(message = "job name must not be empty")
     private String name;
     /**
      * 作业描述
@@ -31,6 +34,7 @@ public class Job extends BaseModel {
      * 作业类型
      * {@link JobTypeEnum}
      */
+    @NotNull(message = "job type must not be null")
     private Integer type;
     /**
      * Flink 客户端版本
