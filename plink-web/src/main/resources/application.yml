@@ -32,3 +32,17 @@ mybatis:
   mapperLocations: classpath:mapper/*.xml
   type-aliases-package: com.github.hairless.plink.model
   configLocation: classpath:config/mybatis-config.xml
+
+
+#热部署组件
+devtools:
+  livereload:
+    enabled: true #是否支持livereload
+    port: 8666
+  restart:
+    enabled: true #是否支持热部署
+
+flink:
+  restful:
+    ip: localhost
+    port: 8081
