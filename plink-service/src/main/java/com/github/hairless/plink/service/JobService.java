@@ -32,8 +32,14 @@ public interface JobService {
 
     Result startJob(Long jobId);
 
+    Result startJobs(List<Long> idList);
+
     Result stopJob(Long jobId);
 
+    Result stopJobs(List<Long> idList);
+
     Result reStartJob(Long jobId);
+
+    Result reStartJobs(List<Long> idList);
 
 }
