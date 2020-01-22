@@ -108,7 +108,7 @@ public class JobController {
      *
      * @param jobId 作业id
      */
-    @RequestMapping(value = "/startJob/{jobId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/startJob/{jobId}")
     public Result startJob(@PathVariable(value = "jobId") @NonNull Long jobId) {
         return jobService.startJob(jobId);
     }
@@ -118,7 +118,7 @@ public class JobController {
      *
      * @param jobId 作业id
      */
-    @RequestMapping(value = "/stopJob/{jobId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/stopJob/{jobId}")
     public Result stopJob(@PathVariable(value = "jobId") @NonNull Long jobId) {
         return jobService.stopJob(jobId);
     }
@@ -128,7 +128,7 @@ public class JobController {
      *
      * @param jobId 作业id
      */
-    @RequestMapping(value = "/reStartJob/{jobId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/reStartJob/{jobId}")
     public Result reStartJob(@PathVariable(value = "jobId") @NonNull Long jobId) {
         return jobService.reStartJob(jobId);
     }
