@@ -236,7 +236,6 @@ export default class JobDetailCustom extends Vue {
         });
       })
       .catch(res => {
-        console.log(JSON.stringify(res));
         this.$Notice.warning({
           title: "删除作业失败",
           desc: res.msg
@@ -268,7 +267,6 @@ export default class JobDetailCustom extends Vue {
       .queryJobInstances({ jobId: this.rt.jobId })
       .then((res: any) => {
         this.jobInstanceList = res.list;
-        console.log(JSON.stringify(res));
       });
   }
 
