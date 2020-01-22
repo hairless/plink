@@ -1,5 +1,6 @@
-interface IJob {
+interface IJobInstance {
   id?: number;
+  jobId?: number;
   name?: string;
   description?: string;
   type?: number;
@@ -10,12 +11,12 @@ interface IJob {
     args?: string;
     parallelism?: number;
   };
-  lastStatus?: string;
-  lastAppId?: string;
-  lastStartTime?: string;
-  lastStopTime?: string;
+  status?: string;
+  appId?: string;
+  startTime?: string;
+  stopTime?: string;
   createTime?: string;
   updateTime?: string;
 }
 
-export { IJob };
+export { IJobInstance };

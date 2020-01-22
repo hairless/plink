@@ -1,5 +1,4 @@
 import axios from "axios";
-import { config } from "@vue/test-utils";
 
 // baseURL
 axios.defaults.baseURL = "/";
@@ -36,10 +35,10 @@ axios.interceptors.response.use(
         return Promise.resolve(response.data.data);
       } else if (response.data.code === resultCode.failure) {
         // failure
-        return Promise.reject(response);
+        return Promise.reject(response.data);
       } else if (response.data.code === resultCode.exception) {
         // exception
-        return Promise.reject(response);
+        return Promise.reject(response.data);
       } else {
         // else
         return Promise.reject(response);

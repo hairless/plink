@@ -10,6 +10,7 @@
             placeholder=""
             style="width: 80px"
             size="small"
+            clearable
           />
           <span> 名称 : </span>
           <Input
@@ -17,6 +18,7 @@
             placeholder=""
             style="width: 200px"
             size="small"
+            clearable
           />
         </Col>
         <Col span="4" align="right">
@@ -33,10 +35,21 @@
     </div>
     <!-- Job List -->
     <div>
-      <Table stripe ref="selection" :columns="jobListColumns" :data="jobList">
+      <Table
+        stripe
+        ref="selection"
+        :columns="jobListColumns"
+        :data="jobList"
+        @on-select-all-cancel="handleSelectAllCancel"
+        @on-select-all="handleSelectAll"
+        @on-select="handleSelect"
+        @on-select-cancel="handleSelectCancel"
+      >
         <template slot-scope="{ row }" slot="operator">
           <div>
-            <Button type="info" size="small" @click="clickDetail(row)">详情</Button>
+            <Button type="info" size="small" @click="clickDetail(row)"
+              >详情</Button
+            >
             <Button
               type="info"
               size="small"
@@ -52,34 +65,43 @@
     <div style="margin-top: 10px; padding: 5px; background: #f8f8f9">
       <Row :gutter="10">
         <Col span="8">
-          <Button type="success" size="small" @click="clickStart">启动</Button>
+          <Button
+            type="success"
+            size="small"
+            :disabled="multiSelectJobIds.length === 0"
+            @click="clickStartJobs"
+            >启动</Button
+          >
           <Button
             type="warning"
             size="small"
             style="margin-left: 10px;"
-            @click="clickRestart"
+            :disabled="multiSelectJobIds.length === 0"
+            @click="clickRestartJobs"
             >重启</Button
           >
           <Button
             type="error"
             size="small"
             style="margin-left: 10px;"
-            @click="clickStop"
+            :disabled="multiSelectJobIds.length === 0"
+            @click="clickStopJobs"
             >停止</Button
           >
           <Button
             type="error"
             size="small"
             style="margin-left: 10px;"
-            @click="clickDelete"
+            :disabled="multiSelectJobIds.length === 0"
+            @click="clickDeleteJobs"
             >删除</Button
           >
         </Col>
         <Col span="16" align="right">
           <Page
-            :total="page.total"
-            :current="page.pageNum"
-            :page-size="page.pageSize"
+            :total="jobQueryCondition.total"
+            :current="jobQueryCondition.pageNum"
+            :page-size="jobQueryCondition.pageSize"
             :page-size-opts="[5, 10, 20, 50, 100]"
             @on-change="pageChange"
             @on-page-size-change="pageSizeChange"
@@ -107,7 +129,12 @@
           </FormItem>
           <FormItem label="作业类型 : ">
             <Select v-model="jobCreateItems.type">
-              <Option v-for="item in hintJobTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
+              <Option
+                v-for="item in hintJobTypeList"
+                :value="item.value"
+                :key="item.value"
+                >{{ item.label }}</Option
+              >
             </Select>
           </FormItem>
           <FormItem label="作业描述 :">
@@ -127,14 +154,12 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import jobApi from "@/api/jobApi";
-import { JobModel } from "@/model/jobModel";
+import { IJob } from "@/model/jobModel";
 
 @Component
 export default class JobList extends Vue {
   // hint
-  hintJobTypeList: object[] = [
-    { value : 1, label : "自定义 / Jar"}
-  ];
+  hintJobTypeList: object[] = [{ value: 1, label: "自定义 / Jar" }];
   // Job Props
   jobListColumns: object[] = [
     {
@@ -171,12 +196,12 @@ export default class JobList extends Vue {
     },
     {
       title: "开始时间",
-      key: "start_time",
+      key: "startTime",
       align: "center"
     },
     {
       title: "结束时间",
-      key: "stop_time",
+      key: "stopTime",
       align: "center"
     },
     {
@@ -192,31 +217,29 @@ export default class JobList extends Vue {
       width: 140
     }
   ];
-  jobList: JobModel[] = [];
+  jobList: IJob[] = [];
   // Job Query
-  page: any = {
+  jobQueryCondition: any = {
+    id: "",
+    name: "",
     total: 100,
     pageNum: 1,
     pageSize: 10
-  };
-  jobQueryCondition: object = {
-    id: "",
-    name: ""
   };
   clickQuery() {
     this.getJobList();
   }
   pageChange(num: number) {
-    this.page.pageNum = num;
+    this.jobQueryCondition.pageNum = num;
     this.getJobList();
   }
   pageSizeChange(size: number) {
-    this.page.pageSize = size;
+    this.jobQueryCondition.pageSize = size;
     this.getJobList();
   }
   // Job Create
   jobCreateModal: boolean = false;
-  jobCreateItems: JobModel = {
+  jobCreateItems: IJob = {
     name: "name",
     type: 1,
     description: "desc"
@@ -244,7 +267,7 @@ export default class JobList extends Vue {
   // Job Click Actions
   clickDetail(row: any) {
     this.$router.push({
-      path: "/job/detail",
+      path: "/page/job/detail",
       query: {
         id: row.id
       }
@@ -252,30 +275,90 @@ export default class JobList extends Vue {
   }
   clickEdit(row: any) {
     this.$router.push({
-      path: "/job/edit",
+      path: "/page/job/edit",
       query: {
         id: row.id
       }
     });
   }
-  clickStart() {
-    this.$Message.success("启动作业成功");
+  // Multi Select
+  multiSelectJobIds: any[] = [];
+  handleSelectAllCancel(selection: any[]) {
+    this.multiSelectJobIds = [];
   }
-  clickRestart() {
-    this.$Message.success("重启作业成功");
+  handleSelectAll(selection: any[]) {
+    this.multiSelectJobIds = selection.map(row => {
+      return row.id;
+    });
   }
-  clickStop() {
-    this.$Message.success("停止作业成功");
+  handleSelect(selection: any[], row: any) {
+    this.multiSelectJobIds.push(row.id);
   }
-  clickDelete() {
-    this.$Message.success("删除作业成功");
+  handleSelectCancel(selection: any[], row: any) {
+    this.multiSelectJobIds.splice(this.multiSelectJobIds.indexOf(row.id), 1);
+  }
+  clickStartJobs() {
+    jobApi
+      .startJobs({ idList: this.multiSelectJobIds })
+      .then(res => {
+        this.$Notice.success({ title: "启动作业成功" });
+      })
+      .catch(res => {
+        console.log(JSON.stringify(res));
+        this.$Notice.error({ title: "启动作业失败", desc: res.msg });
+      });
+  }
+  clickRestartJobs() {
+    jobApi
+      .restartJobs({ idList: this.multiSelectJobIds })
+      .then(res => {
+        this.$Notice.success({ title: "重启作业成功" });
+      })
+      .catch(res => {
+        this.$Notice.error({ title: "重启作业失败", desc: res.msg });
+      });
+  }
+  clickStopJobs() {
+    jobApi
+      .stopJobs({ idList: this.multiSelectJobIds })
+      .then(res => {
+        this.$Notice.success({ title: "停止作业成功" });
+      })
+      .catch(res => {
+        this.$Notice.error({ title: "停止作业失败", desc: res.msg });
+      });
+  }
+  clickDeleteJobs() {
+    jobApi
+      .deleteJobs({ idList: this.multiSelectJobIds })
+      .then(res => {
+        this.getJobList();
+        this.handleSelectAllCancel(this.multiSelectJobIds);
+        this.$Notice.success({ title: "删除作业成功" });
+      })
+      .catch(res => {
+        this.$Notice.error({ title: "删除作业失败", desc: res.msg });
+      });
   }
 
   getJobList() {
-    jobApi.queryJobs(this.page).then((res: any) => {
-      this.jobList = res.list;
-      this.page.total = res.total;
-    });
+    jobApi
+      .queryJobs({
+        id: this.jobQueryCondition.id,
+        name:
+          this.jobQueryCondition.name === ""
+            ? null
+            : this.jobQueryCondition.name,
+        pageNum: this.jobQueryCondition.pageNum,
+        pageSize: this.jobQueryCondition.pageSize
+      })
+      .then((res: any) => {
+        this.jobList = res.list;
+        this.jobQueryCondition.total = res.total;
+      })
+      .catch(err => {
+        this.$Notice.error({ title: err.msg });
+      });
   }
 
   mounted() {
