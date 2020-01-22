@@ -114,6 +114,16 @@ public class JobController {
     }
 
     /**
+     * 作业批量启动接口
+     *
+     * @param idList 作业id列表
+     */
+    @RequestMapping(value = "/startJobs")
+    public Result startJobs(@RequestBody @NonNull List<Long> idList) {
+        return jobService.startJobs(idList);
+    }
+
+    /**
      * 作业停止接口
      *
      * @param jobId 作业id
@@ -124,6 +134,16 @@ public class JobController {
     }
 
     /**
+     * 作业批量停止接口
+     *
+     * @param idList 作业id列表
+     */
+    @RequestMapping(value = "/stopJobs")
+    public Result stopJobs(@RequestBody @NotNull List<Long> idList) {
+        return jobService.stopJobs(idList);
+    }
+
+    /**
      * 作业重启接口
      *
      * @param jobId 作业id
@@ -131,6 +151,16 @@ public class JobController {
     @RequestMapping(value = "/reStartJob/{jobId}")
     public Result reStartJob(@PathVariable(value = "jobId") @NonNull Long jobId) {
         return jobService.reStartJob(jobId);
+    }
+
+    /**
+     * 作业批量重启接口
+     *
+     * @param idList 作业id列表
+     */
+    @RequestMapping(value = "/reStartJobs")
+    public Result reStartJob(@RequestBody @NonNull List<Long> idList) {
+        return jobService.reStartJobs(idList);
     }
 
 
