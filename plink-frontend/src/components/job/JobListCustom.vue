@@ -304,7 +304,6 @@ export default class JobList extends Vue {
         this.$Notice.success({ title: "启动作业成功" });
       })
       .catch(res => {
-        console.log(JSON.stringify(res));
         this.$Notice.error({ title: "启动作业失败", desc: res.msg });
       });
   }
