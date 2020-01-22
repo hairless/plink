@@ -2,10 +2,10 @@ export default {
   routes: [
     {
       path: "/",
-      redirect: "/job/list"
+      redirect: "/page/job/list"
     },
     {
-      path: "/",
+      path: "/page",
       component: () => import("@/layout/Home.vue"),
       meta: { title: "LayoutHome" },
       children: [
@@ -45,6 +45,13 @@ export default {
               name: "JobDetail",
               component: () => import("@/pages/job/JobDetail.vue"),
               meta: { title: "作业详情", permission: true }
+            },
+            // Instance
+            {
+              path: "instanceList",
+              name: "JobInstanceList",
+              component: () => import("@/pages/job/JobInstanceList.vue"),
+              meta: { title: "实例列表", permission: true }
             }
           ]
         }
