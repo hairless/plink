@@ -38,7 +38,7 @@
             </Select>
           </FormItem>
           <FormItem label="执行文件 : ">
-            <Select v-model="jobEdit.config.execFile" placeholder="可上传文件">
+            <Select v-model="jobEdit.config.jarName" placeholder="可上传文件">
               <Option
                 v-for="item in hintExecFileList"
                 :value="item.value"
@@ -54,12 +54,16 @@
             <Input v-model="jobEdit.config.mainClass" placeholder="" />
           </FormItem>
           <FormItem label="程序参数 :">
-            <Input v-model="jobEdit.config.params" type="textarea" :rows="4" />
+            <Input v-model="jobEdit.config.args" type="textarea" :rows="4" />
           </FormItem>
         </Form>
       </TabPane>
-      <TabPane label="运行参数" name="runtime" disabled>
-        <!-- ... -->
+      <TabPane label="运行参数" name="runtime">
+        <Form :model="jobEdit" :label-width="100" style="width:80%;">
+          <FormItem label="作业并行度 :">
+            <Slider v-model="jobEdit.config.parallelism" show-input></Slider>
+          </FormItem>
+        </Form>
       </TabPane>
       <div
         slot="extra"
@@ -81,7 +85,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import jobApi from "@/api/jobApi";
-import { JobModel } from "@/model/jobModel";
+import { IJob } from "@/model/jobModel";
 
 @Component
 export default class JobEditCustom extends Vue {
@@ -92,7 +96,7 @@ export default class JobEditCustom extends Vue {
   rt: any = {
     jobId: ""
   };
-  jobEdit: JobModel = {
+  jobEdit: IJob = {
     name: "",
     config: {}
   };
@@ -107,12 +111,15 @@ export default class JobEditCustom extends Vue {
         this.$Message.success("保存配置成功");
       })
       .catch(err => {
-        this.$Message.error("保存配置错误");
+        this.$Notice.error({
+          title: "保存配置失败",
+          desc: err.msg
+        });
       });
   }
 
   // upload
-  uploadJarActionUrl: string = "";
+  uploadJarActionUrl: string = jobApi.UPLOAD_JAR_URL;
 
   uploadOnSuccess(res: any, file: any) {
     this.getJobJarList();
@@ -123,14 +130,19 @@ export default class JobEditCustom extends Vue {
 
   // get
   getJob() {
-    jobApi.queryJob({ jobId: this.rt.jobId }).then((res: any) => {
-      this.jobEdit.id = res.id;
-      this.jobEdit.name = res.name;
-      this.jobEdit.type = res.type;
-      this.jobEdit.description = res.description;
-      this.jobEdit.clientVersion = res.clientVersion;
-      this.jobEdit.config = res.config;
-    });
+    jobApi
+      .queryJob({ jobId: this.rt.jobId })
+      .then((res: any) => {
+        this.jobEdit.id = res.id;
+        this.jobEdit.name = res.name;
+        this.jobEdit.type = res.type;
+        this.jobEdit.description = res.description;
+        this.jobEdit.clientVersion = res.clientVersion;
+        this.jobEdit.config = res.config;
+      })
+      .catch(res => {
+        this.$Notice.error({ title: res.msg });
+      });
   }
 
   getJobJarList() {
@@ -149,7 +161,10 @@ export default class JobEditCustom extends Vue {
   parseRouter() {
     let id = this.$route.query.id;
     this.rt.jobId = id;
-    this.uploadJarActionUrl = "/mng/job/" + id + "/uploadJar";
+    this.uploadJarActionUrl = this.uploadJarActionUrl.replace(
+      "{jobId}",
+      String(id)
+    );
   }
 
   mounted() {

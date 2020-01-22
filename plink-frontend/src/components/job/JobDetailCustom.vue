@@ -23,18 +23,33 @@
         <Divider>作业配置</Divider>
         <Row :gutter="10">
           <Col span="12">客户端版本 : {{ job.clientVersion }}</Col>
-          <Col span="12">执行文件 : {{ job.config.execFile }}</Col>
+          <Col span="12">执行文件 : {{ job.config.jarName }}</Col>
         </Row>
         <Row :gutter="10">
           <Col span="12">MainClass : {{ job.config.mainClass }}</Col>
-          <Col span="12">程序参数 : {{ job.config.params }}</Col>
+          <Col span="12">程序参数 : {{ job.config.args }}</Col>
         </Row>
-        <!--<Divider>运行参数</Divider>-->
+        <Divider>运行参数</Divider>
+        <Row :gutter="10">
+          <Col span="12">作业并行度 : {{ job.config.parallelism }}</Col>
+          <Col span="12"></Col>
+        </Row>
       </TabPane>
       <TabPane label="作业实例" name="job">
         <!-- Job List -->
         <div>
-          <Table stripe ref="selection" :columns="jobInstanceListColumns" :data="jobInstanceList">
+          <Table
+            stripe
+            ref="selection"
+            :columns="jobInstanceListColumns"
+            :data="jobInstanceList"
+          >
+            <template slot="name">
+              <span>{{ job.name }}</span>
+            </template>
+            <template slot="type">
+            <span>{{ job.type }}</span>
+          </template>
             <template slot="operator">
               <div>
                 <Button type="info" size="small">
@@ -56,43 +71,72 @@
           </Row>
         </div>-->
       </TabPane>
-      <TabPane label="运行参数" name="runtime" disabled>
+      <TabPane label="作业监控" name="monitor" disabled>
         <!-- ... -->
       </TabPane>
-      <div slot="extra" style="margin-bottom: 10px; padding: 5px; background: #f8f8f9">
-        <Button type="success" size="small" style="margin-right: 10px" @click="clickStart">启动</Button>
-        <Button type="warning" size="small" style="margin-right: 10px" @click="clickRestart">重启</Button>
-        <Button type="error" size="small" style="margin-right: 10px" @click="clickStop">停止</Button>
-        <Button type="error" size="small" style="margin-right: 10px" @click="clickDelete">删除</Button>
-        <Button type="info" size="small" style="margin-right: 10px" @click="clickEdit">编辑</Button>
+      <div
+        slot="extra"
+        style="margin-bottom: 10px; padding: 5px; background: #f8f8f9"
+      >
+        <Button
+          type="success"
+          size="small"
+          style="margin-right: 10px"
+          @click="clickStart"
+          >启动</Button
+        >
+        <Button
+          type="warning"
+          size="small"
+          style="margin-right: 10px"
+          @click="clickRestart"
+          >重启</Button
+        >
+        <Button
+          type="error"
+          size="small"
+          style="margin-right: 10px"
+          @click="clickStop"
+          >停止</Button
+        >
+        <Button
+          type="error"
+          size="small"
+          style="margin-right: 10px"
+          @click="clickDelete"
+          >删除</Button
+        >
+        <Button
+          type="info"
+          size="small"
+          style="margin-right: 10px"
+          @click="clickEdit"
+          >编辑</Button
+        >
       </div>
     </Tabs>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
-import jobApi from "@/api/jobApi";
-import { JobModel } from "@/model/jobModel";
+  import {Component, Vue} from "vue-property-decorator";
+  import jobApi from "@/api/jobApi";
+  import jobInstanceApi from "@/api/jobInstanceApi";
+  import {IJob} from "@/model/jobModel";
+  import {IJobInstance} from "@/model/jobInstanceModel";
 
-@Component
+  @Component
 export default class JobDetailCustom extends Vue {
   rt: any = {
     jobId: ""
   };
-  job: JobModel = {
+  job: IJob = {
     config: {}
   };
   // Job Instance List
   jobInstanceListColumns: object[] = [
     {
       type: "expand",
-      key: "id",
-      width: 50
-    },
-    {
-      type: "selection",
-      title: "ID",
       key: "id",
       width: 50
     },
@@ -105,31 +149,33 @@ export default class JobDetailCustom extends Vue {
     {
       title: "名称",
       key: "name",
-      align: "center"
+      align: "center",
+      slot: "name"
     },
     {
       title: "类型",
       key: "type",
-      align: "center"
+      align: "center",
+      slot: "type"
     },
     {
-      title: "描述",
-      key: "description",
+      title: "创建时间",
+      key: "createTime",
       align: "center"
     },
     {
       title: "开始时间",
-      key: "start_time",
+      key: "startTime",
       align: "center"
     },
     {
       title: "结束时间",
-      key: "stop_time",
+      key: "stopTime",
       align: "center"
     },
     {
       title: "状态",
-      key: "last_status",
+      key: "status",
       align: "center"
     },
     {
@@ -140,42 +186,66 @@ export default class JobDetailCustom extends Vue {
       width: 100
     }
   ];
-  jobInstanceList: object[] = [
-    {
-      id: 10001,
-      name: "作业1",
-      type: "自定义 / Jar",
-      description: "单词统计",
-      start_time: "2020-01-13 12:14:00",
-      stop_time: "2020-01-13 14:45:21",
-      last_status: "已停止",
-      _checked: true
-    },
-    {
-      id: 10002,
-      name: "作业2",
-      type: "自定义 / Jar",
-      description: "文件测试",
-      start_time: "2020-01-13 12:16:00",
-      stop_time: "2020-01-13 12:45:21",
-      last_status: "已停止"
-    }
-  ];
+  jobInstanceList: IJobInstance[] = [];
   clickStart() {
-    this.$Message.success("启动");
+    jobApi
+      .startJob({ jobId: this.rt.jobId })
+      .then(res => {
+        this.$Notice.success({ title: "启动作业成功" });
+      })
+      .catch(res => {
+        this.$Notice.warning({
+          title: "启动作业失败",
+          desc: res.msg
+        });
+      });
   }
   clickRestart() {
-    this.$Message.success("重启");
+    jobApi
+      .restartJob({ jobId: this.rt.jobId })
+      .then(res => {
+        this.$Notice.success({ title: "重启作业成功" });
+      })
+      .catch(res => {
+        this.$Notice.warning({
+          title: "重启作业失败",
+          desc: res.msg
+        });
+      });
   }
   clickStop() {
-    this.$Message.success("停止");
+    jobApi
+      .stopJob({ jobId: this.rt.jobId })
+      .then(res => {
+        this.$Notice.success({ title: "停止作业成功" });
+      })
+      .catch(res => {
+        this.$Notice.warning({
+          title: "停止作业失败",
+          desc: res.msg
+        });
+      });
   }
   clickDelete() {
-    this.$Message.success("删除");
+    jobApi
+      .deleteJob({ jobId: this.rt.jobId })
+      .then(res => {
+        this.$Notice.success({ title: "删除作业成功" });
+        this.$router.push({
+          path: "/page/job/list"
+        });
+      })
+      .catch(res => {
+        console.log(JSON.stringify(res));
+        this.$Notice.warning({
+          title: "删除作业失败",
+          desc: res.msg
+        });
+      });
   }
   clickEdit() {
     this.$router.push({
-      path: "/job/edit",
+      path: "/page/job/edit",
       query: {
         id: this.rt.jobId
       }
@@ -183,19 +253,33 @@ export default class JobDetailCustom extends Vue {
   }
   // get
   getJob() {
-    jobApi.queryJob({ jobId: this.rt.jobId }).then((res: any) => {
-      this.job = res;
-    });
+    jobApi
+      .queryJob({ jobId: this.rt.jobId })
+      .then((res: any) => {
+        this.job = res;
+      })
+      .catch(res => {
+        this.$Notice.error({ title: res.msg });
+      });
+  }
+
+  getJobInstanceList() {
+    jobInstanceApi
+      .queryJobInstances({ jobId: this.rt.jobId })
+      .then((res: any) => {
+        this.jobInstanceList = res.list;
+        console.log(JSON.stringify(res));
+      });
   }
 
   parseRouter() {
-    let id = this.$route.query.id;
-    this.rt.jobId = id;
+    this.rt.jobId = this.$route.query.id;
   }
 
   mounted() {
     this.parseRouter();
     this.getJob();
+    this.getJobInstanceList();
   }
 }
 </script>
