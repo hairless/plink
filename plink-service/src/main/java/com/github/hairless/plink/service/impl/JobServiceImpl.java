@@ -2,11 +2,9 @@ package com.github.hairless.plink.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.common.PageInfoUtil;
-import com.github.hairless.plink.common.ValidatorUtil;
 import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
-import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.model.req.JobReq;
@@ -20,7 +18,6 @@ import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -186,37 +183,23 @@ public class JobServiceImpl implements JobService {
      * 后期做分布式拆分也比较方便，接口调用所在机器不一定是作业提交的机器
      * 插入待启动实例记录，等待异步提交任务吊起
      */
-    @Transactional
     @Override
     public Result startJob(Long jobId) {
         Job job = jobMapper.selectByPrimaryKey(jobId);
         if (job == null) {
             return new Result(ResultCode.FAILURE, "jobId is not exist");
         }
-        JobResp jobResp = new JobResp().transform(job);
-        ValidatorUtil.validate(jobResp);
-        if (jobResp.getLastStatus() != null) {
-            JobInstanceStatusEnum jobInstanceStatusEnum = JobInstanceStatusEnum.getEnum(jobResp.getLastStatus());
-            if (jobInstanceStatusEnum != null && !jobInstanceStatusEnum.isFinalState()) {
-                return new Result(ResultCode.FAILURE, jobInstanceStatusEnum.getDesc() + " status can not start");
-            }
-        }
-        Job newJob = new Job();
-        newJob.setId(jobId);
-        newJob.setLastStatus(JobInstanceStatusEnum.WAITING_START.getValue());
-        int jobUpdateRowCnt = jobMapper.updateByPrimaryKeySelective(newJob);
-        if (jobUpdateRowCnt == 0) {
-            throw new PlinkRuntimeException("update job status fail");
-        }
+        //TODO check job config
         JobInstance jobInstance = new JobInstance();
         jobInstance.setJobId(job.getId());
         jobInstance.setConfigJson(job.getConfigJson());
         jobInstance.setStatus(JobInstanceStatusEnum.WAITING_START.getValue());
         int rowCnt = jobInstanceMapper.insertSelective(jobInstance);
-        if (rowCnt == 0) {
-            throw new PlinkRuntimeException("insert job instance fail");
+        if (rowCnt > 0) {
+            return new Result<>(ResultCode.SUCCESS);
+        } else {
+            return new Result<>(ResultCode.FAILURE, "insert job instance fail");
         }
-        return new Result<>(ResultCode.SUCCESS);
     }
 
     @Override

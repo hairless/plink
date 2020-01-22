@@ -1,4 +1,4 @@
-package com.github.hairless.plink.model.exception;
+package com.github.hairless.plink.service.exception;
 
 /**
  * @author: silence

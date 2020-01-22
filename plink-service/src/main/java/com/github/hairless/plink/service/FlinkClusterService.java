@@ -28,7 +28,7 @@ public interface FlinkClusterService {
      * 停止作业
      *
      * @param jobResp 作业信息
-     * @return 是否成功
+     * @return 状态枚举
      */
     Boolean cancelJob(JobResp jobResp) throws Exception;
 }

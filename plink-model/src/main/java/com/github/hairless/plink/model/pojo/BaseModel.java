@@ -22,8 +22,8 @@ public class BaseModel implements Serializable {
      * 主键自增id
      */
     @Id
-    @NotNull(message = "id must not be null")
-    @Min(value = 1, message = "id must be a positive integer")
+    @NotNull(message = "Id must be not null")
+    @Min(value = 1, message = "Id must be a positive integer")
     private Long id;
     /**
      * 记录创建时间
