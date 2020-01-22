@@ -182,11 +182,11 @@ public class JobServiceImpl implements JobService {
     }
 
     /**
-     * 由于作业启动可能会话费较长时间，所以采用异步启动的方式
+     * 由于作业启动可能会花费较长时间，所以采用异步启动的方式
      * 后期做分布式拆分也比较方便，接口调用所在机器不一定是作业提交的机器
      * 插入待启动实例记录，等待异步提交任务吊起
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Result startJob(Long jobId) {
         Job job = jobMapper.selectByPrimaryKey(jobId);
@@ -219,6 +219,22 @@ public class JobServiceImpl implements JobService {
         return new Result<>(ResultCode.SUCCESS);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Result startJobs(List<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return new Result(ResultCode.FAILURE, "idList is empty");
+        }
+        idList.forEach(id -> {
+            Result result = this.startJob(id);
+            if (!result.getSuccess()) {
+                throw new PlinkRuntimeException("start job fail jobId=" + id);
+            }
+        });
+        return new Result<>(ResultCode.SUCCESS);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Result stopJob(Long jobId) {
         Job job = jobMapper.selectByPrimaryKey(jobId);
@@ -228,6 +244,14 @@ public class JobServiceImpl implements JobService {
         try {
             Boolean success = flinkClusterServiceFactory.getDefaultFlinkClusterService().cancelJob(new JobResp().transform(job));
             if (success) {
+                Job newJob = new Job();
+                newJob.setId(jobId);
+                newJob.setLastStatus(JobInstanceStatusEnum.STOPPED.getValue());
+                int jobUpdateRowCnt = jobMapper.updateByPrimaryKeySelective(newJob);
+                if (jobUpdateRowCnt == 0) {
+                    throw new PlinkRuntimeException("update job status fail");
+                }
+                //todo update instance status
                 return new Result<>(ResultCode.SUCCESS);
             } else {
                 return new Result<>(ResultCode.FAILURE, "stop job fail");
@@ -238,6 +262,22 @@ public class JobServiceImpl implements JobService {
         }
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Result stopJobs(List<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return new Result(ResultCode.FAILURE, "idList is empty");
+        }
+        idList.forEach(id -> {
+            Result result = this.stopJob(id);
+            if (!result.getSuccess()) {
+                throw new PlinkRuntimeException("stop job fail jobId=" + id);
+            }
+        });
+        return new Result<>(ResultCode.SUCCESS);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Result reStartJob(Long jobId) {
         Result stopResult = this.stopJob(jobId);
@@ -251,4 +291,18 @@ public class JobServiceImpl implements JobService {
         return new Result<>(ResultCode.SUCCESS);
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public Result reStartJobs(List<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return new Result(ResultCode.FAILURE, "idList is empty");
+        }
+        idList.forEach(id -> {
+            Result result = this.reStartJob(id);
+            if (!result.getSuccess()) {
+                throw new PlinkRuntimeException("reStart job fail jobId=" + id);
+            }
+        });
+        return new Result<>(ResultCode.SUCCESS);
+    }
 }
