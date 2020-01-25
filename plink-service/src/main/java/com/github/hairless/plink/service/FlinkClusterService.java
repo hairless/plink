@@ -1,34 +1,44 @@
 package com.github.hairless.plink.service;
 
-import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
-import com.github.hairless.plink.model.resp.JobResp;
+import com.github.hairless.plink.model.common.FlinkConfig;
+import com.github.hairless.plink.model.resp.JobDetail;
+import com.github.hairless.plink.service.exception.FlinkClusterServiceException;
 
 /**
  * @author: silence
  * @date: 2020/1/19
+ * 封装 flink rest api，此处的内容应只和flink api本身相关
  */
 public interface FlinkClusterService {
+
     /**
      * 作业提交
-     *
-     * @param jobResp 作业信息
-     * @return appId
+     * 上传jar包 并启动作业
+     * @param filePath jar path
+     * @return jobId
      */
-    String submitJob(JobResp jobResp) throws Exception;
+    String uploadJar(String filePath) throws FlinkClusterServiceException;
+
+    /**
+     *
+     * @param jarId
+     * @param config flink 启动参数
+     * @return
+     * @throws FlinkClusterServiceException
+     */
+    String runJob(String jarId, FlinkConfig config)throws FlinkClusterServiceException;
 
     /**
      * 查询任务状态
-     *
-     * @param jobResp 作业信息
-     * @return 状态枚举
+     * @param  jobId 任务id 由#runJob返回
+     * @return 详细信息及状态
      */
-    JobInstanceStatusEnum jobStatus(JobResp jobResp) throws Exception;
+    JobDetail jobDetail(String jobId) throws FlinkClusterServiceException;
 
     /**
      * 停止作业
      *
-     * @param jobResp 作业信息
-     * @return 是否成功
+     * @param jobId 任务id 由#runJob返回
      */
-    Boolean cancelJob(JobResp jobResp) throws Exception;
+    void cancelJob(String jobId) throws FlinkClusterServiceException;
 }

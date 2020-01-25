@@ -43,6 +43,8 @@ devtools:
     enabled: true #是否支持热部署
 
 flink:
+  # 配置文件路径 如果关键字 classpath 则从classpath 读取。否则从给定路径读取
+  conf-file: classpath
   restful:
     ip: localhost
     port: 8081

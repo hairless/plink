@@ -242,20 +242,17 @@ public class JobServiceImpl implements JobService {
             return new Result(ResultCode.FAILURE, "jobId is not exist");
         }
         try {
-            Boolean success = flinkClusterServiceFactory.getDefaultFlinkClusterService().cancelJob(new JobResp().transform(job));
-            if (success) {
-                Job newJob = new Job();
-                newJob.setId(jobId);
-                newJob.setLastStatus(JobInstanceStatusEnum.STOPPED.getValue());
-                int jobUpdateRowCnt = jobMapper.updateByPrimaryKeySelective(newJob);
-                if (jobUpdateRowCnt == 0) {
-                    throw new PlinkRuntimeException("update job status fail");
-                }
-                //todo update instance status
-                return new Result<>(ResultCode.SUCCESS);
-            } else {
-                return new Result<>(ResultCode.FAILURE, "stop job fail");
+            // TODO change cancelJob param as string jobId
+            //flinkClusterServiceFactory.getDefaultFlinkClusterService().cancelJob(new JobResp().transform(job));
+            Job newJob = new Job();
+            newJob.setId(jobId);
+            newJob.setLastStatus(JobInstanceStatusEnum.STOPPED.getValue());
+            int jobUpdateRowCnt = jobMapper.updateByPrimaryKeySelective(newJob);
+            if (jobUpdateRowCnt == 0) {
+                throw new PlinkRuntimeException("update job status fail");
             }
+            //todo update instance status
+            return new Result<>(ResultCode.SUCCESS);
         } catch (Exception e) {
             log.warn("stop job fail! jobId={}", jobId, e);
             return new Result<>(ResultCode.EXCEPTION, e);

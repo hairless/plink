@@ -25,22 +25,27 @@ public class FlinkConfig implements Serializable {
     /**
      * 主类全路径
      */
-    @NotBlank(message = "mainClass must not be empty")
-    private String mainClass;
+    @NotBlank(message = "entryClass must not be empty")
+    private String entryClass;
     /**
      * main方法参数
      */
-    private String args;
+    private String programArgs;
+
+    private String[] programArgsList;
     /**
      * jobManager 内存
+     * 目前通过api 提交任务不支持这个参数
      */
     private String jobManagerMemory;
     /**
      * taskManager 内存
+     * 目前通过api 提交任务不支持这个参数
      */
     private String taskManagerMemory;
     /**
      * taskManager slot数量
+     * 目前通过api 提交任务不支持这个参数
      */
     private Integer taskManagerSlots;
     /**
@@ -51,4 +56,6 @@ public class FlinkConfig implements Serializable {
      * 其他flink配置
      */
     private List<String> configs;
+
+    private String savepointPath;
 }

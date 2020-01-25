@@ -9,9 +9,9 @@ spring:
   thymeleaf:
     prefix: "classpath:/static/"
   datasource:
-    url: jdbc:mysql://localhost:3306/plink?useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://39.105.175.66:31101/plink?useUnicode=true&characterEncoding=utf-8
     username: root
-    password: 123456
+    password: Plink1234567
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.github.hairless.plink.dao.conf.DataSource
     initialSize: 5
