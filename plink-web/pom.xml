@@ -17,6 +17,10 @@
             <groupId>com.github.hairless</groupId>
             <artifactId>plink-service</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.hairless</groupId>
+            <artifactId>plink-schedule</artifactId>
+        </dependency>
 
         <!--spring boot jars-->
         <dependency>
