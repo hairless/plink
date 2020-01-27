@@ -1,7 +1,7 @@
 package com.github.hairless.plink.service;
 
-import com.github.hairless.plink.model.req.JobReq;
-import com.github.hairless.plink.model.resp.JobResp;
+import com.github.hairless.plink.model.dto.JobDTO;
+import com.github.hairless.plink.model.req.PageReq;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,17 +14,17 @@ import java.util.List;
  */
 
 public interface JobService {
-    Result<JobResp> addJob(JobReq jobReq);
+    Result<JobDTO> addJob(JobDTO jobDTO);
 
     Result deleteJob(Long jobId);
 
     Result deleteJobs(List<Long> idList);
 
-    Result updateJob(JobReq jobReq);
+    Result updateJob(JobDTO jobDTO);
 
-    Result<JobResp> queryJob(Long jobId);
+    Result<JobDTO> queryJob(Long jobId);
 
-    Result<PageInfo<JobResp>> queryJobs(JobReq jobReq);
+    Result<PageInfo<JobDTO>> queryJobs(JobDTO jobDTO, PageReq pageReq);
 
     Result uploadJar(Long jobId, MultipartFile file);
 
