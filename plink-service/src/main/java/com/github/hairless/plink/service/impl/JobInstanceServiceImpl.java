@@ -59,6 +59,9 @@ public class JobInstanceServiceImpl implements JobInstanceService {
         if (jobInstanceRowCnt == 0) {
             throw new PlinkException("update job instance status fail");
         }
+        if (jobInstance.getJobId() == null) {
+            throw new PlinkException("update job instance status fail,jobId is null");
+        }
         Job job = new Job();
         job.setId(jobInstance.getJobId());
         job.setLastStatus(jobInstance.getStatus());
