@@ -45,6 +45,10 @@ public class Job extends BaseModel {
      */
     private String configJson;
     /**
+     * 最新实例ID
+     */
+    private Long lastInstanceId;
+    /**
      * 最新实例状态
      * {@link JobInstance#status}
      * {@link JobInstanceStatusEnum}

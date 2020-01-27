@@ -1,7 +1,7 @@
 package com.github.hairless.plink.service;
 
+import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
-import com.github.hairless.plink.model.resp.JobResp;
 
 /**
  * @author: silence
@@ -9,26 +9,26 @@ import com.github.hairless.plink.model.resp.JobResp;
  */
 public interface FlinkClusterService {
     /**
-     * 作业提交
+     * 作业实例提交flink job
      *
-     * @param jobResp 作业信息
+     * @param jobInstanceDTO 作业实例信息
      * @return appId
      */
-    String submitJob(JobResp jobResp) throws Exception;
+    String submitJob(JobInstanceDTO jobInstanceDTO) throws Exception;
 
     /**
-     * 查询任务状态
+     * 查询flink job的状态对应的作业实例状态
      *
-     * @param jobResp 作业信息
+     * @param jobInstanceDTO 作业实例信息
      * @return 状态枚举
      */
-    JobInstanceStatusEnum jobStatus(JobResp jobResp) throws Exception;
+    JobInstanceStatusEnum jobStatus(JobInstanceDTO jobInstanceDTO) throws Exception;
 
     /**
-     * 停止作业
+     * 停止作业实例对应的flink job
      *
-     * @param jobResp 作业信息
+     * @param jobInstanceDTO 作业实例信息
      * @return 是否成功
      */
-    Boolean cancelJob(JobResp jobResp) throws Exception;
+    Boolean cancelJob(JobInstanceDTO jobInstanceDTO) throws Exception;
 }
