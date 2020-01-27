@@ -1,12 +1,10 @@
 package com.github.hairless.plink.service.impl;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.github.hairless.plink.common.HttpUtil;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
-import com.github.hairless.plink.model.exception.PlinkException;
+import com.github.hairless.plink.rpc.FlinkRestRpcService;
 import com.github.hairless.plink.service.FlinkClusterService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,40 +13,39 @@ import org.springframework.stereotype.Component;
  */
 @Component("standaloneFlinkClusterService")
 public class StandaloneFlinkClusterService implements FlinkClusterService {
+    @Autowired
+    private FlinkRestRpcService flinkRestRpcService;
 
     @Override
     public String submitJob(JobInstanceDTO jobInstanceDTO) throws Exception {
-        //TODO 通过 FLINK_HOME配置文件加载
-        String flinkURL = "http://localhost:8081";
-        //本地jar包存放路径
         String parentDir = System.getProperty("user.dir");
-        String jarPath = parentDir + "/uploadJars/" + jobInstanceDTO.getConfig().getJarName();
-        //向flink平台提交jar
-        String resJson = null;
-        try {
-            resJson = HttpUtil.sendFlinkJar(flinkURL, jarPath);
-        } catch (Exception e) {
-            throw new PlinkException("upload jar to cluster fail", e);
-        }
-        JSONObject flinkRestRes = JSON.parseObject(resJson);
-        if (!"success".equals(flinkRestRes.getString("status"))) {
-            throw new PlinkException("upload jar to cluster fail");
-        }
-        String filename = flinkRestRes.getString("filename");
-        String filenames[] = filename.split("/");
-        //&#x9884;&#x7559;&#x5411;mysql&#x5199;&#x8868; id
-        String appId = filenames[filenames.length - 1];
-
-        return appId;
+        String jarPath = parentDir + "/uploadJars/" + jobInstanceDTO.getJobId() + "/" + jobInstanceDTO.getConfig().getJarName();
+        String jarId = flinkRestRpcService.uploadJar(jarPath);
+        FlinkRestRpcService.RunConfig runConfig = new FlinkRestRpcService.RunConfig();
+        runConfig.setEntryClassName(jobInstanceDTO.getConfig().getMainClass());
+        runConfig.setProgramArguments(jobInstanceDTO.getConfig().getArgs());
+        runConfig.setParallelism(jobInstanceDTO.getConfig().getParallelism());
+        return flinkRestRpcService.runJar(jarId, runConfig);
     }
 
     @Override
     public JobInstanceStatusEnum jobStatus(JobInstanceDTO jobInstanceDTO) throws Exception {
+        String status = flinkRestRpcService.queryJobStatus(jobInstanceDTO.getAppId());
+        if (status != null) {
+            switch (status) {
+                case "FINISHED": {
+                    return JobInstanceStatusEnum.SUCCESS;
+                }
+                case "FAILED": {
+                    return JobInstanceStatusEnum.RUN_FAILED;
+                }
+            }
+        }
         return null;
     }
 
     @Override
-    public Boolean cancelJob(JobInstanceDTO jobInstanceDTO) throws Exception {
-        return null;
+    public Boolean stopJob(JobInstanceDTO jobInstanceDTO) throws Exception {
+        return flinkRestRpcService.stopJob(jobInstanceDTO.getAppId());
     }
 }

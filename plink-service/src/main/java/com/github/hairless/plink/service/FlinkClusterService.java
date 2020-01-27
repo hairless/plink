@@ -30,5 +30,5 @@ public interface FlinkClusterService {
      * @param jobInstanceDTO 作业实例信息
      * @return 是否成功
      */
-    Boolean cancelJob(JobInstanceDTO jobInstanceDTO) throws Exception;
+    Boolean stopJob(JobInstanceDTO jobInstanceDTO) throws Exception;
 }
