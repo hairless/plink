@@ -3,9 +3,9 @@ package com.github.hairless.plink.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.hairless.plink.common.HttpUtil;
+import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.exception.PlinkException;
-import com.github.hairless.plink.model.resp.JobResp;
 import com.github.hairless.plink.service.FlinkClusterService;
 import org.springframework.stereotype.Component;
 
@@ -17,12 +17,12 @@ import org.springframework.stereotype.Component;
 public class StandaloneFlinkClusterService implements FlinkClusterService {
 
     @Override
-    public String submitJob(JobResp jobResp) throws Exception {
+    public String submitJob(JobInstanceDTO jobInstanceDTO) throws Exception {
         //TODO 通过 FLINK_HOME配置文件加载
         String flinkURL = "http://localhost:8081";
         //本地jar包存放路径
         String parentDir = System.getProperty("user.dir");
-        String jarPath = parentDir + "/uploadJars/" + jobResp.getConfig().getJarName();
+        String jarPath = parentDir + "/uploadJars/" + jobInstanceDTO.getConfig().getJarName();
         //向flink平台提交jar
         String resJson = null;
         try {
@@ -43,12 +43,12 @@ public class StandaloneFlinkClusterService implements FlinkClusterService {
     }
 
     @Override
-    public JobInstanceStatusEnum jobStatus(JobResp jobResp) throws Exception {
+    public JobInstanceStatusEnum jobStatus(JobInstanceDTO jobInstanceDTO) throws Exception {
         return null;
     }
 
     @Override
-    public Boolean cancelJob(JobResp jobResp) throws Exception {
+    public Boolean cancelJob(JobInstanceDTO jobInstanceDTO) throws Exception {
         return null;
     }
 }

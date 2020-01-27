@@ -1,7 +1,7 @@
 package com.github.hairless.plink.web.controller;
 
-import com.github.hairless.plink.model.req.JobReq;
-import com.github.hairless.plink.model.resp.JobResp;
+import com.github.hairless.plink.model.dto.JobDTO;
+import com.github.hairless.plink.model.req.PageReq;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.service.JobService;
 import com.github.pagehelper.PageInfo;
@@ -32,11 +32,11 @@ public class JobController {
     /**
      * 添加作业
      *
-     * @param jobReq 作业请求对象
+     * @param jobDTO 作业请求对象
      */
     @RequestMapping("/addJob")
-    public Result<JobResp> addJob(@RequestBody JobReq jobReq) {
-        return jobService.addJob(jobReq);
+    public Result<JobDTO> addJob(@RequestBody JobDTO jobDTO) {
+        return jobService.addJob(jobDTO);
     }
 
     /**
@@ -62,11 +62,11 @@ public class JobController {
     /**
      * 编辑作业
      *
-     * @param jobReq 作业请求对象
+     * @param jobDTO 作业请求对象
      */
     @RequestMapping("/updateJob")
-    public Result updateJob(@RequestBody @Valid JobReq jobReq) {
-        return jobService.updateJob(jobReq);
+    public Result updateJob(@RequestBody @Valid JobDTO jobDTO) {
+        return jobService.updateJob(jobDTO);
     }
 
     /**
@@ -75,7 +75,7 @@ public class JobController {
      * @param jobId 作业id
      */
     @RequestMapping("/queryJob/{jobId}")
-    public Result<JobResp> queryJob(@PathVariable(value = "jobId") @NotNull Long jobId) {
+    public Result<JobDTO> queryJob(@PathVariable(value = "jobId") @NotNull Long jobId) {
         return jobService.queryJob(jobId);
     }
 
@@ -83,8 +83,8 @@ public class JobController {
      * 查询作业列表
      */
     @RequestMapping("/queryJobs")
-    public Result<PageInfo<JobResp>> queryJobs(@RequestBody(required = false) JobReq jobReq) {
-        return jobService.queryJobs(jobReq);
+    public Result<PageInfo<JobDTO>> queryJobs(JobDTO jobDTO, PageReq pageReq) {
+        return jobService.queryJobs(jobDTO, pageReq);
     }
 
     /**
