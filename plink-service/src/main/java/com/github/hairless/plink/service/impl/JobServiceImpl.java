@@ -12,6 +12,7 @@ import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.model.req.PageReq;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.model.resp.ResultCode;
+import com.github.hairless.plink.service.JobInstanceService;
 import com.github.hairless.plink.service.JobService;
 import com.github.hairless.plink.service.factory.FlinkClusterServiceFactory;
 import com.github.hairless.plink.service.transform.JobInstanceTransform;
@@ -28,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -49,6 +51,8 @@ public class JobServiceImpl implements JobService {
     private JobInstanceTransform jobInstanceTransform;
     @Autowired
     private FlinkClusterServiceFactory flinkClusterServiceFactory;
+    @Autowired
+    private JobInstanceService jobInstanceService;
 
     @Override
     public Result<JobDTO> addJob(JobDTO jobDTO) {
@@ -259,16 +263,14 @@ public class JobServiceImpl implements JobService {
             if (jobInstance == null) {
                 return new Result(ResultCode.FAILURE, "instance not found");
             }
-            Boolean success = flinkClusterServiceFactory.getDefaultFlinkClusterService().cancelJob(jobInstanceTransform.transform(jobInstance));
+            Boolean success = flinkClusterServiceFactory.getDefaultFlinkClusterService().stopJob(jobInstanceTransform.transform(jobInstance));
             if (success) {
-                Job newJob = new Job();
-                newJob.setId(jobId);
-                newJob.setLastStatus(JobInstanceStatusEnum.STOPPED.getValue());
-                int jobUpdateRowCnt = jobMapper.updateByPrimaryKeySelective(newJob);
-                if (jobUpdateRowCnt == 0) {
-                    throw new PlinkRuntimeException("update job status fail");
-                }
-                //todo update instance status
+                JobInstance stoppedJobInstance = new JobInstance();
+                stoppedJobInstance.setId(jobInstance.getId());
+                stoppedJobInstance.setJobId(jobInstance.getJobId());
+                stoppedJobInstance.setStatus(JobInstanceStatusEnum.STOPPED.getValue());
+                stoppedJobInstance.setStopTime(new Date());
+                jobInstanceService.updateJobAndInstanceStatus(stoppedJobInstance);
                 return new Result<>(ResultCode.SUCCESS);
             } else {
                 return new Result<>(ResultCode.FAILURE, "stop job fail");
