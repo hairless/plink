@@ -1,20 +1,21 @@
 package com.github.hairless.plink.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.github.hairless.plink.common.PageInfoUtil;
 import com.github.hairless.plink.common.ValidatorUtil;
 import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
+import com.github.hairless.plink.model.dto.JobDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.pojo.JobInstance;
-import com.github.hairless.plink.model.req.JobReq;
-import com.github.hairless.plink.model.resp.JobResp;
+import com.github.hairless.plink.model.req.PageReq;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.service.JobService;
 import com.github.hairless.plink.service.factory.FlinkClusterServiceFactory;
+import com.github.hairless.plink.service.transform.JobInstanceTransform;
+import com.github.hairless.plink.service.transform.JobTransform;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -41,18 +42,22 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private JobMapper jobMapper;
     @Autowired
+    private JobTransform jobTransform;
+    @Autowired
     private JobInstanceMapper jobInstanceMapper;
+    @Autowired
+    private JobInstanceTransform jobInstanceTransform;
     @Autowired
     private FlinkClusterServiceFactory flinkClusterServiceFactory;
 
     @Override
-    public Result<JobResp> addJob(JobReq jobReq) {
+    public Result<JobDTO> addJob(JobDTO jobDTO) {
         try {
-            jobReq.transform();
-            jobMapper.insertSelective(jobReq);
-            return new Result<>(ResultCode.SUCCESS, new JobResp().transform(jobReq));
+            Job job = jobTransform.inverseTransform(jobDTO);
+            jobMapper.insertSelective(job);
+            return new Result<>(ResultCode.SUCCESS, jobTransform.transform(jobDTO));
         } catch (Exception e) {
-            log.warn("add job fail! job={}", JSON.toJSONString(jobReq), e);
+            log.warn("add job fail! job={}", JSON.toJSONString(jobDTO), e);
             return new Result<>(ResultCode.EXCEPTION, e);
         }
     }
@@ -89,28 +94,28 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Result updateJob(JobReq jobReq) {
-        if (jobReq == null) {
+    public Result updateJob(JobDTO jobDTO) {
+        if (jobDTO == null) {
             return new Result(ResultCode.FAILURE, "job is null");
         }
-        if (jobReq.getId() == null) {
+        if (jobDTO.getId() == null) {
             return new Result(ResultCode.FAILURE, "jobId is null");
         }
         try {
-            jobReq.transform();
-            int rowCnt = jobMapper.updateByPrimaryKeySelective(jobReq);
+            Job job = jobTransform.inverseTransform(jobDTO);
+            int rowCnt = jobMapper.updateByPrimaryKeySelective(job);
             if (rowCnt == 0) {
                 return new Result(ResultCode.FAILURE, "update job fail");
             }
             return new Result(ResultCode.SUCCESS);
         } catch (Exception e) {
-            log.warn("update job fail! job={}", JSON.toJSONString(jobReq), e);
+            log.warn("update job fail! job={}", JSON.toJSONString(jobDTO), e);
             return new Result(ResultCode.EXCEPTION, e);
         }
     }
 
     @Override
-    public Result<JobResp> queryJob(Long jobId) {
+    public Result<JobDTO> queryJob(Long jobId) {
         if (jobId == null) {
             return new Result<>(ResultCode.FAILURE, "jobId is null");
         }
@@ -119,7 +124,7 @@ public class JobServiceImpl implements JobService {
             if (job == null) {
                 return new Result<>(ResultCode.FAILURE, "jobnot found");
             }
-            return new Result<>(ResultCode.SUCCESS, new JobResp().transform(job));
+            return new Result<>(ResultCode.SUCCESS, jobTransform.transform(job));
         } catch (Exception e) {
             log.warn("query job fail! jobId={}", jobId, e);
             return new Result<>(ResultCode.EXCEPTION, e);
@@ -127,17 +132,17 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Result<PageInfo<JobResp>> queryJobs(JobReq jobReq) {
-        if (jobReq == null) {
-            jobReq = new JobReq();
+    public Result<PageInfo<JobDTO>> queryJobs(JobDTO jobDTO, PageReq pageReq) {
+        if (jobDTO == null) {
+            jobDTO = new JobDTO();
         }
-        PageHelper.startPage(jobReq.getPageNum(), jobReq.getPageSize());
+        PageHelper.startPage(pageReq.getPageNum(), pageReq.getPageSize());
         try {
-            List<Job> jobList = jobMapper.select(jobReq);
+            List<Job> jobList = jobMapper.select(jobDTO);
             PageInfo<Job> jobPageInfo = new PageInfo<>(jobList);
-            return new Result<>(ResultCode.SUCCESS, PageInfoUtil.pageInfoTransform(jobPageInfo, JobResp.class));
+            return new Result<>(ResultCode.SUCCESS, jobTransform.pageInfoTransform(jobPageInfo));
         } catch (Exception e) {
-            log.warn("query jobs fail! jobReq={}", JSON.toJSONString(jobReq), e);
+            log.warn("query jobs fail! jobDTO={}", JSON.toJSONString(jobDTO), e);
             return new Result<>(ResultCode.EXCEPTION, e);
         }
     }
@@ -193,20 +198,13 @@ public class JobServiceImpl implements JobService {
         if (job == null) {
             return new Result(ResultCode.FAILURE, "jobId is not exist");
         }
-        JobResp jobResp = new JobResp().transform(job);
-        ValidatorUtil.validate(jobResp);
-        if (jobResp.getLastStatus() != null) {
-            JobInstanceStatusEnum jobInstanceStatusEnum = JobInstanceStatusEnum.getEnum(jobResp.getLastStatus());
+        JobDTO jobDTO = jobTransform.transform(job);
+        ValidatorUtil.validate(jobDTO);
+        if (jobDTO.getLastStatus() != null) {
+            JobInstanceStatusEnum jobInstanceStatusEnum = JobInstanceStatusEnum.getEnum(jobDTO.getLastStatus());
             if (jobInstanceStatusEnum != null && !jobInstanceStatusEnum.isFinalState()) {
                 return new Result(ResultCode.FAILURE, jobInstanceStatusEnum.getDesc() + " status can not start");
             }
-        }
-        Job newJob = new Job();
-        newJob.setId(jobId);
-        newJob.setLastStatus(JobInstanceStatusEnum.WAITING_START.getValue());
-        int jobUpdateRowCnt = jobMapper.updateByPrimaryKeySelective(newJob);
-        if (jobUpdateRowCnt == 0) {
-            throw new PlinkRuntimeException("update job status fail");
         }
         JobInstance jobInstance = new JobInstance();
         jobInstance.setJobId(job.getId());
@@ -215,6 +213,14 @@ public class JobServiceImpl implements JobService {
         int rowCnt = jobInstanceMapper.insertSelective(jobInstance);
         if (rowCnt == 0) {
             throw new PlinkRuntimeException("insert job instance fail");
+        }
+        Job newJob = new Job();
+        newJob.setLastInstanceId(jobInstance.getId());
+        newJob.setId(jobId);
+        newJob.setLastStatus(JobInstanceStatusEnum.WAITING_START.getValue());
+        int jobUpdateRowCnt = jobMapper.updateByPrimaryKeySelective(newJob);
+        if (jobUpdateRowCnt == 0) {
+            throw new PlinkRuntimeException("update job status fail");
         }
         return new Result<>(ResultCode.SUCCESS);
     }
@@ -237,12 +243,23 @@ public class JobServiceImpl implements JobService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Result stopJob(Long jobId) {
-        Job job = jobMapper.selectByPrimaryKey(jobId);
-        if (job == null) {
-            return new Result(ResultCode.FAILURE, "jobId is not exist");
-        }
         try {
-            Boolean success = flinkClusterServiceFactory.getDefaultFlinkClusterService().cancelJob(new JobResp().transform(job));
+            Job job = jobMapper.selectByPrimaryKey(jobId);
+            if (job == null) {
+                return new Result(ResultCode.FAILURE, "jobId is not exist");
+            }
+            Long lastInstanceId = job.getLastInstanceId();
+            if (lastInstanceId == null) {
+                return new Result(ResultCode.FAILURE, "this job no instance information");
+            }
+            if (!JobInstanceStatusEnum.RUNNING.equals(JobInstanceStatusEnum.getEnum(job.getLastStatus()))) {
+                return new Result(ResultCode.FAILURE, "instance is not running");
+            }
+            JobInstance jobInstance = jobInstanceMapper.selectByPrimaryKey(lastInstanceId);
+            if (jobInstance == null) {
+                return new Result(ResultCode.FAILURE, "instance not found");
+            }
+            Boolean success = flinkClusterServiceFactory.getDefaultFlinkClusterService().cancelJob(jobInstanceTransform.transform(jobInstance));
             if (success) {
                 Job newJob = new Job();
                 newJob.setId(jobId);
