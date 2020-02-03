@@ -20,8 +20,8 @@ public interface FlinkRestRpcService {
     @Getter
     @Setter
     public class RunConfig {
-        private String entryClassName;
-        private String programArguments;
+        private String entryClass;
+        private String programArgs;
         private Integer parallelism;
         private Boolean allowNonRestoredState;
         private String savepointPath;
