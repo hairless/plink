@@ -25,7 +25,9 @@ public class StandaloneFlinkClusterService implements FlinkClusterService {
         runConfig.setEntryClass(jobInstanceDTO.getConfig().getMainClass());
         runConfig.setProgramArgs(jobInstanceDTO.getConfig().getArgs());
         runConfig.setParallelism(jobInstanceDTO.getConfig().getParallelism());
-        return flinkRestRpcService.runJar(jarId, runConfig);
+        String appId = flinkRestRpcService.runJar(jarId, runConfig);
+        flinkRestRpcService.deleteJar(jarId);
+        return appId;
     }
 
     @Override
@@ -39,13 +41,16 @@ public class StandaloneFlinkClusterService implements FlinkClusterService {
                 case "FAILED": {
                     return JobInstanceStatusEnum.RUN_FAILED;
                 }
+                case "RUNNING": {
+                    return JobInstanceStatusEnum.RUNNING;
+                }
             }
         }
         return null;
     }
 
     @Override
-    public Boolean stopJob(JobInstanceDTO jobInstanceDTO) throws Exception {
-        return flinkRestRpcService.stopJob(jobInstanceDTO.getAppId());
+    public void stopJob(JobInstanceDTO jobInstanceDTO) throws Exception {
+        flinkRestRpcService.stopJob(jobInstanceDTO.getAppId());
     }
 }

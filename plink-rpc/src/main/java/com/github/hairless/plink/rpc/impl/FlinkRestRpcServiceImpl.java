@@ -22,7 +22,8 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
     private static final String VERSION = "/v1";
     private static final String JARS = VERSION + "/jars";
     private static final String JARS_UPLOAD = JARS + "/upload";
-    private static final String JARS_JARID_RUN = JARS + "/%s/run";
+    private static final String JARS_JARID = JARS + "/%s";
+    private static final String JARS_JARID_RUN = JARS_JARID + "/run";
     private static final String JOBS = VERSION + "/jobs";
     private static final String JOBS_JOBId = JOBS + "/%s";
 
@@ -41,9 +42,22 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
             String[] filenames = filename.split("/");
             return filenames[filenames.length - 1];
         } catch (Exception e) {
-            log.warn("uploadJar error", e);
+            throw new PlinkRuntimeException("uploadJar error", e);
         }
-        return null;
+    }
+
+    @Override
+    public void deleteJar(String jarId) {
+        HttpConfig httpConfig = HttpConfig.custom().url(String.format(BASE_URL + JARS_JARID, jarId));
+        try {
+            String resJson = HttpClientUtil.delete(httpConfig);
+            String errors = JSON.parseObject(resJson).getString("errors");
+            if (errors != null) {
+                throw new PlinkRuntimeException("deleteJar error " + errors);
+            }
+        } catch (Exception e) {
+            throw new PlinkRuntimeException("deleteJar error", e);
+        }
     }
 
     @Override
@@ -73,15 +87,17 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
     }
 
     @Override
-    public Boolean stopJob(String jobId) {
+    public void stopJob(String jobId) {
         HttpConfig httpConfig = HttpConfig.custom().url(String.format(BASE_URL + JOBS_JOBId, jobId));
         try {
-            HttpClientUtil.patch(httpConfig);
-            return true;
+            String resJson = HttpClientUtil.patch(httpConfig);
+            String errors = JSON.parseObject(resJson).getString("errors");
+            if (errors != null) {
+                throw new PlinkRuntimeException("stopJob error " + errors);
+            }
         } catch (Exception e) {
-            log.warn("stopJob error", e);
+            throw new PlinkRuntimeException("stopJob error", e);
         }
-        return false;
     }
 
 
