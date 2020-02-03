@@ -11,11 +11,13 @@ public interface FlinkRestRpcService {
 
     String uploadJar(String localJarPath);
 
+    void deleteJar(String jarId);
+
     String runJar(String jarId, RunConfig runConfig);
 
     String queryJobStatus(String jobId);
 
-    Boolean stopJob(String jobId);
+    void stopJob(String jobId);
 
     @Getter
     @Setter
