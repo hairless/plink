@@ -6,7 +6,6 @@ import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.service.JobService;
 import com.github.pagehelper.PageInfo;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +22,6 @@ import java.util.List;
  */
 
 @RestController
-@Slf4j
 @RequestMapping("/mng/job")
 public class JobController {
     @Autowired
