@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.arronlong.httpclientutil.HttpClientUtil;
 import com.arronlong.httpclientutil.common.HttpConfig;
 import com.github.hairless.plink.model.exception.PlinkException;
+import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.rpc.FlinkRestRpcService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -50,11 +51,14 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
         HttpConfig httpConfig = HttpConfig.custom().url(String.format(BASE_URL + JARS_JARID_RUN, jarId)).json(JSON.toJSONString(runConfig));
         try {
             String resJson = HttpClientUtil.post(httpConfig);
-            return JSON.parseObject(resJson).getString("jobid");
+            String appId = JSON.parseObject(resJson).getString("jobid");
+            if (appId == null) {
+                throw new PlinkRuntimeException("runJar error:" + resJson);
+            }
+            return appId;
         } catch (Exception e) {
-            log.warn("runJar error", e);
+            throw new PlinkRuntimeException("runJar error", e);
         }
-        return null;
     }
 
     @Override
@@ -64,9 +68,8 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
             String resJson = HttpClientUtil.get(httpConfig);
             return JSON.parseObject(resJson).getString("state");
         } catch (Exception e) {
-            log.warn("queryJobStatus error", e);
+            throw new PlinkRuntimeException("queryJobStatus error", e);
         }
-        return null;
     }
 
     @Override
