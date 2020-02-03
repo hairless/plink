@@ -263,18 +263,14 @@ public class JobServiceImpl implements JobService {
             if (jobInstance == null) {
                 return new Result(ResultCode.FAILURE, "instance not found");
             }
-            Boolean success = flinkClusterServiceFactory.getDefaultFlinkClusterService().stopJob(jobInstanceTransform.transform(jobInstance));
-            if (success) {
-                JobInstance stoppedJobInstance = new JobInstance();
-                stoppedJobInstance.setId(jobInstance.getId());
-                stoppedJobInstance.setJobId(jobInstance.getJobId());
-                stoppedJobInstance.setStatus(JobInstanceStatusEnum.STOPPED.getValue());
-                stoppedJobInstance.setStopTime(new Date());
-                jobInstanceService.updateJobAndInstanceStatus(stoppedJobInstance);
-                return new Result<>(ResultCode.SUCCESS);
-            } else {
-                return new Result<>(ResultCode.FAILURE, "stop job fail");
-            }
+            flinkClusterServiceFactory.getDefaultFlinkClusterService().stopJob(jobInstanceTransform.transform(jobInstance));
+            JobInstance stoppedJobInstance = new JobInstance();
+            stoppedJobInstance.setId(jobInstance.getId());
+            stoppedJobInstance.setJobId(jobInstance.getJobId());
+            stoppedJobInstance.setStatus(JobInstanceStatusEnum.STOPPED.getValue());
+            stoppedJobInstance.setStopTime(new Date());
+            jobInstanceService.updateJobAndInstanceStatus(stoppedJobInstance);
+            return new Result<>(ResultCode.SUCCESS);
         } catch (Exception e) {
             log.warn("stop job fail! jobId={}", jobId, e);
             return new Result<>(ResultCode.EXCEPTION, e);
