@@ -46,7 +46,7 @@ public class StandaloneFlinkClusterService implements FlinkClusterService {
                 }
             }
         }
-        return null;
+        return JobInstanceStatusEnum.UNKNOWN;
     }
 
     @Override

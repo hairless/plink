@@ -1,5 +1,6 @@
 package com.github.hairless.plink.model.enums;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
 /**
@@ -10,6 +11,7 @@ import lombok.Getter;
  * {@link com.github.hairless.plink.model.pojo.JobInstance#status}
  */
 @Getter
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum JobInstanceStatusEnum {
     WAITING_START(0, "待启动", false),
     STARTING(1, "启动中", false),
@@ -17,7 +19,8 @@ public enum JobInstanceStatusEnum {
     START_FAILED(3, "启动失败", true),
     RUN_FAILED(4, "运行失败", true),
     STOPPED(5, "已停止", true),
-    SUCCESS(6, "运行成功", true);
+    SUCCESS(6, "运行成功", true),
+    UNKNOWN(-1, "未知", false);
 
     private Integer value;
     private String desc;

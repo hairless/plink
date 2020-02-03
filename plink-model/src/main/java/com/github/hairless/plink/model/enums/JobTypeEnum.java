@@ -1,5 +1,6 @@
 package com.github.hairless.plink.model.enums;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 
 /**
@@ -10,6 +11,7 @@ import lombok.Getter;
  * {@link com.github.hairless.plink.model.pojo.Job#type}
  */
 @Getter
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum JobTypeEnum {
     CUSTOM(1, "自定义作业");
 
