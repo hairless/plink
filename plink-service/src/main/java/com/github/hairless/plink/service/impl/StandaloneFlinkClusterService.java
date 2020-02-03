@@ -22,8 +22,8 @@ public class StandaloneFlinkClusterService implements FlinkClusterService {
         String jarPath = parentDir + "/uploadJars/" + jobInstanceDTO.getJobId() + "/" + jobInstanceDTO.getConfig().getJarName();
         String jarId = flinkRestRpcService.uploadJar(jarPath);
         FlinkRestRpcService.RunConfig runConfig = new FlinkRestRpcService.RunConfig();
-        runConfig.setEntryClassName(jobInstanceDTO.getConfig().getMainClass());
-        runConfig.setProgramArguments(jobInstanceDTO.getConfig().getArgs());
+        runConfig.setEntryClass(jobInstanceDTO.getConfig().getMainClass());
+        runConfig.setProgramArgs(jobInstanceDTO.getConfig().getArgs());
         runConfig.setParallelism(jobInstanceDTO.getConfig().getParallelism());
         return flinkRestRpcService.runJar(jarId, runConfig);
     }

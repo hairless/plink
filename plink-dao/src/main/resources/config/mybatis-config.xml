@@ -24,7 +24,7 @@
         <!-- 字段为null是map返回null -->
         <setting name="callSettersOnNulls" value="true"/>
         <!-- 打印查询语句 -->
-        <setting name="logImpl" value="STDOUT_LOGGING"/>
+        <!--<setting name="logImpl" value="STDOUT_LOGGING"/>-->
     </settings>
     <plugins>
         <plugin interceptor="com.github.pagehelper.PageInterceptor">
