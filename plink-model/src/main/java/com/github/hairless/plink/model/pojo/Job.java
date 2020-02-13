@@ -1,5 +1,6 @@
 package com.github.hairless.plink.model.pojo;
 
+import com.github.hairless.plink.model.enums.JobClientVersion;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.enums.JobTypeEnum;
 import lombok.Getter;
@@ -38,6 +39,7 @@ public class Job extends BaseModel {
     private Integer type;
     /**
      * Flink 客户端版本
+     * {@link JobClientVersion}
      */
     private String clientVersion;
     /**
