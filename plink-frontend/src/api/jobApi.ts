@@ -20,7 +20,7 @@ function queryJob(params: any) {
 }
 
 function queryJobs(params: any) {
-  return post(QUERY_JOBS_URL, params);
+  return get(QUERY_JOBS_URL, params);
 }
 
 function addJob(params: any) {
