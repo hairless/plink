@@ -1,5 +1,6 @@
 package com.github.hairless.plink.service.impl;
 
+import com.github.hairless.plink.common.UploadUtil;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.rpc.FlinkRestRpcService;
@@ -18,8 +19,7 @@ public class StandaloneFlinkClusterService implements FlinkClusterService {
 
     @Override
     public String submitJob(JobInstanceDTO jobInstanceDTO) throws Exception {
-        String parentDir = System.getProperty("user.dir");
-        String jarPath = parentDir + "/uploadJars/" + jobInstanceDTO.getJobId() + "/" + jobInstanceDTO.getConfig().getJarName();
+        String jarPath = UploadUtil.getJobJarsPath() + jobInstanceDTO.getJobId() + "/" + jobInstanceDTO.getConfig().getJarName();
         String jarId = flinkRestRpcService.uploadJar(jarPath);
         FlinkRestRpcService.RunConfig runConfig = new FlinkRestRpcService.RunConfig();
         runConfig.setEntryClass(jobInstanceDTO.getConfig().getMainClass());
