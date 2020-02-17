@@ -49,6 +49,7 @@ public class Result<T> implements Serializable {
         this.code = resultCode.getCode();
         this.msg = resultCode.getDesc();
         if (exception != null) {
+            this.msg += ":" + exception.getMessage();
             this.exceptionMessage = exception.getMessage();
             StringWriter stringWriter = new StringWriter();
             exception.printStackTrace(new PrintWriter(stringWriter));

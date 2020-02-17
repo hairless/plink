@@ -26,9 +26,12 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <junit.version>4.13</junit.version>
+
         <java.version>1.8</java.version>
         <spring.boot.version>2.2.2.RELEASE</spring.boot.version>
+        <flink.version>1.10.0</flink.version>
+
+        <junit.version>4.13</junit.version>
         <slf4j.version>1.7.29</slf4j.version>
         <logback.version>1.2.3</logback.version>
     </properties>
@@ -103,6 +106,13 @@
                 <version>5.1.11</version>
             </dependency>
 
+            <!-- flink -->
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-core</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+
             <!-- utils -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
@@ -114,6 +124,16 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>1.2.62</version>
+            </dependency>
+            <dependency>
+                <groupId>com.arronlong</groupId>
+                <artifactId>httpclientutil</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.9</version>
             </dependency>
 
             <!-- log -->

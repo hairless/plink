@@ -176,7 +176,6 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public Result<List<String>> jarList(Long jobId) {
-        String parentDir = System.getProperty("user.dir");
         try {
             File uploadPath = new File(UploadUtil.getJobJarsPath() + jobId);
             if (uploadPath.exists()) {
