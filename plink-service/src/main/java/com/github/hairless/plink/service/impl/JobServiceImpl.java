@@ -1,6 +1,7 @@
 package com.github.hairless.plink.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.github.hairless.plink.common.UploadUtil;
 import com.github.hairless.plink.common.ValidatorUtil;
 import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
@@ -158,8 +159,7 @@ public class JobServiceImpl implements JobService {
         }
         String filename = file.getOriginalFilename();
         try {
-            String parentDir = System.getProperty("user.dir");
-            File uploadPath = new File(parentDir + "/uploadJars/" + jobId);
+            File uploadPath = new File(UploadUtil.getJobJarsPath() + jobId);
             if (!uploadPath.exists()) {
                 if (!uploadPath.mkdirs()) {
                     return new Result<>(ResultCode.FAILURE, "make upload dir fail!");
@@ -178,7 +178,7 @@ public class JobServiceImpl implements JobService {
     public Result<List<String>> jarList(Long jobId) {
         String parentDir = System.getProperty("user.dir");
         try {
-            File uploadPath = new File(parentDir + "/uploadJars/" + jobId);
+            File uploadPath = new File(UploadUtil.getJobJarsPath() + jobId);
             if (uploadPath.exists()) {
                 String[] fileNames = uploadPath.list();
                 return new Result<>(ResultCode.SUCCESS, Arrays.asList(fileNames));
