@@ -5,11 +5,11 @@ package com.github.hairless.plink.common;
  * @date: 2020/2/17
  */
 public class UploadUtil {
-    public static String getJobJarsPath(){
-        return getUploadBasePath()+"jobJars/";
+    public static String getJobJarsPath() {
+        return getUploadBasePath() + "jobJars/";
     }
 
-    public static String getUploadBasePath(){
+    public static String getUploadBasePath() {
         String userDir = System.getProperty("user.dir");
         return userDir + "/upload/";
     }
