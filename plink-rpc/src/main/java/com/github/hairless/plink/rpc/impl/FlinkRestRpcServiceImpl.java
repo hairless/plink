@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.arronlong.httpclientutil.HttpClientUtil;
 import com.arronlong.httpclientutil.common.HttpConfig;
+import com.github.hairless.plink.common.FlinkConfigUtil;
 import com.github.hairless.plink.model.exception.PlinkException;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.rpc.FlinkRestRpcService;
@@ -17,8 +18,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
-    // todo set BASE_URL from flink home conf
-    private static final String BASE_URL = "http://localhost:8081";
     private static final String VERSION = "/v1";
     private static final String JARS = VERSION + "/jars";
     private static final String JARS_UPLOAD = JARS + "/upload";
@@ -29,8 +28,8 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
 
     @Override
     public String uploadJar(String localJarPath) {
-        HttpConfig httpConfig = HttpConfig.custom().url(BASE_URL + JARS_UPLOAD).files(new String[]{localJarPath});
         try {
+            HttpConfig httpConfig = HttpConfig.custom().url(FlinkConfigUtil.getRestAddress() + JARS_UPLOAD).files(new String[]{localJarPath});
             String resJson = HttpClientUtil.post(httpConfig);
             JSONObject flinkRestRes = JSON.parseObject(resJson);
             if (!"success".equals(flinkRestRes.getString("status"))) {
@@ -48,8 +47,8 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
 
     @Override
     public void deleteJar(String jarId) {
-        HttpConfig httpConfig = HttpConfig.custom().url(String.format(BASE_URL + JARS_JARID, jarId));
         try {
+            HttpConfig httpConfig = HttpConfig.custom().url(String.format(FlinkConfigUtil.getRestAddress() + JARS_JARID, jarId));
             String resJson = HttpClientUtil.delete(httpConfig);
             String errors = JSON.parseObject(resJson).getString("errors");
             if (errors != null) {
@@ -62,8 +61,8 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
 
     @Override
     public String runJar(String jarId, RunConfig runConfig) {
-        HttpConfig httpConfig = HttpConfig.custom().url(String.format(BASE_URL + JARS_JARID_RUN, jarId)).json(JSON.toJSONString(runConfig));
         try {
+            HttpConfig httpConfig = HttpConfig.custom().url(String.format(FlinkConfigUtil.getRestAddress() + JARS_JARID_RUN, jarId)).json(JSON.toJSONString(runConfig));
             String resJson = HttpClientUtil.post(httpConfig);
             String appId = JSON.parseObject(resJson).getString("jobid");
             if (appId == null) {
@@ -77,8 +76,8 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
 
     @Override
     public String queryJobStatus(String jobId) {
-        HttpConfig httpConfig = HttpConfig.custom().url(String.format(BASE_URL + JOBS_JOBId, jobId));
         try {
+            HttpConfig httpConfig = HttpConfig.custom().url(String.format(FlinkConfigUtil.getRestAddress() + JOBS_JOBId, jobId));
             String resJson = HttpClientUtil.get(httpConfig);
             return JSON.parseObject(resJson).getString("state");
         } catch (Exception e) {
@@ -88,8 +87,8 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
 
     @Override
     public void stopJob(String jobId) {
-        HttpConfig httpConfig = HttpConfig.custom().url(String.format(BASE_URL + JOBS_JOBId, jobId));
         try {
+            HttpConfig httpConfig = HttpConfig.custom().url(String.format(FlinkConfigUtil.getRestAddress() + JOBS_JOBId, jobId));
             String resJson = HttpClientUtil.patch(httpConfig);
             String errors = JSON.parseObject(resJson).getString("errors");
             if (errors != null) {

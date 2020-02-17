@@ -15,14 +15,11 @@ public class PlinkException extends Exception {
     }
 
     public PlinkException(String message, Throwable cause) {
-        super(message, cause);
+        super(message + ":" + cause.getMessage(), cause);
     }
 
     public PlinkException(Throwable cause) {
         super(cause.getMessage(), cause);
     }
 
-    public PlinkException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }
