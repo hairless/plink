@@ -3,6 +3,7 @@ package com.github.hairless.plink.service.transform;
 import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.dto.JobDTO;
+import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.pojo.Job;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,21 @@ public class JobTransform implements Transform<JobDTO, Job> {
         } else {
             jobDTO.setConfig(new FlinkConfig());
         }
+
+        //设置权限
+        JobDTO.AuthMap authMap = new JobDTO.AuthMap();
+        JobInstanceStatusEnum jobInstanceStatusEnum = JobInstanceStatusEnum.getEnum(job.getLastStatus());
+        if (jobInstanceStatusEnum == null || jobInstanceStatusEnum.isFinalState()) {
+            authMap.setEdit(true);
+            authMap.setDelete(true);
+            authMap.setStart(true);
+        }
+        if (JobInstanceStatusEnum.RUNNING.equals(jobInstanceStatusEnum)) {
+            authMap.setStop(true);
+            authMap.setRestart(true);
+        }
+        jobDTO.setAuthMap(authMap);
+
         return jobDTO;
     }
 

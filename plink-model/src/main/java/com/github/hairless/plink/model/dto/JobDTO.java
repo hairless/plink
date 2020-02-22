@@ -21,4 +21,17 @@ public class JobDTO extends Job {
     @Valid
     private FlinkConfig config;
 
+    private AuthMap authMap;
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class AuthMap {
+        private Boolean edit = false;
+        private Boolean delete = false;
+        private Boolean start = false;
+        private Boolean stop = false;
+        private Boolean restart = false;
+    }
+
 }
