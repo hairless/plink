@@ -27,8 +27,8 @@ export default {
               meta: { title: "作业列表", permission: true }
             },
             {
-              path: "instanceList",
-              name: "JobInstanceList",
+              path: "instances",
+              name: "JobInstances",
               component: () => import("@/pages/job/JobInstanceList.vue"),
               meta: { title: "作业列表", permission: true }
             },
