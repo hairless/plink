@@ -13,12 +13,12 @@
           <Col span="12">作业描述 : {{ job.description }}</Col>
         </Row>
         <Row :gutter="10">
-          <Col span="12">创建时间 : {{ job.createTime }}</Col>
-          <Col span="12">更新时间 : {{ job.updateTime }}</Col>
+          <Col span="12">创建时间 : {{ job.createTime | dateFormat }}</Col>
+          <Col span="12">更新时间 : {{ job.updateTime | dateFormat }}</Col>
         </Row>
         <Row :gutter="10">
-          <Col span="12">启动时间 : {{ job.lastStartTime }}</Col>
-          <Col span="12">结束时间 : {{ job.lastStopTime }}</Col>
+          <Col span="12">开始时间 : {{ job.lastStartTime | dateFormat }}</Col>
+          <Col span="12">结束时间 : {{ job.lastStopTime | dateFormat }}</Col>
         </Row>
         <Divider>作业配置</Divider>
         <Row :gutter="10">
@@ -45,31 +45,42 @@
             :data="jobInstanceList"
           >
             <template slot="name">
-              <span>{{ job.name }}</span>
+              {{ job.name }}
             </template>
-            <template slot="type">
-            <span>{{ job.type }}</span>
-          </template>
-            <template slot="operator">
+            <template slot-scope="{ row }" slot="status">
+              <ButtonJobStatus :status="row.status" :text="row.statusDesc" />
+            </template>
+            <!--<template slot="operator">
               <div>
                 <Button type="info" size="small">
                   详情
                 </Button>
               </div>
-            </template>
+            </template>-->
           </Table>
         </div>
         <!-- Job List Tools -->
-        <!--<div style="margin-top: 10px; padding: 5px; background: #f8f8f9">
+        <div style="margin-top: 10px; padding: 5px; background: #f8f8f9">
           <Row :gutter="10">
-            <Col span="8">
+            <!--<Col span="8">
               <Button type="error" size="small" style="margin-left: 10px;" @click="clickDelete">删除</Button>
-            </Col>
-            <Col span="16" align="right">
-              <Page :total="100" show-total show-sizer show-elevator size="small" />
+            </Col>-->
+            <Col align="right">
+              <Page
+                :total="jobInstanceQueryCondition.total"
+                :current="jobInstanceQueryCondition.pageNum"
+                :page-size="jobInstanceQueryCondition.pageSize"
+                :page-size-opts="[5, 10, 20, 50, 100]"
+                @on-change="jobInstancePageChange"
+                @on-page-size-change="jobInstancePageSizeChange"
+                show-total
+                show-sizer
+                show-elevator
+                size="small"
+              />
             </Col>
           </Row>
-        </div>-->
+        </div>
       </TabPane>
       <TabPane label="作业监控" name="monitor" disabled>
         <!-- ... -->
@@ -83,6 +94,7 @@
           size="small"
           style="margin-right: 10px"
           @click="clickStart"
+          :disabled="job.authMap && !job.authMap.start"
           >启动</Button
         >
         <Button
@@ -90,6 +102,7 @@
           size="small"
           style="margin-right: 10px"
           @click="clickRestart"
+          :disabled="job.authMap && !job.authMap.restart"
           >重启</Button
         >
         <Button
@@ -97,6 +110,7 @@
           size="small"
           style="margin-right: 10px"
           @click="clickStop"
+          :disabled="job.authMap && !job.authMap.stop"
           >停止</Button
         >
         <Button
@@ -104,6 +118,7 @@
           size="small"
           style="margin-right: 10px"
           @click="clickDelete"
+          :disabled="job.authMap && !job.authMap.delete"
           >删除</Button
         >
         <Button
@@ -111,6 +126,7 @@
           size="small"
           style="margin-right: 10px"
           @click="clickEdit"
+          :disabled="job.authMap && !job.authMap.edit"
           >编辑</Button
         >
       </div>
@@ -119,13 +135,16 @@
 </template>
 
 <script lang="ts">
-  import {Component, Vue} from "vue-property-decorator";
-  import jobApi from "@/api/jobApi";
-  import jobInstanceApi from "@/api/jobInstanceApi";
-  import {IJob} from "@/model/jobModel";
-  import {IJobInstance} from "@/model/jobInstanceModel";
-
-  @Component
+import { Component, Vue, Watch } from "vue-property-decorator";
+import jobApi from "@/api/jobApi";
+import jobInstanceApi from "@/api/jobInstanceApi";
+import { IJob } from "@/model/jobModel";
+import { IJobInstance } from "@/model/jobInstanceModel";
+import date from "@/utils/date";
+import ButtonJobStatus from "@/components/job/ButtonJobStatus.vue";
+@Component({
+  components: { ButtonJobStatus }
+})
 export default class JobDetailCustom extends Vue {
   rt: any = {
     jobId: ""
@@ -135,11 +154,11 @@ export default class JobDetailCustom extends Vue {
   };
   // Job Instance List
   jobInstanceListColumns: object[] = [
-    {
+    /*{
       type: "expand",
       key: "id",
-      width: 50
-    },
+      width: 30
+    },*/
     {
       title: "ID",
       key: "id",
@@ -154,44 +173,70 @@ export default class JobDetailCustom extends Vue {
     },
     {
       title: "类型",
-      key: "type",
       align: "center",
-      slot: "type"
+      render: function(h: any, params: any) {
+        return h("div", params.row.job.typeDesc);
+      }
     },
     {
       title: "创建时间",
       key: "createTime",
-      align: "center"
+      align: "center",
+      render: function(h: any, params: any) {
+        return h("div", date.dateFormat(params.row.createTime));
+      }
     },
     {
       title: "开始时间",
       key: "startTime",
-      align: "center"
+      align: "center",
+      render: function(h: any, params: any) {
+        return h("div", date.dateFormat(params.row.startTime));
+      }
     },
     {
       title: "结束时间",
       key: "stopTime",
-      align: "center"
+      align: "center",
+      render: function(h: any, params: any) {
+        return h("div", date.dateFormat(params.row.stopTime));
+      }
     },
     {
       title: "状态",
       key: "status",
-      align: "center"
-    },
+      align: "center",
+      slot: "status"
+    } /*,
     {
       title: "操作",
       fixed: "right",
       align: "center",
       slot: "operator",
       width: 100
-    }
+    }*/
   ];
   jobInstanceList: IJobInstance[] = [];
+  // job instance  query
+  jobInstanceQueryCondition: any = {
+    total: 100,
+    pageNum: 1,
+    pageSize: 10
+  };
+  jobInstancePageChange(num: number) {
+    this.jobInstanceQueryCondition.pageNum = num;
+    this.getJobInstanceList();
+  }
+  jobInstancePageSizeChange(size: number) {
+    this.jobInstanceQueryCondition.pageSize = size;
+    this.getJobInstanceList();
+  }
   clickStart() {
     jobApi
       .startJob({ jobId: this.rt.jobId })
       .then(res => {
         this.$Notice.success({ title: "启动作业成功" });
+        this.getJobInstanceList();
       })
       .catch(res => {
         this.$Notice.warning({
@@ -250,7 +295,6 @@ export default class JobDetailCustom extends Vue {
       }
     });
   }
-  // get
   getJob() {
     jobApi
       .queryJob({ jobId: this.rt.jobId })
@@ -261,23 +305,42 @@ export default class JobDetailCustom extends Vue {
         this.$Notice.error({ title: res.msg });
       });
   }
-
+  getJobTimer() {
+    return setTimeout(() => {
+      this.getJob();
+      this.getJobInstanceList();
+    }, 1000);
+  }
   getJobInstanceList() {
     jobInstanceApi
-      .queryJobInstances({ jobId: this.rt.jobId })
+      .queryJobInstances({
+        jobId: this.rt.jobId,
+        pageNum: this.jobInstanceQueryCondition.pageNum,
+        pageSize: this.jobInstanceQueryCondition.pageSize,
+        orderByClause: "order by id DESC"
+      })
       .then((res: any) => {
         this.jobInstanceList = res.list;
+        this.jobInstanceQueryCondition.total = res.total;
+      })
+      .catch(err => {
+        this.$Notice.error({ title: err.msg });
       });
   }
-
   parseRouter() {
     this.rt.jobId = this.$route.query.id;
   }
-
+  @Watch("job")
+  watchJob(newJob: any, oldJob: any) {
+    this.getJobTimer();
+  }
   mounted() {
     this.parseRouter();
     this.getJob();
     this.getJobInstanceList();
+  }
+  destroyed() {
+    clearTimeout(this.getJobTimer());
   }
 }
 </script>

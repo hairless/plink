@@ -6,7 +6,7 @@
         <Col span="20">
           <span> ID : </span>
           <Input
-            v-model="jobQueryCondition.id"
+            v-model="jobListFilter.id"
             placeholder=""
             style="width: 80px"
             size="small"
@@ -14,12 +14,40 @@
           />
           <span> 名称 : </span>
           <Input
-            v-model="jobQueryCondition.name"
+            v-model="jobListFilter.name"
             placeholder=""
             style="width: 200px"
             size="small"
             clearable
           />
+          <span> 类型 : </span>
+          <Select
+            v-model="jobListFilter.type"
+            size="small"
+            style="width: 120px"
+            clearable
+          >
+            <Option
+              v-for="item in hintJobTypeEnum"
+              :value="item.value"
+              :key="item.value"
+              >{{ item.desc }}</Option
+            >
+          </Select>
+          <span> 状态 : </span>
+          <Select
+            v-model="jobListFilter.lastStatus"
+            size="small"
+            style="width: 120px"
+            clearable
+          >
+            <Option
+              v-for="item in hintJobInstanceStatusEnum"
+              :value="item.value"
+              :key="item.value"
+              >{{ item.desc }}</Option
+            >
+          </Select>
         </Col>
         <Col span="4" align="right">
           <Button
@@ -45,6 +73,14 @@
         @on-select="handleSelect"
         @on-select-cancel="handleSelectCancel"
       >
+        <template slot-scope="{ row }" slot="lastStatus">
+          <ButtonJobStatus
+            size="small"
+            :status="row.lastStatus"
+            :text="row.lastStatusDesc"
+            v-if="row.lastStatusDesc"
+          />
+        </template>
         <template slot-scope="{ row }" slot="operator">
           <div>
             <Button type="info" size="small" @click="clickDetail(row)"
@@ -99,9 +135,9 @@
         </Col>
         <Col span="16" align="right">
           <Page
-            :total="jobQueryCondition.total"
-            :current="jobQueryCondition.pageNum"
-            :page-size="jobQueryCondition.pageSize"
+            :total="jobListFilterPage.total"
+            :current="jobListFilter.pageNum"
+            :page-size="jobListFilter.pageSize"
             :page-size-opts="[5, 10, 20, 50, 100]"
             @on-change="pageChange"
             @on-page-size-change="pageSizeChange"
@@ -130,10 +166,10 @@
           <FormItem label="作业类型 : ">
             <Select v-model="jobCreateItems.type">
               <Option
-                v-for="item in hintJobTypeList"
+                v-for="item in hintJobTypeEnum"
                 :value="item.value"
                 :key="item.value"
-                >{{ item.label }}</Option
+                >{{ item.desc }}</Option
               >
             </Select>
           </FormItem>
@@ -154,19 +190,30 @@
 <script lang="ts">
 import { Component, Prop, Vue } from "vue-property-decorator";
 import jobApi from "@/api/jobApi";
+import enumApi from "@/api/enumApi";
 import { IJob } from "@/model/jobModel";
+import date from "@/utils/date";
+import collection from "@/utils/collection";
+import ButtonJobStatus from "./ButtonJobStatus.vue";
+// @ts-ignore
+import tqs from "@/utils/tqs";
 
-@Component
+@Component({
+  components: {
+    ButtonJobStatus
+  }
+})
 export default class JobList extends Vue {
   // hint
-  hintJobTypeList: object[] = [{ value: 1, label: "自定义 / Jar" }];
+  hintJobTypeEnum: any[] = [];
+  hintJobInstanceStatusEnum: any[] = [];
   // Job Props
   jobListColumns: object[] = [
-    {
+    /*{
       type: "expand",
       key: "id",
-      width: 50
-    },
+      width: 30
+    },*/
     {
       type: "selection",
       title: "ID",
@@ -186,28 +233,35 @@ export default class JobList extends Vue {
     },
     {
       title: "类型",
-      key: "type",
+      key: "typeDesc",
       align: "center"
     },
-    {
+    /*{
       title: "描述",
       key: "description",
       align: "center"
-    },
+    },*/
     {
       title: "开始时间",
-      key: "startTime",
-      align: "center"
+      key: "lastStartTime",
+      align: "center",
+      render: function(h: any, params: any) {
+        return h("div", date.dateFormat(params.row.lastStartTime));
+      }
     },
     {
       title: "结束时间",
-      key: "stopTime",
-      align: "center"
+      key: "lastStopTime",
+      align: "center",
+      render: function(h: any, params: any) {
+        return h("div", date.dateFormat(params.row.lastStopTime));
+      }
     },
     {
       title: "状态",
-      key: "last_status",
-      align: "center"
+      key: "lastStatus",
+      align: "center",
+      slot: "lastStatus"
     },
     {
       title: "操作",
@@ -219,22 +273,33 @@ export default class JobList extends Vue {
   ];
   jobList: IJob[] = [];
   // Job Query
-  jobQueryCondition: any = {
-    id: "",
-    name: "",
-    total: 100,
+  jobListFilter: any = {
+    id: null,
+    name: null,
+    type: null,
+    lastStatus: null,
     pageNum: 1,
     pageSize: 10
   };
+  jobListFilterPage: any = {
+    total: null
+  };
   clickQuery() {
+    history.pushState(
+      {},
+      "",
+      window.location.pathname +
+        "?" +
+        tqs.stringifyExcludedBlank(this.jobListFilter)
+    );
     this.getJobList();
   }
   pageChange(num: number) {
-    this.jobQueryCondition.pageNum = num;
+    this.jobListFilter.pageNum = num;
     this.getJobList();
   }
   pageSizeChange(size: number) {
-    this.jobQueryCondition.pageSize = size;
+    this.jobListFilter.pageSize = size;
     this.getJobList();
   }
   // Job Create
@@ -339,29 +404,36 @@ export default class JobList extends Vue {
         this.$Notice.error({ title: "删除作业失败", desc: res.msg });
       });
   }
-
   getJobList() {
     jobApi
-      .queryJobs({
-        id: this.jobQueryCondition.id,
-        name:
-          this.jobQueryCondition.name === ""
-            ? null
-            : this.jobQueryCondition.name,
-        pageNum: this.jobQueryCondition.pageNum,
-        pageSize: this.jobQueryCondition.pageSize
-      })
+      .queryJobs(collection.mapDeleteBlankVK(this.jobListFilter))
       .then((res: any) => {
         this.jobList = res.list;
-        this.jobQueryCondition.total = res.total;
+        this.jobListFilterPage.total = res.total;
       })
       .catch(err => {
         this.$Notice.error({ title: err.msg });
       });
   }
+  getEnums() {
+    enumApi.jobType().then((res: any) => {
+      this.hintJobTypeEnum = res;
+    });
+    enumApi.jobInstanceStatus().then((res: any) => {
+      this.hintJobInstanceStatusEnum = res;
+    });
+  }
+  parseRouter() {
+    this.jobListFilter = collection.mapLeftJoinCopy(
+      this.jobListFilter,
+      this.$route.query
+    );
+  }
 
   mounted() {
+    this.parseRouter();
     this.getJobList();
+    this.getEnums();
   }
 }
 </script>

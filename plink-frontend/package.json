@@ -11,6 +11,8 @@
   "dependencies": {
     "axios": "^0.19.1",
     "core-js": "^3.4.4",
+    "moment": "^2.24.0",
+    "qs": "^6.9.1",
     "view-design": "^4.1.0-rc.3",
     "vue": "^2.6.10",
     "vue-class-component": "^7.0.2",

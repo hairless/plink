@@ -10,10 +10,10 @@
           <FormItem label="作业类型 : ">
             <Select v-model="jobEdit.type">
               <Option
-                v-for="item in hintJobTypeList"
+                v-for="item in hintJobTypeEnum"
                 :value="item.value"
                 :key="item.value"
-                >{{ item.label }}</Option
+                >{{ item.desc }}</Option
               >
             </Select>
           </FormItem>
@@ -34,7 +34,12 @@
               v-model="jobEdit.clientVersion"
               placeholder="请选择客户端版本"
             >
-              <Option value="1.9.0">1.9.0</Option>
+              <Option
+                v-for="item in hintJobClientVersionEnum"
+                :value="item.value"
+                :key="item.value"
+                >{{ item.desc }}</Option
+              >
             </Select>
           </FormItem>
           <FormItem label="执行文件 : ">
@@ -86,11 +91,13 @@
 import { Component, Prop, Vue } from "vue-property-decorator";
 import jobApi from "@/api/jobApi";
 import { IJob } from "@/model/jobModel";
+import enumApi from "@/api/enumApi";
 
 @Component
 export default class JobEditCustom extends Vue {
   // hint
-  hintJobTypeList: object[] = [{ value: 1, label: "自定义 / Jar" }];
+  hintJobTypeEnum: any[] = [];
+  hintJobClientVersionEnum: any[] = [];
   hintExecFileList: object[] = [];
 
   rt: any = {
@@ -130,6 +137,7 @@ export default class JobEditCustom extends Vue {
 
   // get
   getJob() {
+    console.log("getJob");
     jobApi
       .queryJob({ jobId: this.rt.jobId })
       .then((res: any) => {
@@ -146,10 +154,6 @@ export default class JobEditCustom extends Vue {
   }
 
   getJobJarList() {
-    let a = {
-      a: 1,
-      b: 2
-    };
     jobApi.jarList({ jobId: this.rt.jobId }).then((res: any) => {
       let t: object[] = res;
       this.hintExecFileList = t.map(x => {
@@ -167,10 +171,20 @@ export default class JobEditCustom extends Vue {
     );
   }
 
+  getEnums() {
+    enumApi.jobType().then((res: any) => {
+      this.hintJobTypeEnum = res;
+    });
+    enumApi.jobClientVersion().then((res: any) => {
+      this.hintJobClientVersionEnum = res;
+    });
+  }
+
   mounted() {
     this.parseRouter();
     this.getJob();
     this.getJobJarList();
+    this.getEnums();
   }
 }
 </script>
