@@ -18,6 +18,8 @@ import javax.validation.Valid;
 public class JobInstanceDTO extends JobInstance {
     private static final long serialVersionUID = 1L;
 
+    private String statusDesc;
+
     private JobDTO job;
 
     @Valid
