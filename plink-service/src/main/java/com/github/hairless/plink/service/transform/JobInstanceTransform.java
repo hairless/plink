@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
+import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.pojo.JobInstance;
 import org.springframework.beans.BeanUtils;
@@ -30,6 +31,12 @@ public class JobInstanceTransform implements Transform<JobInstanceDTO, JobInstan
         } else {
             jobInstanceDTO.setConfig(new FlinkConfig());
         }
+        //setLastStatusDesc
+        JobInstanceStatusEnum statusEnum = JobInstanceStatusEnum.getEnum(jobInstance.getStatus());
+        if (statusEnum != null) {
+            jobInstanceDTO.setStatusDesc(statusEnum.getDesc());
+        }
+
         if (jobInstance.getJobId() != null) {
             Job job = jobMapper.selectByPrimaryKey(jobInstance.getJobId());
             jobInstanceDTO.setJob(jobTransform.transform(job));

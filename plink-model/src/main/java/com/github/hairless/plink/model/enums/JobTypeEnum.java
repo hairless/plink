@@ -22,4 +22,14 @@ public enum JobTypeEnum {
         this.value = value;
         this.desc = desc;
     }
+
+    public static JobTypeEnum getEnum(Integer value) {
+        if (value == null)
+            return null;
+        for (JobTypeEnum jobTypeEnum : JobTypeEnum.values()) {
+            if (jobTypeEnum.getValue().equals(value))
+                return jobTypeEnum;
+        }
+        return null;
+    }
 }

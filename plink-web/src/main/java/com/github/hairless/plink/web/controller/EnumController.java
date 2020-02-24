@@ -1,6 +1,6 @@
 package com.github.hairless.plink.web.controller;
 
-import com.github.hairless.plink.model.enums.JobClientVersion;
+import com.github.hairless.plink.model.enums.JobClientVersionEnum;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.enums.JobTypeEnum;
 import com.github.hairless.plink.model.resp.Result;
@@ -27,7 +27,7 @@ public class EnumController {
 
     @RequestMapping("/jobClientVersion")
     public Result jobClientVersion() {
-        return base(JobClientVersion.class);
+        return base(JobClientVersionEnum.class);
     }
 
     private <T extends Class> Result base(T enumClass) {

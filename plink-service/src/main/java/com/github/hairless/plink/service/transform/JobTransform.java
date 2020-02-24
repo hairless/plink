@@ -3,7 +3,9 @@ package com.github.hairless.plink.service.transform;
 import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.dto.JobDTO;
+import com.github.hairless.plink.model.enums.JobClientVersionEnum;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
+import com.github.hairless.plink.model.enums.JobTypeEnum;
 import com.github.hairless.plink.model.pojo.Job;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -18,12 +20,27 @@ public class JobTransform implements Transform<JobDTO, Job> {
     public JobDTO transform(Job job) {
         JobDTO jobDTO = new JobDTO();
         BeanUtils.copyProperties(job, jobDTO);
+        //setConfig
         if (jobDTO.getConfigJson() != null) {
             jobDTO.setConfig(JSON.parseObject(jobDTO.getConfigJson(), FlinkConfig.class));
         } else {
             jobDTO.setConfig(new FlinkConfig());
         }
-
+        //setLastStatusDesc
+        JobInstanceStatusEnum statusEnum = JobInstanceStatusEnum.getEnum(job.getLastStatus());
+        if (statusEnum != null) {
+            jobDTO.setLastStatusDesc(statusEnum.getDesc());
+        }
+        //setTypeDesc
+        JobTypeEnum jobTypeEnum = JobTypeEnum.getEnum(job.getType());
+        if (jobTypeEnum != null) {
+            jobDTO.setTypeDesc(jobTypeEnum.getDesc());
+        }
+        //setClientVersionDesc
+        JobClientVersionEnum versionEnum = JobClientVersionEnum.getEnum(job.getClientVersion());
+        if (versionEnum != null) {
+            jobDTO.setClientVersionDesc(versionEnum.getDesc());
+        }
         //设置权限
         JobDTO.AuthMap authMap = new JobDTO.AuthMap();
         JobInstanceStatusEnum jobInstanceStatusEnum = JobInstanceStatusEnum.getEnum(job.getLastStatus());
