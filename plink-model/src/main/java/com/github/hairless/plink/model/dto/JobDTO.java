@@ -18,6 +18,12 @@ import javax.validation.Valid;
 public class JobDTO extends Job {
     private static final long serialVersionUID = 1L;
 
+    private String typeDesc;
+
+    private String lastStatusDesc;
+
+    private String clientVersionDesc;
+
     @Valid
     private FlinkConfig config;
 
