@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Id;
+import javax.persistence.OrderBy;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -24,6 +25,7 @@ public class BaseModel implements Serializable {
     @Id
     @NotNull(message = "id must not be null")
     @Min(value = 1, message = "id must be a positive integer")
+    @OrderBy("desc")
     private Long id;
     /**
      * 记录创建时间
