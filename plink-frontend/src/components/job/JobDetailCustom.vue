@@ -316,8 +316,7 @@ export default class JobDetailCustom extends Vue {
       .queryJobInstances({
         jobId: this.rt.jobId,
         pageNum: this.jobInstanceQueryCondition.pageNum,
-        pageSize: this.jobInstanceQueryCondition.pageSize,
-        orderByClause: "order by id DESC"
+        pageSize: this.jobInstanceQueryCondition.pageSize
       })
       .then((res: any) => {
         this.jobInstanceList = res.list;

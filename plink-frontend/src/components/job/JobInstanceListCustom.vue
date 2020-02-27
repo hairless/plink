@@ -128,7 +128,7 @@ export default class JobList extends Vue {
       align: "center",
       width: 100
     },
-    /*{
+    {
       title: "名称",
       align: "center",
       render: function(h: any, params: any) {
@@ -139,9 +139,9 @@ export default class JobList extends Vue {
       title: "类型",
       align: "center",
       render: function(h: any, params: any) {
-        return h("div", params.row.job.type);
+        return h("div", params.row.job.typeDesc);
       }
-    },*/
+    },
     {
       title: "创建时间",
       key: "createTime",
