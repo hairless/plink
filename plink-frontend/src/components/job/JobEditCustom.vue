@@ -137,7 +137,6 @@ export default class JobEditCustom extends Vue {
 
   // get
   getJob() {
-    console.log("getJob");
     jobApi
       .queryJob({ jobId: this.rt.jobId })
       .then((res: any) => {
