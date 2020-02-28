@@ -69,7 +69,11 @@
         :data="jobInstanceList"
       >
         <template slot-scope="{ row }" slot="status">
-          <ButtonJobStatus :status="row.status" :text="row.statusDesc" />
+          <ButtonJobStatus
+            size="small"
+            :status="row.status"
+            :text="row.statusDesc"
+          />
         </template>
       </Table>
     </div>
@@ -128,24 +132,35 @@ export default class JobList extends Vue {
       align: "center",
       width: 100
     },
-    /*{
+    {
       title: "名称",
       align: "center",
-      render: function(h: any, params: any) {
-        return h("div", params.row.job.name);
+      render: (h: any, params: any) => {
+        return h(
+          "a",
+          {
+            on: {
+              click: () => {
+                this.handClickJobInstanceListColumnName(params.row);
+              }
+            }
+          },
+          params.row.job.name
+        );
       }
     },
     {
       title: "类型",
       align: "center",
       render: function(h: any, params: any) {
-        return h("div", params.row.job.type);
+        return h("div", params.row.job.typeDesc);
       }
-    },*/
+    },
     {
       title: "创建时间",
       key: "createTime",
       align: "center",
+      width: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.createTime));
       }
@@ -154,6 +169,7 @@ export default class JobList extends Vue {
       title: "开始时间",
       key: "startTime",
       align: "center",
+      width: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.startTime));
       }
@@ -162,6 +178,7 @@ export default class JobList extends Vue {
       title: "结束时间",
       key: "stopTime",
       align: "center",
+      width: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.stopTime));
       }
@@ -185,6 +202,14 @@ export default class JobList extends Vue {
   jobInstanceListFilterPage: any = {
     total: null
   };
+  handClickJobInstanceListColumnName(row: any) {
+    this.$router.push({
+      path: "/page/job/detail",
+      query: {
+        id: row.job.id
+      }
+    });
+  }
   clickQuery() {
     history.pushState(
       {},
@@ -205,7 +230,6 @@ export default class JobList extends Vue {
   }
 
   getJobInstanceList() {
-    console.log(collection.mapDeleteBlankVK(this.jobInstanceListFilter));
     jobInstanceApi
       .queryJobInstances(
         collection.mapDeleteBlankVK(this.jobInstanceListFilter)
@@ -231,7 +255,6 @@ export default class JobList extends Vue {
       this.jobInstanceListFilter,
       this.$route.query
     );
-    console.log(JSON.stringify(this.jobInstanceListFilter));
   }
   mounted() {
     this.parseRouter();

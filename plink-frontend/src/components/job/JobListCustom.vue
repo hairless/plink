@@ -229,7 +229,21 @@ export default class JobList extends Vue {
     {
       title: "名称",
       key: "name",
-      align: "center"
+      align: "center",
+      ellipsis: true,
+      render: (h: any, params: any) => {
+        return h(
+          "a",
+          {
+            on: {
+              click: () => {
+                this.handClickJobListColumnName(params.row);
+              }
+            }
+          },
+          params.row.name
+        );
+      }
     },
     {
       title: "类型",
@@ -245,6 +259,7 @@ export default class JobList extends Vue {
       title: "开始时间",
       key: "lastStartTime",
       align: "center",
+      width: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.lastStartTime));
       }
@@ -253,6 +268,7 @@ export default class JobList extends Vue {
       title: "结束时间",
       key: "lastStopTime",
       align: "center",
+      width: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.lastStopTime));
       }
@@ -284,6 +300,14 @@ export default class JobList extends Vue {
   jobListFilterPage: any = {
     total: null
   };
+  handClickJobListColumnName(row: any) {
+    this.$router.push({
+      path: "/page/job/detail",
+      query: {
+        id: row.id
+      }
+    });
+  }
   clickQuery() {
     history.pushState(
       {},
