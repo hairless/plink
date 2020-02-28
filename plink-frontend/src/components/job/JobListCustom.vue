@@ -184,6 +184,7 @@
         </Form>
       </Modal>
     </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -203,14 +204,6 @@ import tqs from "@/utils/tqs";
   }
 })
 export default class JobList extends Vue {
-  handClickJobListColumnName(row: any) {
-    this.$router.push({
-      path: "/page/job/detail",
-      query: {
-        id: row.id
-      }
-    });
-  }
   // hint
   hintJobTypeEnum: any[] = [];
   hintJobInstanceStatusEnum: any[] = [];
@@ -237,6 +230,7 @@ export default class JobList extends Vue {
       title: "名称",
       key: "name",
       align: "center",
+      ellipsis: true,
       render: (h: any, params: any) => {
         return h(
           "a",
@@ -265,6 +259,7 @@ export default class JobList extends Vue {
       title: "开始时间",
       key: "lastStartTime",
       align: "center",
+      width: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.lastStartTime));
       }
@@ -273,6 +268,7 @@ export default class JobList extends Vue {
       title: "结束时间",
       key: "lastStopTime",
       align: "center",
+      width: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.lastStopTime));
       }
@@ -304,6 +300,14 @@ export default class JobList extends Vue {
   jobListFilterPage: any = {
     total: null
   };
+  handClickJobListColumnName(row: any) {
+    this.$router.push({
+      path: "/page/job/detail",
+      query: {
+        id: row.id
+      }
+    });
+  }
   clickQuery() {
     history.pushState(
       {},

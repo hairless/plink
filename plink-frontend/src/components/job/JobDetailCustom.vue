@@ -48,7 +48,11 @@
               {{ job.name }}
             </template>
             <template slot-scope="{ row }" slot="status">
-              <ButtonJobStatus :status="row.status" :text="row.statusDesc" />
+              <ButtonJobStatus
+                size="small"
+                :status="row.status"
+                :text="row.statusDesc"
+              />
             </template>
             <!--<template slot="operator">
               <div>
@@ -182,6 +186,7 @@ export default class JobDetailCustom extends Vue {
       title: "创建时间",
       key: "createTime",
       align: "center",
+      width: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.createTime));
       }
@@ -190,6 +195,7 @@ export default class JobDetailCustom extends Vue {
       title: "开始时间",
       key: "startTime",
       align: "center",
+      width: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.startTime));
       }
@@ -198,6 +204,7 @@ export default class JobDetailCustom extends Vue {
       title: "结束时间",
       key: "stopTime",
       align: "center",
+      width: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.stopTime));
       }
@@ -243,6 +250,9 @@ export default class JobDetailCustom extends Vue {
           title: "启动作业失败",
           desc: res.msg
         });
+      })
+      .finally(() => {
+        this.jobTimer = this.getJobTimer();
       });
   }
   clickRestart() {
@@ -300,16 +310,25 @@ export default class JobDetailCustom extends Vue {
       .queryJob({ jobId: this.rt.jobId })
       .then((res: any) => {
         this.job = res;
+        // 最终状态时清除定时器
+        if ([3, 4, 5, 6, undefined].includes(this.job.lastStatus)) {
+          this.clearJobTimer();
+        }
       })
       .catch(res => {
         this.$Notice.error({ title: res.msg });
       });
   }
+  jobTimer: any = null;
   getJobTimer() {
-    return setTimeout(() => {
+    return setInterval(() => {
       this.getJob();
       this.getJobInstanceList();
     }, 1000);
+  }
+  clearJobTimer() {
+    clearInterval(this.jobTimer);
+    this.jobTimer = null;
   }
   getJobInstanceList() {
     jobInstanceApi
@@ -329,17 +348,13 @@ export default class JobDetailCustom extends Vue {
   parseRouter() {
     this.rt.jobId = this.$route.query.id;
   }
-  @Watch("job")
-  watchJob(newJob: any, oldJob: any) {
-    this.getJobTimer();
-  }
   mounted() {
     this.parseRouter();
     this.getJob();
     this.getJobInstanceList();
   }
-  destroyed() {
-    clearTimeout(this.getJobTimer());
+  beforeDestroy() {
+    this.clearJobTimer();
   }
 }
 </script>
