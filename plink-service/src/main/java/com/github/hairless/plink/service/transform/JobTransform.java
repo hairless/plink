@@ -6,8 +6,12 @@ import com.github.hairless.plink.model.dto.JobDTO;
 import com.github.hairless.plink.model.enums.JobClientVersionEnum;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.enums.JobTypeEnum;
+import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.model.pojo.Job;
+import com.github.hairless.plink.service.FlinkClusterService;
+import com.github.hairless.plink.service.factory.FlinkClusterServiceFactory;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -16,6 +20,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class JobTransform implements Transform<JobDTO, Job> {
+    @Autowired
+    private FlinkClusterServiceFactory flinkClusterServiceFactory;
+
     @Override
     public JobDTO transform(Job job) {
         JobDTO jobDTO = new JobDTO();
@@ -40,6 +47,15 @@ public class JobTransform implements Transform<JobDTO, Job> {
         JobClientVersionEnum versionEnum = JobClientVersionEnum.getEnum(job.getClientVersion());
         if (versionEnum != null) {
             jobDTO.setClientVersionDesc(versionEnum.getDesc());
+        }
+        //setLastUiAddress
+        if (job.getLastAppId() != null) {
+            FlinkClusterService defaultFlinkClusterService = flinkClusterServiceFactory.getDefaultFlinkClusterService();
+            try {
+                jobDTO.setLastUiAddress(defaultFlinkClusterService.getJobUiAddress(job.getLastAppId()));
+            } catch (Exception e) {
+                throw new PlinkRuntimeException(e);
+            }
         }
         //设置权限
         JobDTO.AuthMap authMap = new JobDTO.AuthMap();

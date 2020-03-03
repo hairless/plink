@@ -19,6 +19,8 @@ public interface FlinkRestRpcService {
 
     void stopJob(String jobId);
 
+    String getJobUiAddress(String jobId);
+
     @Getter
     @Setter
     public class RunConfig {

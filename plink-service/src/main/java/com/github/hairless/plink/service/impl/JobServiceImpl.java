@@ -22,6 +22,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -61,6 +62,8 @@ public class JobServiceImpl implements JobService {
             Job job = jobTransform.inverseTransform(jobDTO);
             jobMapper.insertSelective(job);
             return new Result<>(ResultCode.SUCCESS, jobTransform.transform(jobDTO));
+        } catch (DuplicateKeyException e) {
+            return new Result<>(ResultCode.FAILURE, "job name is duplicate");
         } catch (Exception e) {
             log.warn("add job fail! job={}", JSON.toJSONString(jobDTO), e);
             return new Result<>(ResultCode.EXCEPTION, e);
@@ -155,7 +158,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public Result uploadJar(Long jobId, MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            return new Result(ResultCode.FAILURE, "上传的文件为空");
+            return new Result(ResultCode.FAILURE, "the file is empty");
         }
         String filename = file.getOriginalFilename();
         try {

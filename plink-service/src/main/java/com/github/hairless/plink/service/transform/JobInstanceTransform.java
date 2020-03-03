@@ -5,8 +5,11 @@ import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
+import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.pojo.JobInstance;
+import com.github.hairless.plink.service.FlinkClusterService;
+import com.github.hairless.plink.service.factory.FlinkClusterServiceFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +24,8 @@ public class JobInstanceTransform implements Transform<JobInstanceDTO, JobInstan
     private JobMapper jobMapper;
     @Autowired
     private JobTransform jobTransform;
+    @Autowired
+    private FlinkClusterServiceFactory flinkClusterServiceFactory;
 
     @Override
     public JobInstanceDTO transform(JobInstance jobInstance) {
@@ -35,6 +40,15 @@ public class JobInstanceTransform implements Transform<JobInstanceDTO, JobInstan
         JobInstanceStatusEnum statusEnum = JobInstanceStatusEnum.getEnum(jobInstance.getStatus());
         if (statusEnum != null) {
             jobInstanceDTO.setStatusDesc(statusEnum.getDesc());
+        }
+
+        if (jobInstance.getAppId() != null) {
+            FlinkClusterService defaultFlinkClusterService = flinkClusterServiceFactory.getDefaultFlinkClusterService();
+            try {
+                jobInstanceDTO.setUiAddress(defaultFlinkClusterService.getJobUiAddress(jobInstance.getAppId()));
+            } catch (Exception e) {
+                throw new PlinkRuntimeException(e);
+            }
         }
 
         if (jobInstance.getJobId() != null) {
