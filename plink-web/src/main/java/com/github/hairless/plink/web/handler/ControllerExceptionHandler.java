@@ -1,5 +1,6 @@
 package com.github.hairless.plink.web.handler;
 
+import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.model.exception.ValidationException;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.model.resp.ResultCode;
@@ -21,7 +22,7 @@ import java.util.List;
 @RestControllerAdvice
 public class ControllerExceptionHandler {
 
-    @ExceptionHandler(ValidationException.class)
+    @ExceptionHandler({ValidationException.class, PlinkMessageException.class})
     public Result handlerValidationException(ValidationException exception) {
         return new Result(ResultCode.FAILURE, exception.getMessage());
     }

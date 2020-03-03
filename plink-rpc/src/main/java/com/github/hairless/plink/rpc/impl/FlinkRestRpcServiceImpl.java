@@ -26,6 +26,9 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
     private static final String JOBS = VERSION + "/jobs";
     private static final String JOBS_JOBId = JOBS + "/%s";
 
+    //flink ui address
+    private static final String JOB_UI_ADDRESS = "/#/job/%s";
+
     @Override
     public String uploadJar(String localJarPath) {
         try {
@@ -96,6 +99,15 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
             }
         } catch (Exception e) {
             throw new PlinkRuntimeException("stopJob error", e);
+        }
+    }
+
+    @Override
+    public String getJobUiAddress(String jobId) {
+        try {
+            return String.format(FlinkConfigUtil.getRestAddress() + JOB_UI_ADDRESS, jobId);
+        } catch (Exception e) {
+            throw new PlinkRuntimeException("getJobUiAddress error", e);
         }
     }
 

@@ -20,6 +20,8 @@ public class JobInstanceDTO extends JobInstance {
 
     private String statusDesc;
 
+    private String uiAddress;
+
     private JobDTO job;
 
     @Valid

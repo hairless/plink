@@ -53,4 +53,9 @@ public class StandaloneFlinkClusterService implements FlinkClusterService {
     public void stopJob(JobInstanceDTO jobInstanceDTO) throws Exception {
         flinkRestRpcService.stopJob(jobInstanceDTO.getAppId());
     }
+
+    @Override
+    public String getJobUiAddress(String appId) throws Exception {
+        return flinkRestRpcService.getJobUiAddress(appId);
+    }
 }
