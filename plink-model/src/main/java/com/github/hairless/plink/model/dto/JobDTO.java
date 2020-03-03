@@ -24,6 +24,8 @@ public class JobDTO extends Job {
 
     private String clientVersionDesc;
 
+    private String lastUiAddress;
+
     @Valid
     private FlinkConfig config;
 
