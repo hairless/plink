@@ -161,7 +161,7 @@
       >
         <Form :model="jobCreateItems" :label-width="80">
           <FormItem label="作业名称 :">
-            <Input v-model="jobCreateItems.name" placeholder="" />
+            <Input v-model="jobCreateItems.name" placeholder="作业名称" />
           </FormItem>
           <FormItem label="作业类型 : ">
             <Select v-model="jobCreateItems.type">
@@ -177,7 +177,7 @@
             <Input
               type="textarea"
               v-model="jobCreateItems.description"
-              placeholder=""
+              placeholder="作业描述"
               :rows="4"
             />
           </FormItem>
@@ -218,18 +218,19 @@ export default class JobList extends Vue {
       type: "selection",
       title: "ID",
       key: "id",
-      width: 50
+      minWidth: 50
     },
     {
       title: "ID",
       key: "id",
       align: "center",
-      width: 100
+      minWidth: 50
     },
     {
       title: "名称",
       key: "name",
       align: "center",
+      minWidth: 200,
       ellipsis: true,
       render: (h: any, params: any) => {
         return h(
@@ -248,7 +249,8 @@ export default class JobList extends Vue {
     {
       title: "类型",
       key: "typeDesc",
-      align: "center"
+      align: "center",
+      minWidth: 150
     },
     /*{
       title: "描述",
@@ -259,7 +261,7 @@ export default class JobList extends Vue {
       title: "开始时间",
       key: "lastStartTime",
       align: "center",
-      width: 166,
+      minWidth: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.lastStartTime));
       }
@@ -268,23 +270,45 @@ export default class JobList extends Vue {
       title: "结束时间",
       key: "lastStopTime",
       align: "center",
-      width: 166,
+      minWidth: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.lastStopTime));
+      }
+    },
+    {
+      title: "Flink UI",
+      key: "lastUiAddress",
+      align: "center",
+      minWidth: 250,
+      ellipsis: true,
+      render: (h: any, params: any) => {
+        return h(
+          "a",
+          {
+            on: {
+              click: () => {
+                this.handClickJobListColumnLastUiAddress(params.row);
+              }
+            }
+          },
+          params.row.lastUiAddress
+        );
       }
     },
     {
       title: "状态",
       key: "lastStatus",
       align: "center",
-      slot: "lastStatus"
+      minWidth: 100,
+      slot: "lastStatus",
+      fixed: "right"
     },
     {
       title: "操作",
-      fixed: "right",
       align: "center",
       slot: "operator",
-      width: 140
+      minWidth: 140,
+      fixed: "right"
     }
   ];
   jobList: IJob[] = [];
@@ -308,6 +332,11 @@ export default class JobList extends Vue {
       }
     });
   }
+  handClickJobListColumnLastUiAddress(row: any) {
+    this.$router.push({
+      path: row.lastUiAddress
+    });
+  }
   clickQuery() {
     history.pushState(
       {},
@@ -329,9 +358,9 @@ export default class JobList extends Vue {
   // Job Create
   jobCreateModal: boolean = false;
   jobCreateItems: IJob = {
-    name: "name",
+    name: "",
     type: 1,
-    description: "desc"
+    description: ""
   };
   clickCreate() {
     this.jobCreateModal = true;
@@ -345,6 +374,12 @@ export default class JobList extends Vue {
       .then(res => {
         this.$Notice.success({
           title: "新建作业成功"
+        });
+      })
+      .catch(err => {
+        this.$Notice.error({
+          title: "新建作业失败",
+          desc: err.msg
         });
       });
   }
