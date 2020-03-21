@@ -1,4 +1,4 @@
-import {IJob} from "@/model/jobModel";
+import { IJob } from "@/model/jobModel";
 
 interface IJobInstance {
   id?: number;
@@ -9,6 +9,7 @@ interface IJobInstance {
   stopTime?: string;
   createTime?: string;
   updateTime?: string;
+  uiAddress?: string;
   config?: {
     jarName?: string;
     mainClass?: string;

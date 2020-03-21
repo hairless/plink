@@ -130,11 +130,12 @@ export default class JobList extends Vue {
       title: "ID",
       key: "id",
       align: "center",
-      width: 100
+      minWidth: 50
     },
     {
       title: "名称",
       align: "center",
+      minWidth: 200,
       render: (h: any, params: any) => {
         return h(
           "a",
@@ -152,6 +153,7 @@ export default class JobList extends Vue {
     {
       title: "类型",
       align: "center",
+      minWidth: 150,
       render: function(h: any, params: any) {
         return h("div", params.row.job.typeDesc);
       }
@@ -160,7 +162,7 @@ export default class JobList extends Vue {
       title: "创建时间",
       key: "createTime",
       align: "center",
-      width: 166,
+      minWidth: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.createTime));
       }
@@ -169,7 +171,7 @@ export default class JobList extends Vue {
       title: "开始时间",
       key: "startTime",
       align: "center",
-      width: 166,
+      minWidth: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.startTime));
       }
@@ -178,16 +180,38 @@ export default class JobList extends Vue {
       title: "结束时间",
       key: "stopTime",
       align: "center",
-      width: 166,
+      minWidth: 166,
       render: function(h: any, params: any) {
         return h("div", date.dateFormat(params.row.stopTime));
+      }
+    },
+    {
+      title: "Flink UI",
+      key: "uiAddress",
+      align: "center",
+      minWidth: 250,
+      ellipsis: true,
+      render: (h: any, params: any) => {
+        return h(
+          "a",
+          {
+            on: {
+              click: () => {
+                this.handClickJobInstanceListColumnUiAddress(params.row);
+              }
+            }
+          },
+          params.row.appId
+        );
       }
     },
     {
       title: "状态",
       key: "status",
       align: "center",
-      slot: "status"
+      minWidth: 100,
+      slot: "status",
+      fixed: "right"
     }
   ];
   jobInstanceList: IJobInstance[] = [];
@@ -209,6 +233,9 @@ export default class JobList extends Vue {
         id: row.job.id
       }
     });
+  }
+  handClickJobInstanceListColumnUiAddress(row: any) {
+    window.open(row.uiAddress, "_blank");
   }
   clickQuery() {
     history.pushState(
