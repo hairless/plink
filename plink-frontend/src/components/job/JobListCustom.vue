@@ -291,7 +291,7 @@ export default class JobList extends Vue {
               }
             }
           },
-          params.row.lastUiAddress
+          params.row.lastAppId
         );
       }
     },
@@ -337,9 +337,7 @@ export default class JobList extends Vue {
     });
   }
   handClickJobListColumnLastUiAddress(row: any) {
-    this.$router.push({
-      path: row.lastUiAddress
-    });
+    window.open(row.lastUiAddress, "_blank");
   }
   clickQuery() {
     history.pushState(

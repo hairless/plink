@@ -227,7 +227,7 @@ export default class JobDetailCustom extends Vue {
               }
             }
           },
-          params.row.lastUiAddress
+          params.row.appId
         );
       }
     },
@@ -280,9 +280,7 @@ export default class JobDetailCustom extends Vue {
       });
   }
   handClickJobInstanceListColumnUiAddress(row: any) {
-    this.$router.push({
-      path: row.uiAddress
-    });
+    window.open(row.uiAddress, "_blank");
   }
   clickRestart() {
     jobApi

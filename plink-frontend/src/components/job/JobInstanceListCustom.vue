@@ -201,7 +201,7 @@ export default class JobList extends Vue {
               }
             }
           },
-          params.row.lastUiAddress
+          params.row.appId
         );
       }
     },
@@ -235,9 +235,7 @@ export default class JobList extends Vue {
     });
   }
   handClickJobInstanceListColumnUiAddress(row: any) {
-    this.$router.push({
-      path: row.uiAddress
-    });
+    window.open(row.uiAddress, "_blank");
   }
   clickQuery() {
     history.pushState(
