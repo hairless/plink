@@ -104,7 +104,7 @@
           <Button
             type="success"
             size="small"
-            :disabled="multiSelectJobIds.length === 0"
+            :disabled="buttonStartDisabled"
             @click="clickStartJobs"
             >启动</Button
           >
@@ -112,7 +112,7 @@
             type="warning"
             size="small"
             style="margin-left: 10px;"
-            :disabled="multiSelectJobIds.length === 0"
+            :disabled="buttonRestartDisabled"
             @click="clickRestartJobs"
             >重启</Button
           >
@@ -120,7 +120,7 @@
             type="error"
             size="small"
             style="margin-left: 10px;"
-            :disabled="multiSelectJobIds.length === 0"
+            :disabled="buttonStopDisabled"
             @click="clickStopJobs"
             >停止</Button
           >
@@ -128,7 +128,7 @@
             type="error"
             size="small"
             style="margin-left: 10px;"
-            :disabled="multiSelectJobIds.length === 0"
+            :disabled="buttonDeleteDisabled"
             @click="clickDeleteJobs"
             >删除</Button
           >
@@ -324,6 +324,10 @@ export default class JobList extends Vue {
   jobListFilterPage: any = {
     total: null
   };
+  buttonStartDisabled: boolean = true;
+  buttonRestartDisabled: boolean = true;
+  buttonStopDisabled: boolean = true;
+  buttonDeleteDisabled: boolean = true;
   handClickJobListColumnName(row: any) {
     this.$router.push({
       path: "/page/job/detail",
@@ -409,17 +413,74 @@ export default class JobList extends Vue {
   multiSelectJobIds: any[] = [];
   handleSelectAllCancel(selection: any[]) {
     this.multiSelectJobIds = [];
+    // button disabled
+    this.buttonStartDisabled = true;
+    this.buttonRestartDisabled = true;
+    this.buttonStopDisabled = true;
+    this.buttonDeleteDisabled = true;
   }
   handleSelectAll(selection: any[]) {
     this.multiSelectJobIds = selection.map(row => {
       return row.id;
     });
+    // button disabled
+    let finalStart = true;
+    let finalRestart = true;
+    let finalStop = true;
+    let finalDelete = true;
+    selection.forEach(row => {
+      finalStart = finalStart && row.authMap.start;
+      finalRestart = finalRestart && row.authMap.restart;
+      finalStop = finalStop && row.authMap.stop;
+      finalDelete = finalDelete && row.authMap.delete;
+    });
+    this.buttonStartDisabled = !finalStart;
+    this.buttonRestartDisabled = !finalRestart;
+    this.buttonStopDisabled = !finalStop;
+    this.buttonDeleteDisabled = !finalDelete;
   }
   handleSelect(selection: any[], row: any) {
     this.multiSelectJobIds.push(row.id);
+    // button disabled
+    let finalStart = true;
+    let finalRestart = true;
+    let finalStop = true;
+    let finalDelete = true;
+    selection.forEach(row => {
+      finalStart = finalStart && row.authMap.start;
+      finalRestart = finalRestart && row.authMap.restart;
+      finalStop = finalStop && row.authMap.stop;
+      finalDelete = finalDelete && row.authMap.delete;
+    });
+    this.buttonStartDisabled = !finalStart;
+    this.buttonRestartDisabled = !finalRestart;
+    this.buttonStopDisabled = !finalStop;
+    this.buttonDeleteDisabled = !finalDelete;
   }
   handleSelectCancel(selection: any[], row: any) {
     this.multiSelectJobIds.splice(this.multiSelectJobIds.indexOf(row.id), 1);
+    // button disabled
+    let finalStart = true;
+    let finalRestart = true;
+    let finalStop = true;
+    let finalDelete = true;
+    if (selection.length > 0) {
+      selection.forEach(row => {
+        finalStart = finalStart && row.authMap.start;
+        finalRestart = finalRestart && row.authMap.restart;
+        finalStop = finalStop && row.authMap.stop;
+        finalDelete = finalDelete && row.authMap.delete;
+      });
+      this.buttonStartDisabled = !finalStart;
+      this.buttonRestartDisabled = !finalRestart;
+      this.buttonStopDisabled = !finalStop;
+      this.buttonDeleteDisabled = !finalDelete;
+    } else {
+      this.buttonStartDisabled = true;
+      this.buttonRestartDisabled = true;
+      this.buttonStopDisabled = true;
+      this.buttonDeleteDisabled = true;
+    }
   }
   clickStartJobs() {
     jobApi
