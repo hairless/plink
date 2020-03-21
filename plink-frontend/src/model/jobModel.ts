@@ -10,6 +10,7 @@ interface IJob {
   lastStopTime?: string;
   createTime?: string;
   updateTime?: string;
+  lastUiAddress?: string;
   config?: {
     jarName?: string;
     mainClass?: string;
