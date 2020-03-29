@@ -22,6 +22,7 @@
         <module>plink-rpc</module>
         <module>plink-schedule</module>
         <module>plink-dist</module>
+        <module>plink-jars/plink-sql</module>
     </modules>
 
     <properties>
