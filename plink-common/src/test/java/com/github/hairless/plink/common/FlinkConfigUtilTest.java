@@ -37,5 +37,8 @@ public class FlinkConfigUtilTest {
         String version = FlinkConfigUtil.getFlinkVersion();
         assert version != null;
         log.info("FlinkConfigUtilTest flink version is {}", version);
+        String version2 = FlinkConfigUtil.getFlinkVersion();
+        assert version2 != null;
+        log.info("FlinkConfigUtilTest flink version2 is {}", version2);
     }
 }
