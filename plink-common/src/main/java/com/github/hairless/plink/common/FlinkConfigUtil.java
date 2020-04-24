@@ -12,6 +12,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 /**
@@ -19,14 +21,17 @@ import java.util.stream.Stream;
  * @date: 2020/2/17
  */
 public class FlinkConfigUtil {
+    private static Map<String, Object> cache = new ConcurrentHashMap<>();
 
     private static final String CONF_SUFFIX = "/conf";
     private static final String LIB_SUFFIX = "/lib";
 
     private static final String VERSION_CLASS = "org.apache.flink.runtime.util.EnvironmentInformation";
     private static final String VERSION_METHODS = "getVersion";
+    private static final String VERSION_CACHE_KEY = "version";
 
     private static volatile Configuration configuration;
+
 
     public static String getFlinkHome() throws PlinkMessageException {
         String flinkHome = System.getenv("FLINK_HOME");
@@ -54,6 +59,9 @@ public class FlinkConfigUtil {
     }
 
     public static String getFlinkVersion() throws PlinkMessageException {
+        if (cache.containsKey(VERSION_CACHE_KEY)) {
+            return cache.get(VERSION_CACHE_KEY).toString();
+        }
         try {
             File libDir = new File(getFlinkHome() + LIB_SUFFIX);
             File[] libFiles = libDir.listFiles();
@@ -71,6 +79,7 @@ public class FlinkConfigUtil {
                 Class<?> versionClass = urlClassLoader.loadClass(VERSION_CLASS);
                 Object flinkVersion = versionClass.getMethod(VERSION_METHODS).invoke(null);
                 if (flinkVersion != null) {
+                    cache.put(VERSION_CACHE_KEY, flinkVersion);
                     return flinkVersion.toString();
                 }
             }

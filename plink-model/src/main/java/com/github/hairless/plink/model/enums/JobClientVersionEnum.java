@@ -11,7 +11,6 @@ import lombok.Getter;
 @Getter
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum JobClientVersionEnum {
-    V_1_9_X("1.9.x", "flink 1.9"),
     V_1_10_X("1.10.x", "flink 1.10");
 
     private String value;
