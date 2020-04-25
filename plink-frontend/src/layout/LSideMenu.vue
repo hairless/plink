@@ -1,9 +1,9 @@
 <template>
   <Menu active-name="2-1" theme="light" width="auto" :open-names="['2']">
-    <MenuItem name="1">
+    <!--<MenuItem name="1">
       <Icon type="ios-navigate"></Icon>
       平台概览
-    </MenuItem>
+    </MenuItem>-->
     <Submenu name="2">
       <template slot="title">
         <Icon type="ios-navigate"></Icon>
