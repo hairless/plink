@@ -370,12 +370,19 @@ export default class JobList extends Vue {
   clickCreateOk() {
     jobApi
       .addJob(this.jobCreateItems)
-      .then(res => {
-        this.getJobList();
+      .then((res: any) => {
+        // this.getJobList();
+        // go to edit page
+        this.$router.push({
+          path: "/page/job/edit",
+          query: {
+            id: res.id
+          }
+        });
       })
       .then(res => {
         this.$Notice.success({
-          title: "新建作业成功"
+          title: "新建作业成功, 请编辑作业."
         });
       })
       .catch(err => {
