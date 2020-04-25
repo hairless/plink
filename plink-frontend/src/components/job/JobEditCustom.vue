@@ -66,7 +66,7 @@
       <TabPane label="运行参数" name="runtime">
         <Form :model="jobEdit" :label-width="100" style="width:80%;">
           <FormItem label="作业并行度 :">
-            <Slider v-model="jobEdit.config.parallelism" show-input></Slider>
+            <InputNumber v-model="jobEdit.config.parallelism" ></InputNumber>
           </FormItem>
         </Form>
       </TabPane>
@@ -114,13 +114,23 @@ export default class JobEditCustom extends Vue {
   clickSave() {
     jobApi
       .updateJob(this.jobEdit)
+      .then((res: any) => {
+        this.$router.push({
+          path: "/page/job/detail",
+          query: {
+            id: this.rt.jobId
+          }
+        });
+      })
       .then(res => {
-        this.$Message.success("保存配置成功");
+        this.$Notice.success({
+          title: "编辑配置成功, 请查看详情."
+        });
       })
       .catch(err => {
         this.$Notice.error({
-          title: "保存配置失败",
-          desc: err.msg
+          title: "编辑配置失败",
+          desc: err
         });
       });
   }
@@ -146,6 +156,10 @@ export default class JobEditCustom extends Vue {
         this.jobEdit.description = res.description;
         this.jobEdit.clientVersion = res.clientVersion;
         this.jobEdit.config = res.config;
+        if(this.jobEdit.config && !this.jobEdit.config.parallelism) {
+          // 并行度默认为 1
+          this.jobEdit.config.parallelism = 1;
+        }
       })
       .catch(res => {
         this.$Notice.error({ title: res.msg });
