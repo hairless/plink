@@ -12,7 +12,7 @@ const START_JOB_URL = "/mng/job/startJob/{jobId}";
 const START_JOBS_URL = "/mng/job/startJobs";
 const RESTART_JOB_URL = "/mng/job/reStartJob/{jobId}";
 const RESTART_JOBS_URL = "/mng/job/reStartJobs";
-const STOP_JOB_URL = "/mng/job/startJob/{jobId}";
+const STOP_JOB_URL = "/mng/job/stopJob/{jobId}";
 const STOP_JOBS_URL = "/mng/job/stopJobs";
 
 function queryJob(params: any) {
