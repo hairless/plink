@@ -13,5 +13,5 @@ import com.github.pagehelper.PageInfo;
 public interface JobInstanceService {
     Result<PageInfo<JobInstanceDTO>> queryJobInstances(JobInstanceDTO jobInstanceDTO, PageReq pageReq);
 
-    void updateJobAndInstanceStatus(JobInstance jobInstance) throws Exception;
+    void updateJobAndInstanceStatus(JobInstance jobInstance);
 }

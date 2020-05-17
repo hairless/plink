@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
-import com.github.hairless.plink.model.exception.PlinkException;
+import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.model.req.PageReq;
@@ -54,13 +54,13 @@ public class JobInstanceServiceImpl implements JobInstanceService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateJobAndInstanceStatus(JobInstance jobInstance) throws Exception {
+    public void updateJobAndInstanceStatus(JobInstance jobInstance){
         int jobInstanceRowCnt = jobInstanceMapper.updateByPrimaryKeySelective(jobInstance);
         if (jobInstanceRowCnt == 0) {
-            throw new PlinkException("update job instance status fail");
+            throw new PlinkMessageException("update job instance status fail");
         }
         if (jobInstance.getJobId() == null) {
-            throw new PlinkException("update job instance status fail,jobId is null");
+            throw new PlinkMessageException("update job instance status fail,jobId is null");
         }
         Job job = new Job();
         job.setId(jobInstance.getJobId());
@@ -70,7 +70,7 @@ public class JobInstanceServiceImpl implements JobInstanceService {
         job.setLastStopTime(jobInstance.getStopTime());
         int jobRowCnt = jobMapper.updateByPrimaryKeySelective(job);
         if (jobRowCnt == 0) {
-            throw new PlinkException("update job status fail");
+            throw new PlinkMessageException("update job status fail");
         }
     }
 }

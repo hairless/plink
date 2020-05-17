@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.arronlong.httpclientutil.HttpClientUtil;
 import com.arronlong.httpclientutil.common.HttpConfig;
 import com.github.hairless.plink.common.FlinkConfigUtil;
-import com.github.hairless.plink.model.exception.PlinkException;
+import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.rpc.FlinkRestRpcService;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
             String resJson = HttpClientUtil.post(httpConfig);
             JSONObject flinkRestRes = JSON.parseObject(resJson);
             if (!"success".equals(flinkRestRes.getString("status"))) {
-                throw new PlinkException("upload jar to cluster fail");
+                throw new PlinkRuntimeException("upload jar to cluster fail");
             }
             String filename = flinkRestRes.getString("filename");
             //兼容windows
@@ -55,7 +55,7 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
             String resJson = HttpClientUtil.delete(httpConfig);
             String errors = JSON.parseObject(resJson).getString("errors");
             if (errors != null) {
-                throw new PlinkRuntimeException("deleteJar error " + errors);
+                throw new PlinkRuntimeException("deleteJar error:" + errors);
             }
         } catch (Exception e) {
             throw new PlinkRuntimeException("deleteJar error", e);
@@ -95,7 +95,7 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
             String resJson = HttpClientUtil.patch(httpConfig);
             String errors = JSON.parseObject(resJson).getString("errors");
             if (errors != null) {
-                throw new PlinkRuntimeException("stopJob error " + errors);
+                throw new PlinkRuntimeException("stopJob error:" + errors);
             }
         } catch (Exception e) {
             throw new PlinkRuntimeException("stopJob error", e);

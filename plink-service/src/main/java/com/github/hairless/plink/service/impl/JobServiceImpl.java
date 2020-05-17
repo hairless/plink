@@ -7,7 +7,7 @@ import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.dto.JobDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
-import com.github.hairless.plink.model.exception.PlinkRuntimeException;
+import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.model.req.PageReq;
@@ -218,7 +218,7 @@ public class JobServiceImpl implements JobService {
         jobInstance.setStatus(JobInstanceStatusEnum.WAITING_START.getValue());
         int rowCnt = jobInstanceMapper.insertSelective(jobInstance);
         if (rowCnt == 0) {
-            throw new PlinkRuntimeException("insert job instance fail");
+            throw new PlinkMessageException("insert job instance fail");
         }
         Job newJob = new Job();
         newJob.setLastInstanceId(jobInstance.getId());
@@ -226,7 +226,7 @@ public class JobServiceImpl implements JobService {
         newJob.setLastStatus(JobInstanceStatusEnum.WAITING_START.getValue());
         int jobUpdateRowCnt = jobMapper.updateByPrimaryKeySelective(newJob);
         if (jobUpdateRowCnt == 0) {
-            throw new PlinkRuntimeException("update job status fail");
+            throw new PlinkMessageException("update job status fail");
         }
         return new Result<>(ResultCode.SUCCESS);
     }
@@ -240,7 +240,7 @@ public class JobServiceImpl implements JobService {
         idList.forEach(id -> {
             Result result = this.startJob(id);
             if (!result.getSuccess()) {
-                throw new PlinkRuntimeException("start job fail jobId=" + id);
+                throw new PlinkMessageException("start job fail jobId=" + id);
             }
         });
         return new Result<>(ResultCode.SUCCESS);
@@ -288,7 +288,7 @@ public class JobServiceImpl implements JobService {
         idList.forEach(id -> {
             Result result = this.stopJob(id);
             if (!result.getSuccess()) {
-                throw new PlinkRuntimeException("stop job fail jobId=" + id);
+                throw new PlinkMessageException("stop job fail jobId=" + id);
             }
         });
         return new Result<>(ResultCode.SUCCESS);
@@ -317,7 +317,7 @@ public class JobServiceImpl implements JobService {
         idList.forEach(id -> {
             Result result = this.reStartJob(id);
             if (!result.getSuccess()) {
-                throw new PlinkRuntimeException("reStart job fail jobId=" + id);
+                throw new PlinkMessageException("reStart job fail jobId=" + id);
             }
         });
         return new Result<>(ResultCode.SUCCESS);
