@@ -26,6 +26,7 @@
             size="small"
             style="width: 120px"
             clearable
+            @on-change="handleTypeChange"
           >
             <Option
               v-for="item in hintJobTypeEnum"
@@ -40,6 +41,7 @@
             size="small"
             style="width: 120px"
             clearable
+            @on-change="handleStatusChange"
           >
             <Option
               v-for="item in hintJobInstanceStatusEnum"
@@ -209,7 +211,7 @@ export default class JobList extends Vue {
   hintJobInstanceStatusEnum: any[] = [];
   // Job Props
   jobListColumns: object[] = [
-    /*{
+ /*   {
       type: "expand",
       key: "id",
       width: 30
@@ -218,13 +220,13 @@ export default class JobList extends Vue {
       type: "selection",
       title: "ID",
       key: "id",
-      minWidth: 50
+      minWidth: 55
     },
     {
       title: "ID",
       key: "id",
       align: "center",
-      minWidth: 50
+      minWidth: 80
     },
     {
       title: "名称",
@@ -355,6 +357,12 @@ export default class JobList extends Vue {
   }
   pageSizeChange(size: number) {
     this.jobListFilter.pageSize = size;
+    this.getJobList();
+  }
+  handleTypeChange() {
+    this.getJobList();
+  }
+  handleStatusChange() {
     this.getJobList();
   }
   // Job Create
