@@ -40,6 +40,7 @@
             size="small"
             style="width: 120px"
             clearable
+            @on-change="handleStatusChange"
           >
             <Option
               v-for="item in hintJobInstanceStatusEnum"
@@ -255,7 +256,9 @@ export default class JobList extends Vue {
     this.jobInstanceListFilter.pageSize = size;
     this.getJobInstanceList();
   }
-
+  handleStatusChange() {
+    this.getJobInstanceList();
+  }
   getJobInstanceList() {
     jobInstanceApi
       .queryJobInstances(
