@@ -1,12 +1,15 @@
 <template>
   <Header>
     <Menu mode="horizontal" theme="dark" active-name="1">
-      <div class="layout-logo"></div>
+      <!--<span class="layout-logo">
+        哈哈
+      </span>-->
+      <span style="color: #FFFFFF; font-size: 24px;">Plink</span>
       <div class="layout-nav">
-        <MenuItem name="1">
+        <!--<MenuItem name="1">
           <Icon type="ios-navigate"></Icon>
           作业管理
-        </MenuItem>
+        </MenuItem>-->
       </div>
     </Menu>
   </Header>
