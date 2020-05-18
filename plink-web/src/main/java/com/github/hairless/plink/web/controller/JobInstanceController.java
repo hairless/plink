@@ -3,6 +3,7 @@ package com.github.hairless.plink.web.controller;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.req.PageReq;
 import com.github.hairless.plink.model.resp.Result;
+import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.service.JobInstanceService;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ public class JobInstanceController {
      */
     @RequestMapping("/queryJobInstances")
     public Result<PageInfo<JobInstanceDTO>> queryJobInstances(JobInstanceDTO jobInstanceDTO, PageReq pageReq) {
-        return jobInstanceService.queryJobInstances(jobInstanceDTO, pageReq);
+        PageInfo<JobInstanceDTO> jobInstanceDTOPageInfo = jobInstanceService.queryJobInstances(jobInstanceDTO, pageReq);
+        return new Result<>(ResultCode.SUCCESS, jobInstanceDTOPageInfo);
     }
 }

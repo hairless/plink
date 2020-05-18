@@ -1,6 +1,5 @@
 package com.github.hairless.plink.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
@@ -8,8 +7,6 @@ import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.model.req.PageReq;
-import com.github.hairless.plink.model.resp.Result;
-import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.service.JobInstanceService;
 import com.github.hairless.plink.service.transform.JobInstanceTransform;
 import com.github.pagehelper.PageHelper;
@@ -37,24 +34,19 @@ public class JobInstanceServiceImpl implements JobInstanceService {
 
 
     @Override
-    public Result<PageInfo<JobInstanceDTO>> queryJobInstances(JobInstanceDTO jobInstanceDTO, PageReq pageReq) {
+    public PageInfo<JobInstanceDTO> queryJobInstances(JobInstanceDTO jobInstanceDTO, PageReq pageReq) {
         if (jobInstanceDTO == null) {
             jobInstanceDTO = new JobInstanceDTO();
         }
         PageHelper.startPage(pageReq.getPageNum(), pageReq.getPageSize());
-        try {
-            List<JobInstance> jobInstanceList = jobInstanceMapper.select(jobInstanceDTO);
-            PageInfo<JobInstance> jobInstancePageInfo = new PageInfo<>(jobInstanceList);
-            return new Result<>(ResultCode.SUCCESS, jobInstanceTransform.pageInfoTransform(jobInstancePageInfo));
-        } catch (Exception e) {
-            log.warn("query jobs fail! jobInstanceDTO={}", JSON.toJSONString(jobInstanceDTO), e);
-            return new Result<>(ResultCode.EXCEPTION, e);
-        }
+        List<JobInstance> jobInstanceList = jobInstanceMapper.select(jobInstanceDTO);
+        PageInfo<JobInstance> jobInstancePageInfo = new PageInfo<>(jobInstanceList);
+        return jobInstanceTransform.pageInfoTransform(jobInstancePageInfo);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateJobAndInstanceStatus(JobInstance jobInstance){
+    public void updateJobAndInstanceStatus(JobInstance jobInstance) {
         int jobInstanceRowCnt = jobInstanceMapper.updateByPrimaryKeySelective(jobInstance);
         if (jobInstanceRowCnt == 0) {
             throw new PlinkMessageException("update job instance status fail");

@@ -3,6 +3,7 @@ package com.github.hairless.plink.web.controller;
 import com.github.hairless.plink.model.dto.JobDTO;
 import com.github.hairless.plink.model.req.PageReq;
 import com.github.hairless.plink.model.resp.Result;
+import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.service.JobService;
 import com.github.pagehelper.PageInfo;
 import lombok.NonNull;
@@ -34,7 +35,8 @@ public class JobController {
      */
     @RequestMapping("/addJob")
     public Result<JobDTO> addJob(@RequestBody JobDTO jobDTO) {
-        return jobService.addJob(jobDTO);
+        JobDTO jobDTORes = jobService.addJob(jobDTO);
+        return new Result<>(ResultCode.SUCCESS, jobDTORes);
     }
 
     /**
@@ -44,7 +46,8 @@ public class JobController {
      */
     @RequestMapping(value = "/deleteJobs", method = RequestMethod.POST)
     public Result deleteJobs(@RequestBody List<Long> idList) {
-        return jobService.deleteJobs(idList);
+        jobService.deleteJobs(idList);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
     /**
@@ -54,7 +57,8 @@ public class JobController {
      */
     @RequestMapping(value = "/deleteJob/{jobId}", method = RequestMethod.POST)
     public Result deleteJob(@PathVariable(value = "jobId") @NotNull Long jobId) {
-        return jobService.deleteJob(jobId);
+        jobService.deleteJob(jobId);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
     /**
@@ -64,7 +68,8 @@ public class JobController {
      */
     @RequestMapping("/updateJob")
     public Result updateJob(@RequestBody @Valid JobDTO jobDTO) {
-        return jobService.updateJob(jobDTO);
+        jobService.updateJob(jobDTO);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
     /**
@@ -74,7 +79,8 @@ public class JobController {
      */
     @RequestMapping("/queryJob/{jobId}")
     public Result<JobDTO> queryJob(@PathVariable(value = "jobId") @NotNull Long jobId) {
-        return jobService.queryJob(jobId);
+        JobDTO jobDTO = jobService.queryJob(jobId);
+        return new Result<>(ResultCode.SUCCESS, jobDTO);
     }
 
     /**
@@ -82,7 +88,8 @@ public class JobController {
      */
     @RequestMapping("/queryJobs")
     public Result<PageInfo<JobDTO>> queryJobs(JobDTO jobDTO, PageReq pageReq) {
-        return jobService.queryJobs(jobDTO, pageReq);
+        PageInfo<JobDTO> jobDTOPageInfo = jobService.queryJobs(jobDTO, pageReq);
+        return new Result<>(ResultCode.SUCCESS, jobDTOPageInfo);
     }
 
     /**
@@ -90,7 +97,8 @@ public class JobController {
      */
     @RequestMapping("{jobId}/uploadJar")
     public Result uploadJar(@PathVariable(value = "jobId") @NotNull Long jobId, @RequestParam("file") MultipartFile file) {
-        return jobService.uploadJar(jobId, file);
+        jobService.uploadJar(jobId, file);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
     /**
@@ -98,7 +106,8 @@ public class JobController {
      */
     @RequestMapping("{jobId}/jarList")
     public Result jarList(@PathVariable(value = "jobId") @NotNull Long jobId) {
-        return jobService.jarList(jobId);
+        jobService.jarList(jobId);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
     /**
@@ -108,7 +117,8 @@ public class JobController {
      */
     @RequestMapping(value = "/startJob/{jobId}")
     public Result startJob(@PathVariable(value = "jobId") @NonNull Long jobId) {
-        return jobService.startJob(jobId);
+        jobService.startJob(jobId);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
     /**
@@ -118,7 +128,8 @@ public class JobController {
      */
     @RequestMapping(value = "/startJobs")
     public Result startJobs(@RequestBody @NonNull List<Long> idList) {
-        return jobService.startJobs(idList);
+        jobService.startJobs(idList);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
     /**
@@ -128,7 +139,8 @@ public class JobController {
      */
     @RequestMapping(value = "/stopJob/{jobId}")
     public Result stopJob(@PathVariable(value = "jobId") @NonNull Long jobId) {
-        return jobService.stopJob(jobId);
+        jobService.stopJob(jobId);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
     /**
@@ -138,7 +150,8 @@ public class JobController {
      */
     @RequestMapping(value = "/stopJobs")
     public Result stopJobs(@RequestBody @NotNull List<Long> idList) {
-        return jobService.stopJobs(idList);
+        jobService.stopJobs(idList);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
     /**
@@ -148,7 +161,8 @@ public class JobController {
      */
     @RequestMapping(value = "/reStartJob/{jobId}")
     public Result reStartJob(@PathVariable(value = "jobId") @NonNull Long jobId) {
-        return jobService.reStartJob(jobId);
+        jobService.reStartJob(jobId);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
     /**
@@ -158,7 +172,8 @@ public class JobController {
      */
     @RequestMapping(value = "/reStartJobs")
     public Result reStartJob(@RequestBody @NonNull List<Long> idList) {
-        return jobService.reStartJobs(idList);
+        jobService.reStartJobs(idList);
+        return new Result<>(ResultCode.SUCCESS);
     }
 
 
