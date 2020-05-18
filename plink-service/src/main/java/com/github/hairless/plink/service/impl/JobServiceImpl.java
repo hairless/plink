@@ -1,18 +1,16 @@
 package com.github.hairless.plink.service.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.common.UploadUtil;
 import com.github.hairless.plink.common.ValidatorUtil;
 import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.dto.JobDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
+import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.model.req.PageReq;
-import com.github.hairless.plink.model.resp.Result;
-import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.service.JobInstanceService;
 import com.github.hairless.plink.service.JobService;
 import com.github.hairless.plink.service.factory.FlinkClusterServiceFactory;
@@ -29,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -57,139 +56,108 @@ public class JobServiceImpl implements JobService {
     private JobInstanceService jobInstanceService;
 
     @Override
-    public Result<JobDTO> addJob(JobDTO jobDTO) {
+    public JobDTO addJob(JobDTO jobDTO) {
+        Job job = jobTransform.inverseTransform(jobDTO);
         try {
-            Job job = jobTransform.inverseTransform(jobDTO);
             jobMapper.insertSelective(job);
-            return new Result<>(ResultCode.SUCCESS, jobTransform.transform(jobDTO));
         } catch (DuplicateKeyException e) {
-            return new Result<>(ResultCode.FAILURE, "job name is duplicate");
-        } catch (Exception e) {
-            log.warn("add job fail! job={}", JSON.toJSONString(jobDTO), e);
-            return new Result<>(ResultCode.EXCEPTION, e);
+            throw new PlinkMessageException("job name is duplicate");
         }
+        return jobTransform.transform(jobDTO);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public Result deleteJob(Long jobId) {
+    public void deleteJob(Long jobId) {
         if (jobId == null) {
-            return new Result(ResultCode.FAILURE, "jobId is null");
+            throw new PlinkMessageException("jobId is null");
         }
-        try {
-            int rowCnt = jobMapper.deleteByPrimaryKey(jobId);
-            if (rowCnt == 0) {
-                return new Result(ResultCode.FAILURE, "delete job fail");
-            }
-            return new Result(ResultCode.SUCCESS);
-        } catch (Exception e) {
-            log.warn("delete job fail! jobId={}", jobId, e);
-            return new Result(ResultCode.EXCEPTION, e);
+        int rowCnt = jobMapper.deleteByPrimaryKey(jobId);
+        if (rowCnt == 0) {
+            throw new PlinkMessageException("delete job fail");
         }
+        //级联删除任务对应的实例信息
+        JobInstance jobInstance = new JobInstance();
+        jobInstance.setJobId(jobId);
+        jobInstanceMapper.delete(jobInstance);
     }
 
     @Override
-    public Result deleteJobs(List<Long> idList) {
+    public void deleteJobs(List<Long> idList) {
         if (CollectionUtils.isEmpty(idList)) {
-            return new Result(ResultCode.FAILURE, "idList is empty");
+            throw new PlinkMessageException("idList is empty");
         }
-        try {
-            idList.forEach(id -> jobMapper.deleteByPrimaryKey(id));
-            return new Result(ResultCode.SUCCESS);
-        } catch (Exception e) {
-            log.warn("delete job fail! idList={}", JSON.toJSONString(idList), e);
-            return new Result(ResultCode.EXCEPTION, e);
-        }
+        idList.forEach(id -> jobMapper.deleteByPrimaryKey(id));
     }
 
     @Override
-    public Result updateJob(JobDTO jobDTO) {
+    public void updateJob(JobDTO jobDTO) {
         if (jobDTO == null) {
-            return new Result(ResultCode.FAILURE, "job is null");
+            throw new PlinkMessageException("job is null");
         }
         if (jobDTO.getId() == null) {
-            return new Result(ResultCode.FAILURE, "jobId is null");
+            throw new PlinkMessageException("jobId is null");
         }
-        try {
-            Job job = jobTransform.inverseTransform(jobDTO);
-            int rowCnt = jobMapper.updateByPrimaryKeySelective(job);
-            if (rowCnt == 0) {
-                return new Result(ResultCode.FAILURE, "update job fail");
-            }
-            return new Result(ResultCode.SUCCESS);
-        } catch (Exception e) {
-            log.warn("update job fail! job={}", JSON.toJSONString(jobDTO), e);
-            return new Result(ResultCode.EXCEPTION, e);
+        Job job = jobTransform.inverseTransform(jobDTO);
+        int rowCnt = jobMapper.updateByPrimaryKeySelective(job);
+        if (rowCnt == 0) {
+            throw new PlinkMessageException("update job fail");
         }
     }
 
     @Override
-    public Result<JobDTO> queryJob(Long jobId) {
+    public JobDTO queryJob(Long jobId) {
         if (jobId == null) {
-            return new Result<>(ResultCode.FAILURE, "jobId is null");
+            throw new PlinkMessageException("jobId is null");
         }
-        try {
-            Job job = jobMapper.selectByPrimaryKey(jobId);
-            if (job == null) {
-                return new Result<>(ResultCode.FAILURE, "jobnot found");
-            }
-            return new Result<>(ResultCode.SUCCESS, jobTransform.transform(job));
-        } catch (Exception e) {
-            log.warn("query job fail! jobId={}", jobId, e);
-            return new Result<>(ResultCode.EXCEPTION, e);
+        Job job = jobMapper.selectByPrimaryKey(jobId);
+        if (job == null) {
+            throw new PlinkMessageException("job not found");
         }
+        return jobTransform.transform(job);
     }
 
     @Override
-    public Result<PageInfo<JobDTO>> queryJobs(JobDTO jobDTO, PageReq pageReq) {
+    public PageInfo<JobDTO> queryJobs(JobDTO jobDTO, PageReq pageReq) {
         if (jobDTO == null) {
             jobDTO = new JobDTO();
         }
         PageHelper.startPage(pageReq.getPageNum(), pageReq.getPageSize());
-        try {
-            List<Job> jobList = jobMapper.select(jobDTO);
-            PageInfo<Job> jobPageInfo = new PageInfo<>(jobList);
-            return new Result<>(ResultCode.SUCCESS, jobTransform.pageInfoTransform(jobPageInfo));
-        } catch (Exception e) {
-            log.warn("query jobs fail! jobDTO={}", JSON.toJSONString(jobDTO), e);
-            return new Result<>(ResultCode.EXCEPTION, e);
-        }
+        List<Job> jobList = jobMapper.select(jobDTO);
+        PageInfo<Job> jobPageInfo = new PageInfo<>(jobList);
+        return jobTransform.pageInfoTransform(jobPageInfo);
     }
 
     @Override
-    public Result uploadJar(Long jobId, MultipartFile file) {
+    public void uploadJar(Long jobId, MultipartFile file) {
         if (file == null || file.isEmpty()) {
-            return new Result(ResultCode.FAILURE, "the file is empty");
+            throw new PlinkMessageException("the file is empty");
         }
         String filename = file.getOriginalFilename();
-        try {
-            File uploadPath = new File(UploadUtil.getJobJarsPath() + jobId);
-            if (!uploadPath.exists()) {
-                if (!uploadPath.mkdirs()) {
-                    return new Result<>(ResultCode.FAILURE, "make upload dir fail!");
-                }
+        File uploadPath = new File(UploadUtil.getJobJarsPath() + jobId);
+        if (!uploadPath.exists()) {
+            if (!uploadPath.mkdirs()) {
+                throw new PlinkMessageException("make upload dir fail!");
             }
-            File targetFile = new File(uploadPath, filename);
+        }
+        File targetFile = new File(uploadPath, filename);
+        try {
             file.transferTo(targetFile);
-            return new Result<>(ResultCode.SUCCESS);
-        } catch (Exception e) {
-            log.warn("upload jar fail! fileName={}", filename, e);
-            return new Result<>(ResultCode.EXCEPTION, e);
+        } catch (IOException e) {
+            throw new PlinkRuntimeException("file upload fail!", e);
         }
     }
 
     @Override
-    public Result<List<String>> jarList(Long jobId) {
-        try {
-            File uploadPath = new File(UploadUtil.getJobJarsPath() + jobId);
-            if (uploadPath.exists()) {
-                String[] fileNames = uploadPath.list();
-                return new Result<>(ResultCode.SUCCESS, Arrays.asList(fileNames));
+    public List<String> jarList(Long jobId) {
+        File uploadPath = new File(UploadUtil.getJobJarsPath() + jobId);
+        if (uploadPath.exists()) {
+            String[] fileNames = uploadPath.list();
+            if (fileNames != null) {
+                return Arrays.asList(fileNames);
             }
-            return new Result<>(ResultCode.SUCCESS, Collections.emptyList());
-        } catch (Exception e) {
-            log.warn("get jar list fail! jobId={}", jobId, e);
-            return new Result<>(ResultCode.EXCEPTION, e);
         }
+        return Collections.emptyList();
     }
 
     /**
@@ -199,17 +167,17 @@ public class JobServiceImpl implements JobService {
      */
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Result startJob(Long jobId) {
+    public void startJob(Long jobId) {
         Job job = jobMapper.selectByPrimaryKey(jobId);
         if (job == null) {
-            return new Result(ResultCode.FAILURE, "jobId is not exist");
+            throw new PlinkMessageException("jobId is not exist");
         }
         JobDTO jobDTO = jobTransform.transform(job);
         ValidatorUtil.validate(jobDTO);
         if (jobDTO.getLastStatus() != null) {
             JobInstanceStatusEnum jobInstanceStatusEnum = JobInstanceStatusEnum.getEnum(jobDTO.getLastStatus());
             if (jobInstanceStatusEnum != null && !jobInstanceStatusEnum.isFinalState()) {
-                return new Result(ResultCode.FAILURE, jobInstanceStatusEnum.getDesc() + " status can not start");
+                throw new PlinkMessageException(jobInstanceStatusEnum.getDesc() + " status can not start");
             }
         }
         JobInstance jobInstance = new JobInstance();
@@ -218,7 +186,7 @@ public class JobServiceImpl implements JobService {
         jobInstance.setStatus(JobInstanceStatusEnum.WAITING_START.getValue());
         int rowCnt = jobInstanceMapper.insertSelective(jobInstance);
         if (rowCnt == 0) {
-            throw new PlinkRuntimeException("insert job instance fail");
+            throw new PlinkMessageException("insert job instance fail");
         }
         Job newJob = new Job();
         newJob.setLastInstanceId(jobInstance.getId());
@@ -226,100 +194,75 @@ public class JobServiceImpl implements JobService {
         newJob.setLastStatus(JobInstanceStatusEnum.WAITING_START.getValue());
         int jobUpdateRowCnt = jobMapper.updateByPrimaryKeySelective(newJob);
         if (jobUpdateRowCnt == 0) {
-            throw new PlinkRuntimeException("update job status fail");
+            throw new PlinkMessageException("update job status fail");
         }
-        return new Result<>(ResultCode.SUCCESS);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Result startJobs(List<Long> idList) {
+    public void startJobs(List<Long> idList) {
         if (CollectionUtils.isEmpty(idList)) {
-            return new Result(ResultCode.FAILURE, "idList is empty");
+            throw new PlinkMessageException("idList is empty");
         }
-        idList.forEach(id -> {
-            Result result = this.startJob(id);
-            if (!result.getSuccess()) {
-                throw new PlinkRuntimeException("start job fail jobId=" + id);
-            }
-        });
-        return new Result<>(ResultCode.SUCCESS);
+        idList.forEach(this::startJob);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Result stopJob(Long jobId) {
+    public void stopJob(Long jobId) {
+        if (jobId == null) {
+            throw new PlinkMessageException("jobId is null");
+        }
+        Job job = jobMapper.selectByPrimaryKey(jobId);
+        if (job == null) {
+            throw new PlinkMessageException("jobId is not exist");
+        }
+        Long lastInstanceId = job.getLastInstanceId();
+        if (lastInstanceId == null) {
+            throw new PlinkMessageException("this job no instance information");
+        }
+        if (!JobInstanceStatusEnum.RUNNING.equals(JobInstanceStatusEnum.getEnum(job.getLastStatus()))) {
+            throw new PlinkMessageException("instance is not running");
+        }
+        JobInstance jobInstance = jobInstanceMapper.selectByPrimaryKey(lastInstanceId);
+        if (jobInstance == null) {
+            throw new PlinkMessageException("instance not found");
+        }
         try {
-            Job job = jobMapper.selectByPrimaryKey(jobId);
-            if (job == null) {
-                return new Result(ResultCode.FAILURE, "jobId is not exist");
-            }
-            Long lastInstanceId = job.getLastInstanceId();
-            if (lastInstanceId == null) {
-                return new Result(ResultCode.FAILURE, "this job no instance information");
-            }
-            if (!JobInstanceStatusEnum.RUNNING.equals(JobInstanceStatusEnum.getEnum(job.getLastStatus()))) {
-                return new Result(ResultCode.FAILURE, "instance is not running");
-            }
-            JobInstance jobInstance = jobInstanceMapper.selectByPrimaryKey(lastInstanceId);
-            if (jobInstance == null) {
-                return new Result(ResultCode.FAILURE, "instance not found");
-            }
             flinkClusterServiceFactory.getDefaultFlinkClusterService().stopJob(jobInstanceTransform.transform(jobInstance));
-            JobInstance stoppedJobInstance = new JobInstance();
-            stoppedJobInstance.setId(jobInstance.getId());
-            stoppedJobInstance.setJobId(jobInstance.getJobId());
-            stoppedJobInstance.setStatus(JobInstanceStatusEnum.STOPPED.getValue());
-            stoppedJobInstance.setStopTime(new Date());
-            jobInstanceService.updateJobAndInstanceStatus(stoppedJobInstance);
-            return new Result<>(ResultCode.SUCCESS);
         } catch (Exception e) {
-            log.warn("stop job fail! jobId={}", jobId, e);
-            return new Result<>(ResultCode.EXCEPTION, e);
+            throw new PlinkRuntimeException("stop job fail", e);
         }
+        JobInstance stoppedJobInstance = new JobInstance();
+        stoppedJobInstance.setId(jobInstance.getId());
+        stoppedJobInstance.setJobId(jobInstance.getJobId());
+        stoppedJobInstance.setStatus(JobInstanceStatusEnum.STOPPED.getValue());
+        stoppedJobInstance.setStopTime(new Date());
+        jobInstanceService.updateJobAndInstanceStatus(stoppedJobInstance);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Result stopJobs(List<Long> idList) {
+    public void stopJobs(List<Long> idList) {
         if (CollectionUtils.isEmpty(idList)) {
-            return new Result(ResultCode.FAILURE, "idList is empty");
+            throw new PlinkMessageException("idList is empty");
         }
-        idList.forEach(id -> {
-            Result result = this.stopJob(id);
-            if (!result.getSuccess()) {
-                throw new PlinkRuntimeException("stop job fail jobId=" + id);
-            }
-        });
-        return new Result<>(ResultCode.SUCCESS);
+        idList.forEach(this::stopJob);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Result reStartJob(Long jobId) {
-        Result stopResult = this.stopJob(jobId);
-        if (!stopResult.getSuccess()) {
-            return stopResult;
-        }
-        Result startResult = this.startJob(jobId);
-        if (!startResult.getSuccess()) {
-            return startResult;
-        }
-        return new Result<>(ResultCode.SUCCESS);
+    public void reStartJob(Long jobId) {
+        this.stopJob(jobId);
+        this.startJob(jobId);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Result reStartJobs(List<Long> idList) {
+    public void reStartJobs(List<Long> idList) {
         if (CollectionUtils.isEmpty(idList)) {
-            return new Result(ResultCode.FAILURE, "idList is empty");
+            throw new PlinkMessageException("idList is empty");
         }
-        idList.forEach(id -> {
-            Result result = this.reStartJob(id);
-            if (!result.getSuccess()) {
-                throw new PlinkRuntimeException("reStart job fail jobId=" + id);
-            }
-        });
-        return new Result<>(ResultCode.SUCCESS);
+        idList.forEach(this::reStartJob);
     }
 }

@@ -29,6 +29,9 @@ public class JobInstanceTransform implements Transform<JobInstanceDTO, JobInstan
 
     @Override
     public JobInstanceDTO transform(JobInstance jobInstance) {
+        if (jobInstance == null) {
+            return null;
+        }
         JobInstanceDTO jobInstanceDTO = new JobInstanceDTO();
         BeanUtils.copyProperties(jobInstance, jobInstanceDTO);
         if (jobInstanceDTO.getConfigJson() != null) {
@@ -60,6 +63,9 @@ public class JobInstanceTransform implements Transform<JobInstanceDTO, JobInstan
 
     @Override
     public JobInstance inverseTransform(JobInstanceDTO dto) {
+        if (dto == null) {
+            return null;
+        }
         if (dto.getConfig() != null) {
             dto.setConfigJson(JSON.toJSONString(dto.getConfig()));
         }
