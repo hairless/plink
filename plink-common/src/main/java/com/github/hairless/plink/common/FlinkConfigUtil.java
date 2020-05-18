@@ -1,6 +1,6 @@
 package com.github.hairless.plink.common;
 
-import com.github.hairless.plink.model.exception.PlinkMessageException;
+import com.github.hairless.plink.model.exception.PlinkException;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.configuration.Configuration;
@@ -33,32 +33,32 @@ public class FlinkConfigUtil {
     private static volatile Configuration configuration;
 
 
-    public static String getFlinkHome() throws PlinkMessageException {
+    public static String getFlinkHome() throws PlinkException {
         String flinkHome = System.getenv("FLINK_HOME");
         if (StringUtils.isBlank(flinkHome)) {
-            throw new PlinkMessageException("FLINK_HOME is not set!");
+            throw new PlinkException("FLINK_HOME is not set!");
         }
         return flinkHome;
     }
 
-    private static synchronized void loadConfiguration() throws PlinkMessageException {
+    private static synchronized void loadConfiguration() throws PlinkException {
         if (configuration == null) {
             configuration = GlobalConfiguration.loadConfiguration(getFlinkHome() + CONF_SUFFIX);
         }
     }
 
-    public static Configuration getConfiguration() throws PlinkMessageException {
+    public static Configuration getConfiguration() throws PlinkException {
         if (configuration == null) {
             loadConfiguration();
         }
         return configuration;
     }
 
-    public static String getRestAddress() throws PlinkMessageException {
+    public static String getRestAddress() throws PlinkException {
         return "http://" + getConfiguration().getValue(RestOptions.ADDRESS) + ":" + getConfiguration().getValue(RestOptions.PORT);
     }
 
-    public static String getFlinkVersion() throws PlinkMessageException {
+    public static String getFlinkVersion() throws PlinkException {
         if (cache.containsKey(VERSION_CACHE_KEY)) {
             return cache.get(VERSION_CACHE_KEY).toString();
         }
@@ -83,7 +83,7 @@ public class FlinkConfigUtil {
                     return flinkVersion.toString();
                 }
             }
-        } catch (PlinkMessageException e) {
+        } catch (PlinkException e) {
             throw e;
         } catch (Exception e) {
             throw new PlinkRuntimeException("get flink version error", e);

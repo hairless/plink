@@ -2,7 +2,7 @@ package com.github.hairless.plink.model.exception;
 
 /**
  * @author: silence
- * @date: 2020/1/19
+ * @date: 2020/2/17
  */
 public class PlinkException extends Exception {
     private static final long serialVersionUID = -1L;

@@ -2,7 +2,6 @@ package com.github.hairless.plink.service;
 
 import com.github.hairless.plink.model.dto.JobDTO;
 import com.github.hairless.plink.model.req.PageReq;
-import com.github.hairless.plink.model.resp.Result;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,32 +13,32 @@ import java.util.List;
  */
 
 public interface JobService {
-    Result<JobDTO> addJob(JobDTO jobDTO);
+    JobDTO addJob(JobDTO jobDTO);
 
-    Result deleteJob(Long jobId);
+    void deleteJob(Long jobId);
 
-    Result deleteJobs(List<Long> idList);
+    void deleteJobs(List<Long> idList);
 
-    Result updateJob(JobDTO jobDTO);
+    void updateJob(JobDTO jobDTO);
 
-    Result<JobDTO> queryJob(Long jobId);
+    JobDTO queryJob(Long jobId);
 
-    Result<PageInfo<JobDTO>> queryJobs(JobDTO jobDTO, PageReq pageReq);
+    PageInfo<JobDTO> queryJobs(JobDTO jobDTO, PageReq pageReq);
 
-    Result uploadJar(Long jobId, MultipartFile file);
+    void uploadJar(Long jobId, MultipartFile file);
 
-    Result<List<String>> jarList(Long jobId);
+    List<String> jarList(Long jobId);
 
-    Result startJob(Long jobId);
+    void startJob(Long jobId);
 
-    Result startJobs(List<Long> idList);
+    void startJobs(List<Long> idList);
 
-    Result stopJob(Long jobId);
+    void stopJob(Long jobId);
 
-    Result stopJobs(List<Long> idList);
+    void stopJobs(List<Long> idList);
 
-    Result reStartJob(Long jobId);
+    void reStartJob(Long jobId);
 
-    Result reStartJobs(List<Long> idList);
+    void reStartJobs(List<Long> idList);
 
 }

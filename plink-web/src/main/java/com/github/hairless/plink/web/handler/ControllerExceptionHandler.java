@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -35,7 +36,9 @@ public class ControllerExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public Result handlerAllException(Exception exception) {
+    public Result handlerAllException(Exception exception, HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        log.warn("path:{} throw exception", requestURI, exception);
         return new Result(ResultCode.EXCEPTION, exception);
     }
 }

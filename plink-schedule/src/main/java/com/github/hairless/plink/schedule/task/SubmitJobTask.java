@@ -2,7 +2,7 @@ package com.github.hairless.plink.schedule.task;
 
 import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
-import com.github.hairless.plink.model.exception.PlinkException;
+import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.service.FlinkClusterService;
 import com.github.hairless.plink.service.JobInstanceService;
@@ -51,7 +51,7 @@ public class SubmitJobTask {
                 FlinkClusterService defaultFlinkClusterService = flinkClusterServiceFactory.getDefaultFlinkClusterService();
                 appId = defaultFlinkClusterService.submitJob(jobInstanceTransform.transform(jobInstance));
                 if (StringUtils.isBlank(appId)) {
-                    throw new PlinkException("appId is empty");
+                    throw new PlinkMessageException("appId is empty");
                 }
                 jobInstanceSubmitted.setAppId(appId);
                 //提交成功状态为 '运行中'
