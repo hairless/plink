@@ -2,7 +2,8 @@
   <div>
     <!-- Job Edit -->
     <Tabs>
-      <TabPane label="基本配置" name="basic">
+      <TabPane label="作业编辑" name="basic">
+        <H3>基本配置</H3>
         <Form :model="jobEdit" :label-width="100">
           <FormItem label="作业名称 :">
             <Input v-model="jobEdit.name" placeholder="" />
@@ -26,8 +27,7 @@
             />
           </FormItem>
         </Form>
-      </TabPane>
-      <TabPane label="作业配置" name="job">
+        <H3>作业配置</H3>
         <Form :model="jobEdit" :label-width="100" style="width:80%;">
           <FormItem label="客户端版本 :">
             <Select
@@ -62,8 +62,7 @@
             <Input v-model="jobEdit.config.args" type="textarea" :rows="4" />
           </FormItem>
         </Form>
-      </TabPane>
-      <TabPane label="运行参数" name="runtime">
+        <H3>运行参数</H3>
         <Form :model="jobEdit" :label-width="100" style="width:80%;">
           <FormItem label="作业并行度 :">
             <InputNumber v-model="jobEdit.config.parallelism" ></InputNumber>
@@ -105,6 +104,7 @@ export default class JobEditCustom extends Vue {
   };
   jobEdit: IJob = {
     name: "",
+    clientVersion: "1.10.x",
     config: {}
   };
 
@@ -154,7 +154,7 @@ export default class JobEditCustom extends Vue {
         this.jobEdit.name = res.name;
         this.jobEdit.type = res.type;
         this.jobEdit.description = res.description;
-        this.jobEdit.clientVersion = res.clientVersion;
+        this.jobEdit.clientVersion = res.clientVersion === '' ? '1.10.x' : res.clientVersion;
         this.jobEdit.config = res.config;
         if(this.jobEdit.config && !this.jobEdit.config.parallelism) {
           // 并行度默认为 1
@@ -169,9 +169,11 @@ export default class JobEditCustom extends Vue {
   getJobJarList() {
     jobApi.jarList({ jobId: this.rt.jobId }).then((res: any) => {
       let t: object[] = res;
-      this.hintExecFileList = t.map(x => {
-        return { value: x.toString(), label: x.toString() };
-      });
+      if(t) {
+        this.hintExecFileList = t.map(x => {
+          return { value: x.toString(), label: x.toString() };
+        });
+      }
     });
   }
 
