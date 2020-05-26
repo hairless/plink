@@ -1,34 +1,39 @@
-# Plink: Platform for Flink
+# Plink
+Platform for [Apache Flink](https://flink.apache.org)
 
-[Flink](https://flink.apache.org/)是目前非常流行的一款大数据处理框架,Plink则是基于flink搭建的实时计算平台。
-我们短期目标是构建一个基于flink sql(1.10版本)的sql可视化编辑器，用于实时数仓场景的建设
+## 概述
+旨在基于 [Apache Flink](https://flink.apache.org) 封装构建上层平台。  
+提供常见的作业管理功能。如作业的创建，删除，编辑，更新，保存，启动，停止，重启，管理，多作业模板配置等。  
+Flink SQL 编辑提交功能。如 SQL 的在线开发，智能提示，格式化，语法校验，保存，采样，运行，测试，集成 Kafka 等。
 
-### 主要功能点
+## 目标
+我们的目标，你说了算，赶紧 [联系我们](#联系我们)，一起贡献吧！~~~
 
-* 支持的flink集群的部署方式：standalone
-* 支持的flink作业类型：自定义flink jar
-* flink作业的运维：创建作业、编辑作业、启动、停止、重启
-* flink作业的监控：丰富的可视化指标监控、作业异常重试
-* docker一键部署
+## 特性
 
-### 规划中功能
+1. 作业管理（v0.1）
+    * [√] 作业创建，删除，编辑，更新，保存，上传 Jar，常规参数配置。
+    * [√] 作业启动，停止，重启，停止，删除。
+    * [√] 批量的作业启动，停止，重启，停止，删除。
+    * [√] 作业列表的查看，过滤，分页。
+    * [√] 作业实例列表的查看，过滤，分页。
+    * [] 本地化部署。
+    * [] Dcoker 部署。
 
-* flink on yarn、flink on k8s
-* 可视化sql编辑器
+2. Flink SQL（v0.2）
+    * [] 可视化 Flink SQL 编辑器。
+    * [] SQL 的在线开发，智能提示，格式化，语法校验，保存。
+    * [] SQL 的采样，测试，运行，停止，重启等。
+    * [] SQL 集成 Kafka。
 
-### 文档
-
+## 文档
 - [项目文档](/docs)
 
-### 参与贡献
+## 参与贡献
+如果您对此项目感兴趣，欢迎进行代码 [贡献](CONTRIBUTING.md)  
+我们建议用 **IntelliJ IDEA** 来开发项目，**IDEA** 下载 [https://www.jetbrains.com/idea/](https://www.jetbrains.com/idea/)  
+这是一个活跃的开源项目，如果您对此项目有任何的问题或者建议，请与我们 [联系](#联系我们)
 
-如果您对此项目感兴趣，欢迎进行代码[贡献](CONTRIBUTING.md)
-
-我们建议用IntelliJ IDEA来开发项目，IDEA下载 [https://www.jetbrains.com/idea/](https://www.jetbrains.com/idea/)
-
-这是一个活跃的开源项目，如果您对此项目有任何的问题或者建议，请与我们[联系](#联系我们)
-
-### 联系我们
-
-- QQ群 602995595
+## 联系我们
+- QQ群 : [602995595](https://shang.qq.com/wpa/qunwpa?idkey=80abdf504880b073062bc0e65a40411379ca1df99726736f426b5e9fbbd02310)（只要你主动，我们就会有故事 。。。）
 
