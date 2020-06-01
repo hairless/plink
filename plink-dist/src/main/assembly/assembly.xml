@@ -1,0 +1,61 @@
+<assembly>
+    <id>bin</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <dependencySets>
+        <dependencySet>
+            <useProjectArtifact>false</useProjectArtifact>
+            <outputDirectory>lib</outputDirectory>
+            <unpack>false</unpack>
+        </dependencySet>
+    </dependencySets>
+    <fileSets>
+        <!-- README -->
+        <fileSet>
+            <directory>../${basedir}/</directory>
+            <includes>
+                <include>README.md</include>
+            </includes>
+        </fileSet>
+
+        <!-- bin -->
+        <fileSet>
+            <directory>${basedir}/src/main/plink-bin/bin</directory>
+            <outputDirectory>/bin</outputDirectory>
+            <includes>
+                <include>run.sh</include>
+            </includes>
+        </fileSet>
+
+        <!-- boot -->
+        <!--<fileSet>
+            <directory>${basedir}/target</directory>
+            <outputDirectory>boot</outputDirectory>
+            <fileMode>0755</fileMode>
+            <includes>
+                <include>${project.build.finalName}.jar</include>
+            </includes>
+        </fileSet>-->
+
+        <!-- config -->
+        <fileSet>
+            <directory>../${basedir}/plink-web/target/classes</directory>
+            <outputDirectory>/config</outputDirectory>
+            <fileMode>0755</fileMode>
+            <includes>
+                <include>application.yml</include>
+                <include>application-local.yml</include>
+                <include>application-test.yml</include>
+                <include>banner.txt</include>
+            </includes>
+        </fileSet>
+
+        <!-- docs -->
+        <fileSet>
+            <directory>../${basedir}/docs</directory>
+            <outputDirectory>/docs</outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>
