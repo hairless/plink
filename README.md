@@ -7,7 +7,7 @@ Platform for [Apache Flink](https://flink.apache.org)
 Flink SQL 编辑提交功能。如 SQL 的在线开发，智能提示，格式化，语法校验，保存，采样，运行，测试，集成 Kafka 等。
 
 ## 目标
-我们的目标，你说了算，赶紧 [联系我们](#联系我们)，一起贡献吧！~~~
+我们的目标，你说了才算，赶紧 [联系我们](#联系我们)，一起进步吧！（只要你主动，我们就会有故事 。。。）
 
 ## 特性
 
@@ -17,17 +17,23 @@ Flink SQL 编辑提交功能。如 SQL 的在线开发，智能提示，格式�
     * [√] 批量的作业启动，停止，重启，停止，删除。
     * [√] 作业列表的查看，过滤，分页。
     * [√] 作业实例列表的查看，过滤，分页。
-    * [] 本地化部署。
-    * [] Dcoker 部署。
+    * [_] 本地化部署。
+    * [_] Dcoker 部署。
 
 2. Flink SQL（v0.2）
-    * [] 可视化 Flink SQL 编辑器。
-    * [] SQL 的在线开发，智能提示，格式化，语法校验，保存。
-    * [] SQL 的采样，测试，运行，停止，重启等。
-    * [] SQL 集成 Kafka。
+    * [_] 可视化 Flink SQL 编辑器。
+    * [_] SQL 的在线开发，智能提示，格式化，语法校验，保存。
+    * [_] SQL 的采样，测试，运行，停止，重启等。
+    * [_] SQL 集成 Kafka。
 
-## 文档
-- [项目文档](/docs)
+## 项目部署
+1. [部署文档](docs/deploy-standalone.md)  
+    1.1. [在 Windows 上进行部署](docs/deploy-standalone-on-windows.md)
+
+## 项目文档
+1. [Plink 技术栈](docs/technicalNote.md)
+2. [部署文档](docs/deploy-standalone.md)  
+    2.1. [在 Windows 上进行部署](deploy-standalone-on-windows.md)
 
 ## 参与贡献
 如果您对此项目感兴趣，欢迎进行代码 [贡献](CONTRIBUTING.md)  
