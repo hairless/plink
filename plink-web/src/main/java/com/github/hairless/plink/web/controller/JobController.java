@@ -106,8 +106,7 @@ public class JobController {
      */
     @RequestMapping("{jobId}/jarList")
     public Result jarList(@PathVariable(value = "jobId") @NotNull Long jobId) {
-        jobService.jarList(jobId);
-        return new Result<>(ResultCode.SUCCESS);
+        return new Result<>(ResultCode.SUCCESS, jobService.jarList(jobId));
     }
 
     /**
