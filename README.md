@@ -32,7 +32,9 @@ Flink SQL 编辑提交功能。如 SQL 的在线开发，智能提示，格式�
 ## 项目文档
 1. [Plink 技术栈](docs/technicalNote.md)
 2. [部署文档](docs/deploy-standalone.md)  
-    2.1. [在 Windows 上进行部署](deploy-standalone-on-windows.md)
+    2.1. [在 Windows 上进行部署](docs/deploy-standalone-on-windows.md)
+3. 使用手册  
+    3.1. [运行 Word Count 作业](docs/manual/manual-run-word-count.md)
 
 ## 参与贡献
 如果您对此项目感兴趣，欢迎进行代码 [贡献](CONTRIBUTING.md)  
