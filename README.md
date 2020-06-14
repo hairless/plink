@@ -26,11 +26,14 @@ Flink SQL 编辑提交功能。如 SQL 的在线开发，智能提示，格式�
     * [_] SQL 的采样，测试，运行，停止，重启等。
     * [_] SQL 集成 Kafka。
 
-## 部署
-1. [独立部署](docs/deploy-standalone.md)
+## 项目部署
+1. [部署文档](docs/deploy-standalone.md)  
+    1.1. [在 Windows 上进行部署](docs/deploy-standalone-on-windows.md)
 
-## 文档
-- [项目文档](/docs)
+## 项目文档
+1. [Plink 技术栈](docs/technicalNote.md)
+2. [部署文档](docs/deploy-standalone.md)  
+    2.1. [在 Windows 上进行部署](deploy-standalone-on-windows.md)
 
 ## 参与贡献
 如果您对此项目感兴趣，欢迎进行代码 [贡献](CONTRIBUTING.md)  
