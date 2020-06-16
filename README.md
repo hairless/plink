@@ -1,6 +1,5 @@
 # Plink
 Platform for [Apache Flink](https://flink.apache.org)
-
 ## 概述
 旨在基于 [Apache Flink](https://flink.apache.org) 封装构建上层平台。  
 提供常见的作业管理功能。如作业的创建，删除，编辑，更新，保存，启动，停止，重启，管理，多作业模板配置等。  
@@ -27,13 +26,19 @@ Flink SQL 编辑提交功能。如 SQL 的在线开发，智能提示，格式�
 
 ## 项目部署
 1. [部署文档](docs/deploy-standalone.md)  
-    1.1. [在 Windows 上进行部署](docs/deploy-standalone-on-windows.md)
+    1.1. [在 Windows 上部署 Plink](docs/deploy-standalone-on-windows.md)  
+    1.2. [在 Linux 上部署 Plink](docs/deploy-standalone-on-linux.md)
+
+## 使用手册
+1. [使用手册](docs/manual/manual-home.md)  
+    1.1. [运行 Word Count 作业](docs/manual/manual-run-word-count.md)
 
 ## 项目文档
 1. [Plink 技术栈](docs/technicalNote.md)
 2. [部署文档](docs/deploy-standalone.md)  
-    2.1. [在 Windows 上进行部署](docs/deploy-standalone-on-windows.md)
-3. 使用手册  
+    2.1. [在 Windows 上部署 Plink](docs/deploy-standalone-on-windows.md)  
+    2.2. [在 Linux 上部署 Plink](docs/deploy-standalone-on-linux.md)
+3. [使用手册](docs/manual/manual-home.md)  
     3.1. [运行 Word Count 作业](docs/manual/manual-run-word-count.md)
 
 ## 参与贡献
