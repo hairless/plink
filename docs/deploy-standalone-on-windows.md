@@ -1,4 +1,4 @@
-# 在 Windows 上进行部署
+# 在 Windows 上部署 Plink
 Plink 进行独立单机部署，可以在 Windows 上进行部署，以下是部署的操作详情。
 
 ## 环境需求
@@ -82,6 +82,8 @@ Plink 进行独立单机部署，可以在 Windows 上进行部署，以下是�
 ```shell
 bin/run.bat start
 ```
+
+访问默认地址: <http://127.0.0.1:8666>，可参考 [使用手册](manual/manual-home.md)
 
 ### 关闭
 打开 cmd 命令提示符，切换到 PLINK_HOME 目录
