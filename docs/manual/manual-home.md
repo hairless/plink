@@ -1,3 +1,3 @@
-# 使用手册
+# Plink 使用手册
 
-1. [运行 Word Count 作业](manual-run-word-count.md)
+1. [在 Plink 上运行 Word Count 作业](manual-run-word-count.md)
