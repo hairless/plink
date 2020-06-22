@@ -1,4 +1,4 @@
-# 运行 Word Count 作业
+# 运行 Word Count 作业示例
 在 Plink 上提交 Flink 自带的 flink-1.9.1\examples\streaming\WordCount.jar，然运行。
 
 ## 作业列表
@@ -7,11 +7,22 @@
 ![新建作业](img/plink-run-word-count-stage-1.jpg)
 
 ### 编辑作业
-* 作业列表编辑或新建作业之后会自动跳转到编辑作业的页面。填写参数，上传 Jar，保存即可。如下所示:
-> 这里的 Jar 使用的是 Flink 官方自带的 flink-1.9.1-bin-scala_2.11\flink-1.9.1\examples\streaming\WordCount.jar。  
-> 下载链接: <https://mirror.bit.edu.cn/apache/flink/flink-1.9.3/flink-1.9.3-bin-scala_2.11.tgz>
+> 注意: 由于独立部署和容器化部署的 Flink 版本可能不一样，最好使用对应的 WordCount Jar 版本。
+
+1. 独立部署（Flink 1.9）:  
+    > 下载链接: <https://mirror.bit.edu.cn/apache/flink/flink-1.9.3/flink-1.9.3-bin-scala_2.11.tgz>
+    Jar 目录: f${FLINK_HOME}examples\streaming\WordCount.jar。  
+    
+
+2. Docker 部署（Flink 1.10）:  
+    > 下载链接: <https://mirrors.bfsu.edu.cn/apache/flink/flink-1.10.1/flink-1.10.1-bin-scala_2.11.tgz>  
+    Jar 目录: ${FLINK_HOME}\examples\streaming\WordCount.jar
+
+作业列表编辑或新建作业之后会自动跳转到编辑作业的页面。填写参数，上传 Jar，保存即可。如下所示:
 
 ![编辑作业](img/plink-run-word-count-stage-2.jpg)
+
+> Word Count MainClass: org.apache.flink.streaming.examples.wordcount.WordCount
 
 ### 作业详情
 1. 作业信息
