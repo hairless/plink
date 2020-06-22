@@ -16,7 +16,8 @@ Flink SQL 编辑提交功能。如 SQL 的在线开发，智能提示，格式�
     * [√] 批量的作业启动，停止，重启，停止，删除。
     * [√] 作业列表的查看，过滤，分页。
     * [√] 作业实例列表的查看，过滤，分页。
-    * [√] 本地化部署。
+    * [√] 本地化部署（Windows / Linux）。
+    * [√] 容器化部署（Docker）。
 
 2. Flink SQL（v0.2）
     * [_] 可视化 Flink SQL 编辑器。
@@ -27,7 +28,8 @@ Flink SQL 编辑提交功能。如 SQL 的在线开发，智能提示，格式�
 ## 项目部署
 1. [部署文档](docs/deploy-standalone.md)  
     1.1. [在 Windows 上部署 Plink](docs/deploy-standalone-on-windows.md)  
-    1.2. [在 Linux 上部署 Plink](docs/deploy-standalone-on-linux.md)
+    1.2. [在 Linux 上部署 Plink](docs/deploy-standalone-on-linux.md)  
+    1.3. [使用 Docker 部署 Plink](docs/deploy-standalone-on-docker.md)
 
 ## 使用手册
 1. [使用手册](docs/manual/manual-home.md)  
@@ -37,7 +39,8 @@ Flink SQL 编辑提交功能。如 SQL 的在线开发，智能提示，格式�
 1. [Plink 技术栈](docs/technicalNote.md)
 2. [部署文档](docs/deploy-standalone.md)  
     2.1. [在 Windows 上部署 Plink](docs/deploy-standalone-on-windows.md)  
-    2.2. [在 Linux 上部署 Plink](docs/deploy-standalone-on-linux.md)
+    2.2. [在 Linux 上部署 Plink](docs/deploy-standalone-on-linux.md)  
+    2.3. [使用 Docker 部署 Plink](docs/deploy-standalone-on-docker.md)
 3. [使用手册](docs/manual/manual-home.md)  
     3.1. [运行 Word Count 作业](docs/manual/manual-run-word-count.md)
 
