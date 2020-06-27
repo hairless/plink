@@ -10,7 +10,7 @@
 > 注意: 由于独立部署和容器化部署的 Flink 版本可能不一样，最好使用对应的 WordCount Jar 版本。
 
 1. 独立部署（Flink 1.9）:  
-    > 下载链接: <https://mirror.bit.edu.cn/apache/flink/flink-1.9.3/flink-1.9.3-bin-scala_2.11.tgz>
+    > 下载链接: <https://mirror.bit.edu.cn/apache/flink/flink-1.9.3/flink-1.9.3-bin-scala_2.11.tgz>  
     Jar 目录: f${FLINK_HOME}examples\streaming\WordCount.jar。  
     
 
