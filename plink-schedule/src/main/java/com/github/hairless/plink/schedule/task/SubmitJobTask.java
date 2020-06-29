@@ -1,6 +1,6 @@
 package com.github.hairless.plink.schedule.task;
 
-import com.alibaba.fastjson.JSON;
+import com.github.hairless.plink.common.LoggerUtil;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.model.pojo.JobInstance;
@@ -11,6 +11,7 @@ import com.github.hairless.plink.service.transform.JobInstanceTransform;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,11 @@ import java.util.Date;
 @Slf4j
 @Component
 public class SubmitJobTask {
+
+    @Value("${logging.instance.dir}")
+    private String instanceLogDir;
+    @Value("${logging.instance.pattern}")
+    private String instanceLogPattern;
     @Autowired
     private JobInstanceTransform jobInstanceTransform;
     @Autowired
@@ -32,7 +38,9 @@ public class SubmitJobTask {
 
     @Async("commonThreadExecutor")
     public void asyncSubmitJobTask(JobInstance jobInstance) {
-        log.info("starting job {}", JSON.toJSON(jobInstance));
+        LoggerUtil.registerThreadFileAppender(String.valueOf(jobInstance.getId()), String.format(instanceLogDir + instanceLogPattern, jobInstance.getJobId(), jobInstance.getId()));
+
+        log.info("prepare starting job instance, jobId={}, instanceId={}", jobInstance.getJobId(), jobInstance.getId());
         try {
             //修改实例和任务状态由 '待启动' 为 '启动中'
             JobInstance jobInstance2Starting = new JobInstance();
@@ -41,6 +49,7 @@ public class SubmitJobTask {
             jobInstance2Starting.setStatus(JobInstanceStatusEnum.STARTING.getValue());
             jobInstance2Starting.setStartTime(new Date());
             jobInstanceService.updateJobAndInstanceStatus(jobInstance2Starting);
+            log.info("jobInstance is starting, jobId={}, instanceId={}", jobInstance.getJobId(), jobInstance.getId());
 
             JobInstance jobInstanceSubmitted = new JobInstance();
             jobInstanceSubmitted.setId(jobInstance.getId());
@@ -56,15 +65,18 @@ public class SubmitJobTask {
                 jobInstanceSubmitted.setAppId(appId);
                 //提交成功状态为 '运行中'
                 jobInstanceSubmitted.setStatus(JobInstanceStatusEnum.RUNNING.getValue());
+                log.info("start success!!!,jobInstance is running, jobId={}, instanceId={}", jobInstance.getJobId(), jobInstance.getId());
             } catch (Exception e) {
                 //提交失败状态为 '启动失败'
                 jobInstanceSubmitted.setStatus(JobInstanceStatusEnum.START_FAILED.getValue());
                 jobInstanceSubmitted.setStopTime(new Date());
-                log.warn("jobInstance start fail jobInstanceId={}", jobInstance.getId(), e);
+                log.warn("jobInstance start fail, jobId={}, instanceId={}", jobInstance.getJobId(), jobInstance.getId(), e);
             }
             jobInstanceService.updateJobAndInstanceStatus(jobInstanceSubmitted);
         } catch (Exception e) {
-            log.warn("submitJobTask failed, jobInstance={}", JSON.toJSONString(jobInstance), e);
+            log.warn("submitJobTask failed, jobId={}, instanceId={}", jobInstance.getJobId(), jobInstance.getId(), e);
         }
+
+        LoggerUtil.rescindAppender(String.valueOf(jobInstance.getId()));
     }
 }
