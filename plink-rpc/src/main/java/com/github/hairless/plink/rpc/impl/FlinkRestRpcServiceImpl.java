@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.arronlong.httpclientutil.HttpClientUtil;
 import com.arronlong.httpclientutil.common.HttpConfig;
 import com.github.hairless.plink.common.FlinkConfigUtil;
-import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.rpc.FlinkRestRpcService;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +35,7 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
             String resJson = HttpClientUtil.post(httpConfig);
             JSONObject flinkRestRes = JSON.parseObject(resJson);
             if (!"success".equals(flinkRestRes.getString("status"))) {
-                throw new PlinkRuntimeException("upload jar to cluster fail");
+                throw new PlinkRuntimeException("upload jar to cluster fail,result=" + resJson);
             }
             String filename = flinkRestRes.getString("filename");
             //兼容windows
