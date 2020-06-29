@@ -130,7 +130,7 @@ export default class JobEditCustom extends Vue {
       .catch(err => {
         this.$Notice.error({
           title: "编辑配置失败",
-          desc: err
+          desc: err.msg
         });
       });
   }
