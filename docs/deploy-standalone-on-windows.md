@@ -58,8 +58,14 @@ Plink 进行独立单机部署，可以在 Windows 上进行部署，以下是�
 * 测试: 访问 <http://127.0.0.1:8081> 正常即可。
 
 ## 安装 Plink
-### 项目编译
-1. 编译
+
+### 获取plink二进制压缩包
+
+## 直接下载
+
+<https://github.com/hairless/plink/releases/download/release-0.1.0/plink-0.1.0-bin.tar.gz>
+
+## 项目编译
     ```shell
     git clone https://github.com/hairless/plink.git
     cd plink
