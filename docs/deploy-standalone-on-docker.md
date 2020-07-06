@@ -16,12 +16,12 @@
 
 ## 拉取镜像
 ```shell
-docker pull registry.cn-hangzhou.aliyuncs.com/hairless/plink:master
+docker pull registry.cn-hangzhou.aliyuncs.com/hairless/plink
 ```
 
 ## 启动镜像
 ```shell
-docker run -ti -p 8666:8666 -p 8081:8081 --name plink -d registry.cn-hangzhou.aliyuncs.com/hairless/plink:0.1.0
+docker run -ti -p 8666:8666 -p 8081:8081 --name plink -d registry.cn-hangzhou.aliyuncs.com/hairless/plink
 ```
 
 > 本地 FLINK_HOME 覆盖 Docker 镜像中的 Flink，需在 docker 启动时加入参数 : -v FLINK_HOME:/opt/flink
