@@ -61,11 +61,11 @@ Plink 进行独立单机部署，可以在 Windows 上进行部署，以下是�
 
 ### 获取plink二进制压缩包
 
-## 直接下载
+#### 直接下载
 
 <https://github.com/hairless/plink/releases/download/release-0.1.0/plink-0.1.0-bin.tar.gz>
 
-## 项目编译
+#### 项目编译
     ```shell
     git clone https://github.com/hairless/plink.git
     cd plink
