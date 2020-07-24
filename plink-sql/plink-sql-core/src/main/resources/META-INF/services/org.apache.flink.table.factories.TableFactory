@@ -1,1 +1,1 @@
-com.github.hairless.plink.sql.factory.CollectionTableFactory
+com.github.hairless.plink.sql.connector.collection.CollectionTableFactory

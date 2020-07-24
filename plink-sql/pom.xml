@@ -16,7 +16,6 @@
 
     <modules>
         <module>plink-sql-core</module>
-        <module>plink-sql-flink-dependency</module>
     </modules>
 
     <properties>
@@ -36,17 +35,21 @@
                 <artifactId>plink-sql-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.github.hairless</groupId>
-                <artifactId>plink-sql-flink-dependency</artifactId>
-                <version>${project.version}</version>
-                <type>pom</type>
-            </dependency>
 
             <!--flink dependencies-->
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-core</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-json</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-csv</artifactId>
                 <version>${flink.version}</version>
             </dependency>
             <dependency>

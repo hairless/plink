@@ -1,5 +1,7 @@
-package com.github.hairless.plink.sql.factory;
+package com.github.hairless.plink.sql.connector.collection;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.TableSchema;
@@ -7,19 +9,33 @@ import org.apache.flink.table.sources.StreamTableSource;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.types.Row;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author: silence
  * @date: 2020/7/8
  */
+@Slf4j
 public class CollectionTableSource implements StreamTableSource<Row> {
-    TableSchema tableSchema;
-    List<Row> data;
+    private final TableSchema tableSchema;
+    private final List<Row> rowList;
 
-    public CollectionTableSource(TableSchema tableSchema, List<Row> data) {
+    public CollectionTableSource(TableSchema tableSchema, List<Row> rowList) {
         this.tableSchema = tableSchema;
-        this.data = data;
+        this.rowList = rowList;
+    }
+
+    public CollectionTableSource(TableSchema tableSchema, List<String> dataList, DeserializationSchema<Row> deserializationSchema) {
+        this.tableSchema = tableSchema;
+        this.rowList = dataList.stream().map(s -> {
+            try {
+                return deserializationSchema.deserialize(s.getBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
     }
 
     @Override
@@ -29,7 +45,7 @@ public class CollectionTableSource implements StreamTableSource<Row> {
 
     @Override
     public DataStream<Row> getDataStream(StreamExecutionEnvironment execEnv) {
-        return execEnv.fromCollection(data);
+        return execEnv.fromCollection(rowList);
     }
 
     @Override
