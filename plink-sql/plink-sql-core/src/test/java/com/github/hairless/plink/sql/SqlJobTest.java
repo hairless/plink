@@ -32,7 +32,7 @@ public class SqlJobTest {
         String viewSql =
                 "create view temp_view as select * from t1;";
         String query =
-                "insert into t2 select t1.a, t1.b, t1.a + 3 as c from temp_view t1;";
+                "insert into t2(a,b,c) select a,b,c from temp_view t1;insert into t2(a,b,c) select a,b,c from temp_view t1;";
 
         sql = sourceDDL + sinkDDL + viewSql + query;
     }

@@ -1,7 +1,6 @@
 package com.github.hairless.plink.sql.util;
 
-import com.github.hairless.plink.sql.model.Column;
-import com.github.hairless.plink.sql.model.SqlParseResult;
+import com.github.hairless.plink.sql.model.sqlparse.*;
 import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.*;
 import org.apache.calcite.sql.parser.SqlParseException;
@@ -16,6 +15,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.api.internal.TableEnvironmentImpl;
+import org.apache.flink.table.operations.CatalogSinkModifyOperation;
 import org.apache.flink.table.operations.ddl.CreateViewOperation;
 
 import java.util.ArrayList;
@@ -36,75 +36,91 @@ public class SqlParserUtil {
             .setIdentifierMaxLength(256)
             .build();
 
-    public static SqlParseResult parse(String sql) throws SqlParseException {
+    public static SqlParseInfo parse(String sql) throws SqlParseException {
         StreamExecutionEnvironment env = new LocalStreamEnvironment();
         EnvironmentSettings settings = EnvironmentSettings.newInstance().useBlinkPlanner().inStreamingMode().build();
         TableEnvironmentImpl tEnv = (TableEnvironmentImpl) StreamTableEnvironment.create(env, settings);
 
-        SqlParseResult sqlParseResult = new SqlParseResult();
+        SqlParseInfo sqlParseInfo = new SqlParseInfo();
         SqlParser sqlParser = SqlParser.create(sql, sqlParserConfig);
         SqlNodeList sqlNodes = sqlParser.parseStmtList();
-        List<SqlParseResult.Node> nodeList = new ArrayList<>();
-        List<SqlParseResult.Link> linkList = new ArrayList<>();
-        sqlNodes.forEach(sqlNode -> {
+        List<SqlParseNode> nodeList = new ArrayList<>();
+        List<SqlParseLink> linkList = new ArrayList<>();
+        int insertNodeNum = 0;
+        for (SqlNode sqlNode : sqlNodes) {
             String splitSql = sqlNode.toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();
             tEnv.sqlUpdate(splitSql);
 
             if (sqlNode instanceof SqlCreateTable) {
                 SqlCreateTable sqlCreateTable = (SqlCreateTable) sqlNode;
-                SqlParseResult.Node node = new SqlParseResult.Node();
+                SqlParseNode node = new SqlParseNode();
                 node.setSql(splitSql);
                 node.setName(sqlCreateTable.getTableName().getSimple());
-                node.setType("table");
-                List<Column> columnList = sqlCreateTable.getColumnList().getList().stream().map(c -> {
+                node.setType(SqlParseNodeTypeEnum.TABLE);
+                List<SqlParseColumn> sqlParseColumnList = sqlCreateTable.getColumnList().getList().stream().map(c -> {
                     SqlTableColumn sqlTableColumn = (SqlTableColumn) c;
-                    Column column = new Column();
-                    column.setName(sqlTableColumn.getName().getSimple());
-                    column.setType(sqlTableColumn.getType().toString());
+                    SqlParseColumn sqlParseColumn = new SqlParseColumn();
+                    sqlParseColumn.setName(sqlTableColumn.getName().getSimple());
+                    sqlParseColumn.setType(sqlTableColumn.getType().toString());
                     if (sqlTableColumn.getComment().isPresent()) {
-                        column.setDesc(sqlTableColumn.getComment().get().getStringValue());
+                        sqlParseColumn.setDesc(sqlTableColumn.getComment().get().getStringValue());
                     }
-                    return column;
+                    return sqlParseColumn;
                 }).collect(Collectors.toList());
-                node.setColumnList(columnList);
+                node.setSqlParseColumnList(sqlParseColumnList);
                 nodeList.add(node);
             } else if (sqlNode instanceof SqlCreateView) {
                 SqlCreateView sqlCreateView = (SqlCreateView) sqlNode;
                 String viewName = sqlCreateView.getViewName().getSimple();
                 CreateViewOperation createViewOperation = (CreateViewOperation) tEnv.getParser().parse(splitSql).get(0);
-                SqlParseResult.Node node = new SqlParseResult.Node();
+                SqlParseNode node = new SqlParseNode();
                 node.setSql(splitSql);
                 node.setName(viewName);
-                node.setType("view");
-                List<Column> columnList = createViewOperation.getCatalogView().getSchema().getTableColumns().stream().map(tableColumn -> {
-                    Column column = new Column();
-                    column.setName(tableColumn.getName());
-                    column.setType(tableColumn.getType().getLogicalType().asSummaryString());
-                    return column;
+                node.setType(SqlParseNodeTypeEnum.VIEW);
+                List<SqlParseColumn> sqlParseColumnList = createViewOperation.getCatalogView().getSchema().getTableColumns().stream().map(tableColumn -> {
+                    SqlParseColumn sqlParseColumn = new SqlParseColumn();
+                    sqlParseColumn.setName(tableColumn.getName());
+                    sqlParseColumn.setType(tableColumn.getType().getLogicalType().asSummaryString());
+                    return sqlParseColumn;
                 }).collect(Collectors.toList());
-                node.setColumnList(columnList);
+                node.setSqlParseColumnList(sqlParseColumnList);
                 nodeList.add(node);
                 List<String> selectTableList = lookupSelectTable(sqlCreateView.getQuery());
-                List<SqlParseResult.Link> viewLinkList = selectTable2Link(selectTableList, viewName);
+                List<SqlParseLink> viewLinkList = selectTable2Link(selectTableList, viewName);
                 linkList.addAll(viewLinkList);
             } else if (sqlNode instanceof SqlInsert) {
                 SqlInsert sqlInsert = (SqlInsert) sqlNode;
-                String targetTableName = sqlInsert.getTargetTable().toString();
+                String sinkTableName = sqlInsert.getTargetTable().toString();
+                String insertName = "insert_node_" + insertNodeNum++;
+                SqlParseNode node = new SqlParseNode();
+                node.setSql(splitSql);
+                node.setType(SqlParseNodeTypeEnum.INSERT);
+                node.setName(insertName);
+                CatalogSinkModifyOperation catalogSinkModifyOperation = (CatalogSinkModifyOperation) tEnv.getParser().parse(splitSql).get(0);
+                List<SqlParseColumn> sqlParseColumnList = catalogSinkModifyOperation.getChild().getTableSchema().getTableColumns().stream().map(tableColumn -> {
+                    SqlParseColumn sqlParseColumn = new SqlParseColumn();
+                    sqlParseColumn.setName(tableColumn.getName());
+                    sqlParseColumn.setType(tableColumn.getType().getLogicalType().asSummaryString());
+                    return sqlParseColumn;
+                }).collect(Collectors.toList());
+                node.setSqlParseColumnList(sqlParseColumnList);
+                nodeList.add(node);
                 List<String> selectTableList = lookupSelectTable(sqlInsert.getSource());
-                List<SqlParseResult.Link> sinkLinkList = selectTable2Link(selectTableList, targetTableName);
+                List<SqlParseLink> sinkLinkList = selectTable2Link(selectTableList, insertName);
                 linkList.addAll(sinkLinkList);
+                linkList.add(new SqlParseLink(insertName, sinkTableName));
             }
-        });
-        sqlParseResult.setNodeList(nodeList);
-        sqlParseResult.setLinkList(linkList);
+        }
+        sqlParseInfo.setNodeList(nodeList);
+        sqlParseInfo.setLinkList(linkList);
         //校验
         tEnv.explain(true);
-        return sqlParseResult;
+        return sqlParseInfo;
     }
 
-    private static List<SqlParseResult.Link> selectTable2Link(List<String> selectTableList, String target) {
+    private static List<SqlParseLink> selectTable2Link(List<String> selectTableList, String target) {
         return selectTableList.stream().map(selectTable -> {
-            SqlParseResult.Link link = new SqlParseResult.Link();
+            SqlParseLink link = new SqlParseLink();
             link.setSource(selectTable);
             link.setTarget(target);
             return link;
