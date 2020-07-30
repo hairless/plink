@@ -1,4 +1,4 @@
-package com.github.hairless.plink.sql.model;
+package com.github.hairless.plink.sql.model.sqlparse;
 
 import lombok.Data;
 
@@ -7,7 +7,7 @@ import lombok.Data;
  * @date: 2020/7/17
  */
 @Data
-public class Column {
+public class SqlParseColumn {
     private String name;
     private String type;
     private String desc;

@@ -1,7 +1,5 @@
 package com.github.hairless.plink.sql;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.github.hairless.plink.sql.model.SqlConfig;
 import com.github.hairless.plink.sql.util.SkipAnsiCheckSqlDialect;
 import com.github.hairless.plink.sql.util.SqlParserUtil;
@@ -12,12 +10,6 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.api.internal.TableEnvironmentImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author: silence
