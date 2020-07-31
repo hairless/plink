@@ -6,3 +6,13 @@ jdk:
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true
 
 script: mvn test
+
+cache:
+  directories:
+  - $HOME/.m2
+  - $HOME/flink-1.11.1-bin-scala_2.11
+ 
+before_install:
+  - export FLINK_HOME=$HOME/flink-1.11.1-bin-scala_2.11
+  - if [ ! -d $FLINK_HOME/bin ]; then curl https://mirrors.tuna.tsinghua.edu.cn/apache/flink/flink-1.11.1/flink-1.11.1-bin-scala_2.11.tgz | tar zxf - -C $HOME; fi
+
