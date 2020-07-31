@@ -1,8 +1,8 @@
 package com.github.hairless.plink.sql;
 
 import com.github.hairless.plink.sql.model.SqlConfig;
+import com.github.hairless.plink.sql.util.PlinkSqlParser;
 import com.github.hairless.plink.sql.util.SkipAnsiCheckSqlDialect;
-import com.github.hairless.plink.sql.util.SqlParserUtil;
 import org.apache.calcite.sql.SqlNodeList;
 import org.apache.calcite.sql.parser.SqlParser;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
@@ -30,7 +30,7 @@ public class SqlJob {
                 .useBlinkPlanner().inStreamingMode().build();
         TableEnvironmentImpl tEnv = (TableEnvironmentImpl) StreamTableEnvironment.create(env, settings);
 
-        SqlParser sqlParser = SqlParser.create(sqlConfig.getSql(), SqlParserUtil.sqlParserConfig);
+        SqlParser sqlParser = SqlParser.create(sqlConfig.getSql(), PlinkSqlParser.sqlParserConfig);
         SqlNodeList sqlNodes = sqlParser.parseStmtList();
         sqlNodes.forEach(sqlNode -> {
             String sql = sqlNode.toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();

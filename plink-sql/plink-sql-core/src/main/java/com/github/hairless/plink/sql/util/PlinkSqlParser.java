@@ -8,6 +8,7 @@ import org.apache.calcite.sql.parser.SqlParser;
 import org.apache.flink.sql.parser.ddl.SqlCreateTable;
 import org.apache.flink.sql.parser.ddl.SqlCreateView;
 import org.apache.flink.sql.parser.ddl.SqlTableColumn;
+import org.apache.flink.sql.parser.ddl.SqlTableOption;
 import org.apache.flink.sql.parser.impl.FlinkSqlParserImpl;
 import org.apache.flink.sql.parser.validate.FlinkSqlConformance;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
@@ -19,14 +20,19 @@ import org.apache.flink.table.operations.CatalogSinkModifyOperation;
 import org.apache.flink.table.operations.ddl.CreateViewOperation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * @author: silence
  * @date: 2020/7/20
  */
-public class SqlParserUtil {
+public class PlinkSqlParser {
+    private final Map<String, SqlParseNode> nodeMap;
+    private final List<SqlParseLink> linkList;
 
     public static SqlParser.Config sqlParserConfig = SqlParser
             .configBuilder()
@@ -36,15 +42,50 @@ public class SqlParserUtil {
             .setIdentifierMaxLength(256)
             .build();
 
-    public static SqlParseInfo parse(String sql) throws SqlParseException {
+    private PlinkSqlParser(Map<String, SqlParseNode> nodeMap, List<SqlParseLink> linkList) {
+        this.nodeMap = nodeMap;
+        this.linkList = linkList;
+    }
+
+    public List<SqlParseNode> getTableList() {
+        return nodeMap.values().stream().filter(node -> SqlParseNodeTypeEnum.TABLE.equals(node.getType())).collect(Collectors.toList());
+    }
+
+    public List<SqlParseNode> getTableList(SqlParseNodeActionEnum actionEnum) {
+        return nodeMap.values().stream().filter(node -> node.getActions().contains(actionEnum)).collect(Collectors.toList());
+    }
+
+    public List<SqlParseNode> getViewList() {
+        return nodeMap.values().stream().filter(node -> SqlParseNodeTypeEnum.VIEW.equals(node.getType())).collect(Collectors.toList());
+    }
+
+    public List<SqlParseNode> getInsertList() {
+        return nodeMap.values().stream().filter(node -> SqlParseNodeTypeEnum.INSERT.equals(node.getType())).collect(Collectors.toList());
+    }
+
+    public List<SqlParseNode> getNodeList(SqlParseNodeTypeEnum sqlParseNodeTypeEnum) {
+        return nodeMap.values().stream().filter(node -> node.getType().equals(sqlParseNodeTypeEnum)).collect(Collectors.toList());
+    }
+
+    public SqlParseInfo getSqlParseInfo() {
+        return new SqlParseInfo(new ArrayList<>(this.nodeMap.values()), this.linkList);
+    }
+
+    public List<SqlParseDagNode> getDag() {
+        Map<String, SqlParseDagNode> dagNodeMap = nodeMap.values().stream().map(SqlParseDagNode::new)
+                .collect(Collectors.toMap(node -> node.getNode().getName(), Function.identity()));
+        this.linkList.forEach(link -> dagNodeMap.get(link.getSourceName()).getChildList().add(dagNodeMap.get(link.getTargetName())));
+        return dagNodeMap.values().stream().filter(node -> node.getNode().getActions().contains(SqlParseNodeActionEnum.SOURCE)).collect(Collectors.toList());
+    }
+
+    public static PlinkSqlParser create(String sql) throws SqlParseException {
         StreamExecutionEnvironment env = new LocalStreamEnvironment();
         EnvironmentSettings settings = EnvironmentSettings.newInstance().useBlinkPlanner().inStreamingMode().build();
         TableEnvironmentImpl tEnv = (TableEnvironmentImpl) StreamTableEnvironment.create(env, settings);
 
-        SqlParseInfo sqlParseInfo = new SqlParseInfo();
         SqlParser sqlParser = SqlParser.create(sql, sqlParserConfig);
         SqlNodeList sqlNodes = sqlParser.parseStmtList();
-        List<SqlParseNode> nodeList = new ArrayList<>();
+        Map<String, SqlParseNode> nodeMap = new HashMap<>();
         List<SqlParseLink> linkList = new ArrayList<>();
         int insertNodeNum = 0;
         for (SqlNode sqlNode : sqlNodes) {
@@ -67,8 +108,12 @@ public class SqlParserUtil {
                     }
                     return sqlParseColumn;
                 }).collect(Collectors.toList());
-                node.setSqlParseColumnList(sqlParseColumnList);
-                nodeList.add(node);
+                node.setColumnList(sqlParseColumnList);
+                Map<String, String> properties = sqlCreateTable.getPropertyList().getList().stream().map(x -> ((SqlTableOption) x))
+                        .collect(Collectors.toMap(SqlTableOption::getKeyString, SqlTableOption::getValueString));
+                node.setProperties(properties);
+                node.setCalciteSqlNode(sqlNode);
+                nodeMap.put(node.getName(), node);
             } else if (sqlNode instanceof SqlCreateView) {
                 SqlCreateView sqlCreateView = (SqlCreateView) sqlNode;
                 String viewName = sqlCreateView.getViewName().getSimple();
@@ -83,8 +128,9 @@ public class SqlParserUtil {
                     sqlParseColumn.setType(tableColumn.getType().getLogicalType().asSummaryString());
                     return sqlParseColumn;
                 }).collect(Collectors.toList());
-                node.setSqlParseColumnList(sqlParseColumnList);
-                nodeList.add(node);
+                node.setColumnList(sqlParseColumnList);
+                node.setCalciteSqlNode(sqlNode);
+                nodeMap.put(node.getName(), node);
                 List<String> selectTableList = lookupSelectTable(sqlCreateView.getQuery());
                 List<SqlParseLink> viewLinkList = selectTable2Link(selectTableList, viewName);
                 linkList.addAll(viewLinkList);
@@ -103,26 +149,35 @@ public class SqlParserUtil {
                     sqlParseColumn.setType(tableColumn.getType().getLogicalType().asSummaryString());
                     return sqlParseColumn;
                 }).collect(Collectors.toList());
-                node.setSqlParseColumnList(sqlParseColumnList);
-                nodeList.add(node);
+                node.setColumnList(sqlParseColumnList);
+                node.setCalciteSqlNode(sqlNode);
+                nodeMap.put(node.getName(), node);
                 List<String> selectTableList = lookupSelectTable(sqlInsert.getSource());
                 List<SqlParseLink> sinkLinkList = selectTable2Link(selectTableList, insertName);
                 linkList.addAll(sinkLinkList);
                 linkList.add(new SqlParseLink(insertName, sinkTableName));
             }
         }
-        sqlParseInfo.setNodeList(nodeList);
-        sqlParseInfo.setLinkList(linkList);
+        linkList.forEach(link -> {
+            SqlParseNode sourNode = nodeMap.get(link.getSourceName());
+            if (SqlParseNodeTypeEnum.TABLE.equals(sourNode.getType())) {
+                sourNode.getActions().add(SqlParseNodeActionEnum.SOURCE);
+            }
+            SqlParseNode targetNode = nodeMap.get(link.getTargetName());
+            if (SqlParseNodeTypeEnum.TABLE.equals(targetNode.getType())) {
+                targetNode.getActions().add(SqlParseNodeActionEnum.SINK);
+            }
+        });
         //校验
         tEnv.explain(true);
-        return sqlParseInfo;
+        return new PlinkSqlParser(nodeMap, linkList);
     }
 
     private static List<SqlParseLink> selectTable2Link(List<String> selectTableList, String target) {
         return selectTableList.stream().map(selectTable -> {
             SqlParseLink link = new SqlParseLink();
-            link.setSource(selectTable);
-            link.setTarget(target);
+            link.setSourceName(selectTable);
+            link.setTargetName(target);
             return link;
         }).collect(Collectors.toList());
     }
