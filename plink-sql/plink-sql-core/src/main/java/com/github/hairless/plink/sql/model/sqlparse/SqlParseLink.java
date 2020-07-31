@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SqlParseLink {
-    private String source;
-    private String target;
+    private String sourceName;
+    private String targetName;
 }
