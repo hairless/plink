@@ -2,7 +2,10 @@ language: java
 jdk:
 - openjdk8
 install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true
-script: mvn test -Dspring.profiles.active=test
+script: 
+ # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=hairless_plink
+  - mvn test -Dspring.profiles.active=test
 cache:
   directories:
   - "$HOME/.m2"
@@ -14,3 +17,8 @@ before_install:
 env:
   global:
     secure: tmn1eLtzAdQ50gwN8kkTCbO3hXPiz7rkI9txDvtoMK5mbSlYfaXBOaTEdB6N/2WqFDwiyr2PjTzWaUjapWvnSFXnGA54+jEGhSihhctKjcxz+d5pSlzjbbnG7gTqO7RXP8UJAdhIF5n2nhkLori7jFDw/c03js55ueEVrgna72rXDZMUvdYdoBp89itybVs9i4wRbVM/Cf2BVBT/41KOPJANl78Hu8FsSq0A/40/uWHTOm9dbdBv9gqeAGkofnvocrg9HDucA7VUZe5TorHtJcUn0Xh9qdjn4U5j0AEGEy4Aj5uC97kPbxbI8NPfueZjAqF4kx2qjakdJpDx+/aCx9iaIjJAenY4SZQH4i2kCvgJclrFLYVmDVaXWh1B92B1Uee5ZtH4LBttiaUkNfoUvB6wkO0TfyNYi5NHwp9H2cDnDyvmEoNeH7gZKW5/hMHdCwL2V+hCg64E3dWt+q8Fxwb+c7Km0OqNrUz0xBCEuLl2llyWOvMclP3Oz+la0GOBAL2G04jbC4f/BllF9w6Uful93UAPqavk/kEBr/FK2c/N/g7nBpv/uHnsZFhiRKPSsiPb1+7JWVzIXCY/ZYvkMIpIEfQT4bmpzbfCzyoQCPW2nM+biOkU+zGqf4wgBsw59ZpC1kjafqB1tZmu7Jf1RBQVIGfBs/tRfg3Fq77yJLY=
+addons:
+  sonarcloud:
+    organization: "hairless"
+    token:
+      secure: "tmn1eLtzAdQ50gwN8kkTCbO3hXPiz7rkI9txDvtoMK5mbSlYfaXBOaTEdB6N/2WqFDwiyr2PjTzWaUjapWvnSFXnGA54+jEGhSihhctKjcxz+d5pSlzjbbnG7gTqO7RXP8UJAdhIF5n2nhkLori7jFDw/c03js55ueEVrgna72rXDZMUvdYdoBp89itybVs9i4wRbVM/Cf2BVBT/41KOPJANl78Hu8FsSq0A/40/uWHTOm9dbdBv9gqeAGkofnvocrg9HDucA7VUZe5TorHtJcUn0Xh9qdjn4U5j0AEGEy4Aj5uC97kPbxbI8NPfueZjAqF4kx2qjakdJpDx+/aCx9iaIjJAenY4SZQH4i2kCvgJclrFLYVmDVaXWh1B92B1Uee5ZtH4LBttiaUkNfoUvB6wkO0TfyNYi5NHwp9H2cDnDyvmEoNeH7gZKW5/hMHdCwL2V+hCg64E3dWt+q8Fxwb+c7Km0OqNrUz0xBCEuLl2llyWOvMclP3Oz+la0GOBAL2G04jbC4f/BllF9w6Uful93UAPqavk/kEBr/FK2c/N/g7nBpv/uHnsZFhiRKPSsiPb1+7JWVzIXCY/ZYvkMIpIEfQT4bmpzbfCzyoQCPW2nM+biOkU+zGqf4wgBsw59ZpC1kjafqB1tZmu7Jf1RBQVIGfBs/tRfg3Fq77yJLY=" # encrypted value of your token
