@@ -39,7 +39,7 @@ service.interceptors.response.use(
 
     // if the custom code is not 10000, it is judged as an error.
     switch (resp.code) {
-      case 10000:
+      case "10001":
         return resp;
       case 40001:
         // 登录失败

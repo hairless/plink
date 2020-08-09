@@ -6,7 +6,7 @@
 
       <!-- 无子菜单 -->
       <a-menu-item v-else :key="item.id">
-        <a-icon :type="item.meta.icon" v-if="item.meta.icon"/>
+        <a-icon :type="item.meta.icon" v-if="item.meta.icon" />
         <span>{{ item.meta.title }}</span>
       </a-menu-item>
     </template>

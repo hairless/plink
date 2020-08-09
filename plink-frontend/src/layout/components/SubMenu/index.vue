@@ -4,7 +4,7 @@
     <!-- icon -->
     <template v-show="props.subMenuArr.meta.icon">
       <span slot="title">
-        <a-icon :type="props.subMenuArr.meta.icon" v-if="props.subMenuArr.meta.icon"/>
+        <a-icon :type="props.subMenuArr.meta.icon" v-if="props.subMenuArr.meta.icon" />
         <span>{{ props.subMenuArr.meta.title }}</span>
       </span>
     </template>
@@ -18,8 +18,8 @@
       <!-- 无子菜单 -->
       <template v-else>
         <a-menu-item :key="item.id">
-          <template >
-            <a-icon :type="item.meta.icon" v-if="item.meta.icon"/>
+          <template>
+            <a-icon :type="item.meta.icon" v-if="item.meta.icon" />
           </template>
           <span>{{ item.meta.title }}</span>
         </a-menu-item>

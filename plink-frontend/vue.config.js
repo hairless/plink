@@ -32,11 +32,12 @@ module.exports = {
           "^/api/user": "/"
         }
       },
-      "/api/job": {
+      /* Job Inst Enum ... */
+      "/api/mng": {
         target: process.env.PROXY_JOB_API_URL,
         changeOrigin: true,
         pathRewrite: {
-          "^/api/job": "/"
+          "^/api/mng": "/"
         }
       }
     }
