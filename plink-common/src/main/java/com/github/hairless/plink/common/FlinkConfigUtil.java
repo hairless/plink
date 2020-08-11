@@ -30,7 +30,7 @@ public class FlinkConfigUtil {
     private static final String VERSION_METHODS = "getVersion";
     private static final String VERSION_CACHE_KEY = "version";
 
-    private static volatile Configuration configuration;
+    private static Configuration configuration;
 
 
     public static String getFlinkHome() throws PlinkException {
@@ -47,7 +47,7 @@ public class FlinkConfigUtil {
         }
     }
 
-    public static Configuration getConfiguration() throws PlinkException {
+    public static synchronized Configuration getConfiguration() throws PlinkException {
         if (configuration == null) {
             loadConfiguration();
         }

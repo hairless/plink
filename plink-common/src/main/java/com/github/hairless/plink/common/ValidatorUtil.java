@@ -18,9 +18,7 @@ public class ValidatorUtil {
     public static void validate(Object obj) {
         Set<ConstraintViolation<Object>> set = validator.validate(obj, Default.class);
         if (set != null && set.size() > 0) {
-            for (ConstraintViolation cv : set) {
-                throw new ValidationException(cv.getMessage());
-            }
+            throw new ValidationException(set.stream().findFirst().get().getMessage());
         }
     }
 }
