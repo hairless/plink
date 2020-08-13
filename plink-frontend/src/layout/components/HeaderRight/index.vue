@@ -2,9 +2,9 @@
   <div style="float: right">
     <a-tooltip placement="left">
       <template slot="title">
-        <a href="http://wiki.beijingyuanxin.com/pages/viewpage.action?pageId=5079608" target="_blank" style="color: #ecffeb">项目文档</a>
+        <a href="/doc" target="_blank" style="color: #ecffeb">项目文档</a>
       </template>
-      <a href="http://wiki.beijingyuanxin.com/pages/viewpage.action?pageId=5079608" target="_blank"><a-icon type="question" style="margin-right: 20px;font-size: 18px; color: #ff0000;" spin/></a>
+      <a href="/doc" target="_blank"><a-icon type="question" style="margin-right: 20px;font-size: 18px; color: #ff0000;" spin/></a>
     </a-tooltip>
     <a-icon type="user" style="font-size: 18px; color: #a6f5ff;" />
     <a-dropdown>

@@ -15,7 +15,7 @@
             </span>
             <span style="margin-left: 10px"
               >类型 :
-              <a-select v-model="dataFilter.type" style="width: 100px" size="small" allowClear>
+              <a-select v-model="dataFilter.type" style="width: 100px" size="small" allowClear @change="getDataList">
                 <a-select-option v-for="(item, index) in helper.jobTypeList" :key="index" :value="item.value">
                   {{ item.desc }}
                 </a-select-option>
@@ -23,7 +23,7 @@
             </span>
             <span style="margin-left: 10px"
               >状态 :
-              <a-select v-model="dataFilter.lastStatus" style="width: 100px" size="small" allowClear>
+              <a-select v-model="dataFilter.lastStatus" style="width: 100px" size="small" allowClear @change="getDataList">
                 <a-select-option v-for="(item, index) in helper.instStatusList" :key="index" :value="item.value">
                   {{ item.desc }}
                 </a-select-option>
@@ -49,12 +49,18 @@
         :rowKey="item => item.id"
         :loading="isLoading"
         :pagination="false"
-        :scroll="{ x: 1300 }"
+        :scroll="{ x: 1920 }"
         :row-selection="{
           selectedRowKeys: dataTableSelectedRowKeys,
           onChange: onDataTableSelectedChange
         }"
       >
+        <span slot="name" slot-scope="current, row">
+          <router-link :to="{ path: '/job/jobDetail', query: { jobId: row.id } }">{{ current }}</router-link>
+        </span>
+        <span slot="lastStatusDesc" slot-scope="current, row">
+          <span :style="{ color: [3, 4, -1].includes(row.lastStatus) ? 'red' : 'green' }">{{ current }}</span>
+        </span>
         <span slot="action" slot-scope="row">
           <router-link :to="{ name: 'JobDetail', query: { jobId: row.id } }">详情</router-link>
           <a-divider type="vertical" />
@@ -70,10 +76,10 @@
         <a-row :gutter="16">
           <a-col class="gutter-row" :span="12">
             <div class="gutter-box">
-              <a-button type="primary" size="small" class="filter-tool" disabled @click="onStartJobList">启动</a-button>
-              <a-button type="danger" size="small" class="filter-tool" disabled @click="onRestartJobList">重启</a-button>
-              <a-button type="primary" size="small" class="filter-tool" disabled @click="onStopJobList">停止</a-button>
-              <a-button type="primary" size="small" class="filter-tool" disabled @click="onDeleteJobList">删除</a-button>
+              <a-button type="primary" size="small" class="filter-tool" @click="onStartJobList" :disabled="helper.isDisabledStartJobListButton">启动</a-button>
+              <a-button type="danger" size="small" class="filter-tool" @click="onRestartJobList" :disabled="helper.isDisabledRestartJobListButton">重启</a-button>
+              <a-button type="primary" size="small" class="filter-tool" @click="onStopJobList" :disabled="helper.isDisabledStopJobListButton">停止</a-button>
+              <a-button type="primary" size="small" class="filter-tool" @click="onDeleteJobList" :disabled="helper.isDisabledDeleteJobListButton">删除</a-button>
             </div>
           </a-col>
           <a-col class="gutter-row" :span="12" align="right">
@@ -145,11 +151,12 @@ export default {
         {
           title: "名称",
           dataIndex: "name",
-          width: 200
+          width: 200,
+          scopedSlots: { customRender: "name" }
         },
         {
           title: "类型",
-          dataIndex: "type",
+          dataIndex: "typeDesc",
           width: 100
         },
         {
@@ -165,14 +172,15 @@ export default {
         {
           title: "Flink UI",
           dataIndex: "lastAppId",
-          width: 150
+          width: 280
         },
         {
           title: "状态",
-          dataIndex: "lastStatus",
+          dataIndex: "lastStatusDesc",
           width: 100,
           align: "center",
-          fixed: "right"
+          fixed: "right",
+          scopedSlots: { customRender: "lastStatusDesc" }
         },
         {
           title: "操作",
@@ -194,7 +202,11 @@ export default {
       // helper
       helper: {
         jobTypeList: [],
-        instStatusList: []
+        instStatusList: [],
+        isDisabledStartJobListButton: true,
+        isDisabledRestartJobListButton: true,
+        isDisabledStopJobListButton: true,
+        isDisabledDeleteJobListButton: true
       },
 
       // jobAddModal
@@ -252,8 +264,31 @@ export default {
     onGoBack() {
       this.$router.go(-1);
     },
-    onDataTableSelectedChange(selectedRowKeys) {
+    onDataTableSelectedChange(selectedRowKeys, selectedRows) {
       this.dataTableSelectedRowKeys = selectedRowKeys;
+
+      if (selectedRowKeys.length === 0) {
+        this.helper.isDisabledStartJobListButton = true;
+        this.helper.isDisabledRestartJobListButton = true;
+        this.helper.isDisabledStopJobListButton = true;
+        this.helper.isDisabledDeleteJobListButton = true;
+        return;
+      }
+
+      let finalStart = true;
+      let finalRestart = true;
+      let finalStop = true;
+      let finalDelete = true;
+      selectedRows.forEach(row => {
+        finalStart = finalStart && row.authMap.start;
+        finalRestart = finalRestart && row.authMap.restart;
+        finalStop = finalStop && row.authMap.stop;
+        finalDelete = finalDelete && row.authMap.delete;
+      });
+      this.helper.isDisabledStartJobListButton = !finalStart;
+      this.helper.isDisabledRestartJobListButton = !finalRestart;
+      this.helper.isDisabledStopJobListButton = !finalStop;
+      this.helper.isDisabledDeleteJobListButton = !finalDelete;
     },
     // eslint-disable-next-line no-unused-vars
     onPageNumChange(pageNum, pageSize) {
@@ -266,19 +301,42 @@ export default {
       this.getDataList();
     },
     getDataList() {
+      this.isLoading = true;
       jobApi.getJobPageList(utils.objectDeleteBlankVK(this.dataFilter)).then(resp => {
         this.dataList = resp.data.list;
         this.page.total = resp.data.total;
+        this.isLoading = false;
       });
     },
     onStartJobList() {
-      //
+      jobApi.startJobList(this.dataTableSelectedRowKeys).then(() => {
+        this.$Notice.success({
+          title: "启动多个作业成功！",
+          duration: 1
+        });
+
+        this.getDataList();
+      });
     },
     onRestartJobList() {
-      //
+      jobApi.restartJobList(this.dataTableSelectedRowKeys).then(() => {
+        this.$Notice.success({
+          title: "重启多个作业成功！",
+          duration: 1
+        });
+
+        this.getDataList();
+      });
     },
     onStopJobList() {
-      //
+      jobApi.stopJobList(this.dataTableSelectedRowKeys).then(() => {
+        this.$Notice.success({
+          title: "停止多个作业成功！",
+          duration: 1
+        });
+
+        this.getDataList();
+      });
     },
     onDeleteJobList() {
       jobApi.deleteJobList(this.dataTableSelectedRowKeys).then(() => {
@@ -287,6 +345,8 @@ export default {
           title: "删除多个作业成功！",
           duration: 1
         });
+
+        this.getDataList();
       });
     },
     /* Helper */

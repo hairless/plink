@@ -3,20 +3,23 @@
     <!-- Page Header -->
     <div>
       <a-page-header style="padding: 5px 5px 0 5px" :title="usageModelHelper.title" :sub-title="usageModelHelper.subTitle" @back="() => $router.go(-1)">
+        <template slot="tags">
+          <a-tag :style="{ color: [3, 4, -1].includes(data.lastStatus) ? 'red' : 'green' }" v-show="data.lastStatusDesc">{{ data.lastStatusDesc }}</a-tag>
+        </template>
         <template slot="extra">
-          <a-button type="primary" size="small" v-show="usageModelHelper.showStartButton" style="margin-right: 5px" @click="onStart" :disabled="!data.id">启动</a-button>
-          <a-button type="danger" size="small" v-show="usageModelHelper.showStopButton" style="margin-right: 5px" @click="onStop" :disabled="!data.id">停止</a-button>
-          <a-button type="primary" size="small" v-show="usageModelHelper.showEditButton" style="margin-right: 5px" @click="onEdit" :disabled="!data.id">编辑</a-button>
+          <a-button type="primary" size="small" v-show="usageModelHelper.showStartButton" style="margin-right: 5px" @click="onStart" :disabled="!data.authMap.start">启动</a-button>
+          <a-button type="danger" size="small" v-show="usageModelHelper.showStopButton" style="margin-right: 5px" @click="onStop" :disabled="!data.authMap.stop">停止</a-button>
+          <a-button type="primary" size="small" v-show="usageModelHelper.showEditButton" style="margin-right: 5px" @click="onEdit" :disabled="!data.authMap.edit">编辑</a-button>
           <a-button type="primary" size="small" v-show="usageModelHelper.showDetailButton" style="margin-right: 5px" @click="onDetail">详情</a-button>
-          <a-button type="danger" size="small" v-show="usageModelHelper.showDeleteButton" style="margin-right: 5px" @click="onDelete" :disabled="!data.id">删除</a-button>
+          <a-button type="danger" size="small" v-show="usageModelHelper.showDeleteButton" style="margin-right: 5px" @click="onDelete" :disabled="!data.authMap.delete">删除</a-button>
           <a-button type="primary" size="small" @click="onGoBack">返回</a-button>
         </template>
       </a-page-header>
     </div>
 
     <!-- Page Content -->
-    <a-tabs default-active-key="1">
-      <a-tab-pane key="1">
+    <a-tabs default-active-key="1" @change="handleTabChange">
+      <a-tab-pane key="job">
         <span slot="tab">
           <a-icon type="file-text" />
           作业信息
@@ -25,7 +28,7 @@
         <!-- 作业信息 -->
         <a-spin :spinning="usageModelHelper.isLoading" size="large">
           <div style="margin-top: 20px">
-            <H3>基本配置</H3>
+            <h2>基本配置</h2>
             <a-form-model ref="ruleForm" :model="data" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
               <a-form-model-item label="作业名称" prop="name">
                 <a-input v-model="data.name" />
@@ -41,7 +44,7 @@
                 <a-textarea v-model="data.description" />
               </a-form-model-item>
 
-              <H3>作业配置</H3>
+              <H2>作业配置</H2>
               <a-form-model-item label="客户端版本" prop="clientVersion">
                 <a-select v-model="data.clientVersion" placeholder="请选择版本">
                   <a-select-option v-for="(item, index) in helper.jobClientVersionList" :key="index" :value="item.value">
@@ -69,7 +72,7 @@
                 <a-textarea v-model="data.config.args" />
               </a-form-model-item>
 
-              <H3>运行参数</H3>
+              <H2>运行参数</H2>
               <a-form-model-item label="作业并行度" prop="configParallelism">
                 <a-input-number v-model="data.config.parallelism" :min="1" />
               </a-form-model-item>
@@ -90,13 +93,13 @@
         </a-spin>
       </a-tab-pane>
 
-      <a-tab-pane key="2">
+      <a-tab-pane key="instList">
         <span slot="tab">
           <a-icon type="database" />
           实例列表
         </span>
 
-        <InstList :job-id="dataId" />
+        <InstList ref="refInstList" :job-id="dataId" :is-auto-flush="true" />
       </a-tab-pane>
     </a-tabs>
   </div>
@@ -125,6 +128,17 @@ export default {
       return jobApi.UPLOAD_JAR_URL.replace("{jobId}", this.dataId);
     }
   },
+  watch: {
+    data: {
+      deep: true,
+      handler() {
+        if (this.usageModel === "edit" || this.usageModel === "detail") {
+          this.usageModelHelper.title = this.data.name;
+          this.usageModelHelper.subTitle = this.data.description;
+        }
+      }
+    }
+  },
   data() {
     return {
       labelCol: { span: 4 },
@@ -133,12 +147,21 @@ export default {
         id: null,
         name: "",
         type: 1,
+        lastStatus: null,
+        statusDesc: "",
         clientVersion: "",
         config: {
           jarName: "",
           mainClass: "",
           args: "",
           parallelism: 1
+        },
+        authMap: {
+          edit: false,
+          delete: false,
+          start: false,
+          stop: false,
+          restart: false
         }
       },
       rules: {
@@ -170,7 +193,8 @@ export default {
         jobTypeList: [],
         jobJarList: [],
         jobClientVersionList: []
-      }
+      },
+      dataTimer: null
     };
   },
   methods: {
@@ -245,24 +269,40 @@ export default {
         this.$Notice.success({
           title: "启动作业成功！"
         });
-        this.getData();
+        this.handleFlush(true);
       });
     },
     onStop() {
-      jobApi.startJob(this.data.id).then(() => {
+      jobApi.stopJob(this.data.id).then(() => {
         this.$Notice.success({
           title: "停止作业成功！"
         });
         this.getData();
       });
     },
+    /* 定时器自动刷新 */
+    handleFlush(checked) {
+      if (checked) {
+        if (!this.dataTimer) {
+          this.dataTimer = this.getDataTimer();
+        }
+      } else {
+        this.clearDataTimer();
+      }
+    },
+    getDataTimer() {
+      return setInterval(() => {
+        this.getData();
+      }, 1000);
+    },
+    clearDataTimer() {
+      clearInterval(this.dataTimer);
+      this.dataTimer = null;
+    },
     onRest() {
       this.data = {};
     },
     handleJarUploadChange(info) {
-      if (info.file.status !== "uploading") {
-        console.log(info.file, info.fileList);
-      }
       if (info.file.status === "done") {
         this.$message.success(`${info.file.name} 上传成功！`);
 
@@ -273,6 +313,12 @@ export default {
     },
     onGoBack() {
       this.$router.go(-1);
+    },
+    handleTabChange(activeKey) {
+      if (activeKey !== "instList") {
+        // 实例列表清除定时器
+        this.$refs.refInstList.clearDataListTimer();
+      }
     },
     initAddUsageModel() {
       this.usageModelHelper.showAddButton = true;
@@ -292,7 +338,6 @@ export default {
       this.usageModelHelper.showStopButton = false;
       this.usageModelHelper.title = "编辑作业";
       this.usageModelHelper.subTitle = "请仔细核对作业信息哟！";
-      this.getData();
     },
     initDetailUsageModel() {
       this.usageModelHelper.showAddButton = false;
@@ -305,16 +350,18 @@ export default {
       this.usageModelHelper.showStopButton = true;
       this.usageModelHelper.title = "作业详情";
       this.usageModelHelper.subTitle = "请仔细核对作业信息哟！";
-      this.getData();
     },
     getData() {
       this.usageModelHelper.isLoading = true;
       // 根据 ID 获取数据详情
       jobApi.getJob(this.dataId).then(resp => {
         this.usageModelHelper.isLoading = false;
-        this.$nextTick(() => {
-          this.data = resp.data;
-        });
+        this.data = resp.data;
+
+        // 最终状态清除定时器
+        if ([3, 4, 5, 6].includes(this.data.lastStatus)) {
+          this.clearDataTimer();
+        }
       });
     },
     getJobUploadJarList() {
@@ -338,12 +385,17 @@ export default {
           this.initAddUsageModel();
           break;
         case "edit":
+          this.getData();
           this.initEditUsageModel();
           break;
         case "detail":
+          this.getData();
           this.initDetailUsageModel();
           break;
       }
+    },
+    beforeDestroy() {
+      this.clearDataTimer();
     },
     init() {
       this.initHelper();

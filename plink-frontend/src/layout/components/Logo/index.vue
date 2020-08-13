@@ -1,6 +1,6 @@
 <template>
   <span>
-    <router-link class="logo" :to="{ name: 'Home' }">{{ title }}</router-link>
+    <router-link class="logo" :to="{ path: '/job/jobList' }">{{ title }}</router-link>
   </span>
 </template>
 <script>

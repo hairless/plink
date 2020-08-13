@@ -75,8 +75,8 @@ export function startJob(jobId) {
 export function startJobList(idList) {
   return request({
     url: "/api/mng/job/startJobs",
-    method: "get",
-    params: idList
+    method: "post",
+    data: idList
   });
 }
 
@@ -90,8 +90,8 @@ export function restartJob(jobId) {
 export function restartJobList(idList) {
   return request({
     url: "/api/mng/job/reStartJobs",
-    method: "get",
-    params: idList
+    method: "post",
+    data: idList
   });
 }
 
@@ -105,7 +105,7 @@ export function stopJob(jobId) {
 export function stopJobList(idList) {
   return request({
     url: "/api/mng/job/stopJobs",
-    method: "get",
-    params: idList
+    method: "post",
+    data: idList
   });
 }
