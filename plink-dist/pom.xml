@@ -28,7 +28,9 @@
                 <configuration>
                     <finalName>plink-${project.version}-bin</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
-                    <descriptors>src/main/assembly/assembly.xml</descriptors>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
                     <outputDirectory>target</outputDirectory>
                 </configuration>
                 <executions>
