@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.calcite.shaded.com.google.common.collect.Lists;
+import org.apache.flink.table.catalog.CatalogTable;
 import org.apache.flink.table.descriptors.FormatDescriptorValidator;
 import org.apache.flink.table.factories.*;
 import org.apache.flink.table.sinks.TableSink;
@@ -23,12 +24,14 @@ import static org.apache.flink.table.descriptors.ConnectorDescriptorValidator.CO
  */
 @Slf4j
 public class CollectionTableFactory implements StreamTableSourceFactory<Row>, StreamTableSinkFactory<Row> {
+    public static final String COLLECTION = "collection";
     public static final String DATA = "data";
+    public static final String IDENTIFIER = "identifier";
 
     @Override
     public Map<String, String> requiredContext() {
         Map<String, String> context = new HashMap<>();
-        context.put(CONNECTOR, "collection");
+        context.put(CONNECTOR, COLLECTION);
         return context;
     }
 
@@ -39,9 +42,12 @@ public class CollectionTableFactory implements StreamTableSourceFactory<Row>, St
 
     @Override
     public TableSink<Row> createTableSink(TableSinkFactory.Context context) {
+        CatalogTable table = context.getTable();
+        Map<String, String> tableProperties = table.toProperties();
         String tableName = context.getObjectIdentifier().getObjectName();
-        SerializationSchema<Row> serializationSchema = getSerializationSchema(context.getTable().toProperties());
-        return new CollectionTableSink(tableName, context.getTable().getSchema(), serializationSchema);
+        String identifier = tableProperties.get(IDENTIFIER);
+        SerializationSchema<Row> serializationSchema = getSerializationSchema(tableProperties);
+        return new CollectionTableSink(identifier, tableName, table.getSchema(), serializationSchema);
     }
 
 

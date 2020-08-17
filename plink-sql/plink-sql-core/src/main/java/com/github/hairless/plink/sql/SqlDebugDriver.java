@@ -1,6 +1,9 @@
 package com.github.hairless.plink.sql;
 
 import com.alibaba.fastjson.JSON;
+import com.github.hairless.plink.sql.connector.collection.CollectionDataWarehouse;
+import com.github.hairless.plink.sql.connector.collection.CollectionTableFactory;
+import com.github.hairless.plink.sql.connector.collection.CollectionTableSink;
 import com.github.hairless.plink.sql.model.SqlConfig;
 import com.github.hairless.plink.sql.model.SqlDebugConfig;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseNode;
@@ -13,11 +16,13 @@ import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.sql.parser.ddl.SqlCreateView;
+import org.apache.flink.table.descriptors.ConnectorDescriptorValidator;
 import org.apache.flink.table.descriptors.FormatDescriptorValidator;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -27,15 +32,22 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SqlDebugDriver {
 
-    public static void debug(String sql, SqlDebugConfig sqlDebugConfig) throws Exception {
-        String debugSql = handleDebugSql(sql, sqlDebugConfig);
+    public static Map<String, List<String>> debug(String sql, SqlDebugConfig sqlDebugConfig) throws Exception {
+        String identifier = UUID.randomUUID().toString();
+        String debugSql = handleDebugSql(identifier, sql, sqlDebugConfig);
         log.debug("start sql debug,sql:{}", debugSql);
         SqlConfig config = SqlConfig.builder().sql(debugSql).jobName("sql_job_debug_test").build();
         SqlJob sqlJob = new SqlJob(config);
-        sqlJob.start();
+        try {
+            CollectionDataWarehouse.registerLock(identifier);
+            sqlJob.start();
+            return CollectionDataWarehouse.getData(identifier);
+        } finally {
+            CollectionDataWarehouse.remove(identifier);
+        }
     }
 
-    private static String handleDebugSql(String sql, SqlDebugConfig sqlDebugConfig) throws SqlParseException {
+    private static String handleDebugSql(final String identifier, String sql, SqlDebugConfig sqlDebugConfig) throws SqlParseException {
         PlinkSqlParser plinkSqlParser = PlinkSqlParser.create(sql);
         StringBuilder sqlBuilder = new StringBuilder();
         List<SqlParseNode> sourceTableList = plinkSqlParser.getTableList(SqlParseNodeActionEnum.SOURCE);
@@ -45,22 +57,22 @@ public class SqlDebugDriver {
         });
         List<SqlParseNode> sinkTableList = plinkSqlParser.getTableList(SqlParseNodeActionEnum.SINK);
         sinkTableList.forEach(sinkTable -> {
-            sqlBuilder.append(buildDebugSinkSql(sinkTable));
+            sqlBuilder.append(buildDebugSinkSql(identifier, sinkTable));
         });
 
         List<SqlParseNode> viewList = plinkSqlParser.getViewList();
         viewList.forEach(view -> {
             sqlBuilder.append(view.getSql()).append(";");
-            String viewOutName = view.getName() + "_out";
-            sqlBuilder.append(buildDebugSinkSql(view, viewOutName));
+            String viewOutName = view.getName() + CollectionTableSink.OUT_SUFFIX;
+            sqlBuilder.append(buildDebugSinkSql(identifier, view, viewOutName));
             sqlBuilder.append(buildDebugInsertSql(view, viewOutName));
         });
 
         List<SqlParseNode> insertList = plinkSqlParser.getInsertList();
         insertList.forEach(insert -> {
             sqlBuilder.append(insert.getSql()).append(";");
-            String insertOutName = insert.getName() + "_out";
-            sqlBuilder.append(buildDebugSinkSql(insert, insertOutName));
+            String insertOutName = insert.getName() + CollectionTableSink.OUT_SUFFIX;
+            sqlBuilder.append(buildDebugSinkSql(identifier, insert, insertOutName));
             sqlBuilder.append(buildDebugInsertSql(insert, insertOutName));
         });
         return sqlBuilder.toString();
@@ -69,24 +81,25 @@ public class SqlDebugDriver {
     private static String buildDebugSourceSql(SqlParseNode sourceTable, SqlDebugConfig.SourceConfig sourceConfig) {
         Map<String, String> properties = sourceTable.getProperties();
         Map<String, String> debugProperties = new HashMap<>();
-        debugProperties.put("connector", "collection");
-        debugProperties.put("data", JSON.toJSONString(sourceConfig.getData()));
+        debugProperties.put(ConnectorDescriptorValidator.CONNECTOR, CollectionTableFactory.COLLECTION);
+        debugProperties.put(CollectionTableFactory.DATA, JSON.toJSONString(sourceConfig.getData()));
         debugProperties.putAll(filterFormatProperties(properties));
         return SqlBuilder.tableBuilder().tableName(sourceTable.getName()).columnList(sourceTable.getColumnList()).properties(debugProperties).build();
     }
 
-    private static String buildDebugSinkSql(SqlParseNode sinkTable) {
-        return buildDebugSinkSql(sinkTable, null);
+    private static String buildDebugSinkSql(String identifier, SqlParseNode sinkTable) {
+        return buildDebugSinkSql(identifier, sinkTable, null);
     }
 
-    private static String buildDebugSinkSql(SqlParseNode sinkTable, String newTableName) {
+    private static String buildDebugSinkSql(String identifier, SqlParseNode sinkTable, String newTableName) {
         Map<String, String> properties = sinkTable.getProperties();
         if (properties == null) {
             properties = new HashMap<>();
             properties.put(FormatDescriptorValidator.FORMAT_TYPE, "json");
         }
         Map<String, String> debugProperties = new HashMap<>();
-        debugProperties.put("connector", "collection");
+        debugProperties.put(ConnectorDescriptorValidator.CONNECTOR, CollectionTableFactory.COLLECTION);
+        debugProperties.put(CollectionTableFactory.IDENTIFIER, identifier);
         debugProperties.putAll(filterFormatProperties(properties));
         return SqlBuilder.tableBuilder()
                 .tableName(StringUtils.isEmpty(newTableName) ? sinkTable.getName() : newTableName)
@@ -103,7 +116,7 @@ public class SqlDebugDriver {
         } else if (calciteSqlNode instanceof SqlInsert) {
             query = ((SqlInsert) calciteSqlNode).getSource().toString();
         } else {
-            throw new RuntimeException("xxx");
+            throw new RuntimeException(calciteSqlNode.getClass().getSimpleName() + "not support");
         }
         return SqlBuilder.insertBuilder().query(query).targetTableName(targetTableName).columnList(fromTable.getColumnList()).build();
     }
