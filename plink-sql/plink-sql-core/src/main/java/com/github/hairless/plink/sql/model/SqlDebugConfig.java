@@ -15,9 +15,6 @@ public class SqlDebugConfig {
 
     private Map<String, SourceConfig> map;
 
-    private Boolean outputViewData;
-    private Boolean outputInsertData;
-
     @Data
     @AllArgsConstructor
     public static class SourceConfig {
