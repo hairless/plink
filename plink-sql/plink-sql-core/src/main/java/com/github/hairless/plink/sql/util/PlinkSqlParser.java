@@ -87,7 +87,7 @@ public class PlinkSqlParser {
         SqlNodeList sqlNodes = sqlParser.parseStmtList();
         Map<String, SqlParseNode> nodeMap = new HashMap<>();
         List<SqlParseLink> linkList = new ArrayList<>();
-        int insertNodeNum = 0;
+        Map<String, Integer> insertNodeNumMap = new HashMap<>();
         for (SqlNode sqlNode : sqlNodes) {
             String splitSql = sqlNode.toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();
             tEnv.sqlUpdate(splitSql);
@@ -137,7 +137,14 @@ public class PlinkSqlParser {
             } else if (sqlNode instanceof SqlInsert) {
                 SqlInsert sqlInsert = (SqlInsert) sqlNode;
                 String sinkTableName = sqlInsert.getTargetTable().toString();
-                String insertName = "insert_node_" + insertNodeNum++;
+                String insertName = "insert_" + sinkTableName;
+                Integer insertNodeNum = insertNodeNumMap.get(sinkTableName);
+                if (insertNodeNum != null) {
+                    insertName += "_" + insertNodeNum;
+                } else {
+                    insertNodeNum = 0;
+                }
+                insertNodeNumMap.put(sinkTableName, ++insertNodeNum);
                 SqlParseNode node = new SqlParseNode();
                 node.setSql(splitSql);
                 node.setType(SqlParseNodeTypeEnum.INSERT);
