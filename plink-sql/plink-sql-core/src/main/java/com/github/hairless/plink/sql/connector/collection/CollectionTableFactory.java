@@ -2,6 +2,7 @@ package com.github.hairless.plink.sql.connector.collection;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
 import org.apache.flink.calcite.shaded.com.google.common.collect.Lists;
@@ -16,7 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.flink.table.descriptors.ConnectorDescriptorValidator.CONNECTOR;
+import static org.apache.flink.table.descriptors.ConnectorDescriptorValidator.CONNECTOR_TYPE;
 
 /**
  * @author: silence
@@ -31,7 +32,7 @@ public class CollectionTableFactory implements StreamTableSourceFactory<Row>, St
     @Override
     public Map<String, String> requiredContext() {
         Map<String, String> context = new HashMap<>();
-        context.put(CONNECTOR, COLLECTION);
+        context.put(CONNECTOR_TYPE, COLLECTION);
         return context;
     }
 
@@ -75,13 +76,17 @@ public class CollectionTableFactory implements StreamTableSourceFactory<Row>, St
     }
 
     private SerializationSchema<Row> getSerializationSchema(Map<String, String> properties) {
+        Map<String, String> newProperties = new HashMap<>(properties);
         String format_type = properties.get(FormatDescriptorValidator.FORMAT_TYPE);
+        if (StringUtils.isEmpty(format_type)) {
+            newProperties.put(FormatDescriptorValidator.FORMAT_TYPE, "json");
+        }
         try {
             @SuppressWarnings("unchecked") final SerializationSchemaFactory<Row> formatFactory = TableFactoryService.find(
                     SerializationSchemaFactory.class,
-                    properties,
+                    newProperties,
                     this.getClass().getClassLoader());
-            return formatFactory.createSerializationSchema(properties);
+            return formatFactory.createSerializationSchema(newProperties);
         } catch (Exception e) {
             log.error("format {} not support", format_type);
             throw new RuntimeException("format " + format_type + " not support", e);

@@ -26,9 +26,9 @@ public class SqlJobTest {
         ).collect(Collectors.toList());
 
         String sourceDDL =
-                "create table t1( a int,b string, c int) with ( 'connector' = 'collection','data'='" + JSON.toJSONString(sourceData) + "','format.type'='json');";
+                "create table t1( a int,b string, c int) with ( 'connector.type' = 'collection','data'='" + JSON.toJSONString(sourceData) + "','format.type'='json');";
         String sinkDDL =
-                "create table t2(a int comment '测试',b string,c int) with ( 'connector' = 'collection', 'format.type'='json');";
+                "create table t2(a int comment '测试',b string,c int) with ( 'connector' = 'print');";
         String viewSql =
                 "create view temp_view as select * from t1;";
         String query =
@@ -38,10 +38,16 @@ public class SqlJobTest {
     }
 
     @Test
-    public void sqlJobTest() throws Exception {
-        SqlConfig config = SqlConfig.builder().sql(sql).jobName("sql_job_test").build();
-        SqlJob sqlJob = new SqlJob(config);
-        sqlJob.start();
+    public void sqlJobTest() {
+        Exception exception = null;
+        try {
+            SqlConfig config = SqlConfig.builder().sql(sql).jobName("sql_job_test").build();
+            SqlJob sqlJob = new SqlJob(config);
+            sqlJob.start();
+        } catch (Exception e) {
+            exception = e;
+        }
+        assert exception == null;
     }
 
 

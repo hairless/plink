@@ -81,7 +81,7 @@ public class SqlDebugDriver {
     private static String buildDebugSourceSql(SqlParseNode sourceTable, SqlDebugConfig.SourceConfig sourceConfig) {
         Map<String, String> properties = sourceTable.getProperties();
         Map<String, String> debugProperties = new HashMap<>();
-        debugProperties.put(ConnectorDescriptorValidator.CONNECTOR, CollectionTableFactory.COLLECTION);
+        debugProperties.put(ConnectorDescriptorValidator.CONNECTOR_TYPE, CollectionTableFactory.COLLECTION);
         debugProperties.put(CollectionTableFactory.DATA, JSON.toJSONString(sourceConfig.getData()));
         debugProperties.putAll(filterFormatProperties(properties));
         return SqlBuilder.tableBuilder().tableName(sourceTable.getName()).columnList(sourceTable.getColumnList()).properties(debugProperties).build();
@@ -98,7 +98,7 @@ public class SqlDebugDriver {
             properties.put(FormatDescriptorValidator.FORMAT_TYPE, "json");
         }
         Map<String, String> debugProperties = new HashMap<>();
-        debugProperties.put(ConnectorDescriptorValidator.CONNECTOR, CollectionTableFactory.COLLECTION);
+        debugProperties.put(ConnectorDescriptorValidator.CONNECTOR_TYPE, CollectionTableFactory.COLLECTION);
         debugProperties.put(CollectionTableFactory.IDENTIFIER, identifier);
         debugProperties.putAll(filterFormatProperties(properties));
         return SqlBuilder.tableBuilder()
