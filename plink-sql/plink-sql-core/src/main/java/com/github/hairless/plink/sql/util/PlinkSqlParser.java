@@ -90,8 +90,6 @@ public class PlinkSqlParser {
         Map<String, Integer> insertNodeNumMap = new HashMap<>();
         for (SqlNode sqlNode : sqlNodes) {
             String splitSql = sqlNode.toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();
-            tEnv.sqlUpdate(splitSql);
-
             if (sqlNode instanceof SqlCreateTable) {
                 SqlCreateTable sqlCreateTable = (SqlCreateTable) sqlNode;
                 SqlParseNode node = new SqlParseNode();
@@ -163,7 +161,15 @@ public class PlinkSqlParser {
                 List<SqlParseLink> sinkLinkList = selectTable2Link(selectTableList, insertName);
                 linkList.addAll(sinkLinkList);
                 linkList.add(new SqlParseLink(insertName, sinkTableName));
+            } else if (sqlNode instanceof SqlSetOption) {
+                String name = ((SqlSetOption) sqlNode).getName().getSimple();
+                String value = ((SqlSetOption) sqlNode).getValue().toString();
+                tEnv.getConfig().getConfiguration().setString(name, value);
+                continue;
+            } else {
+                throw new RuntimeException("not support operation: " + sqlNode.getClass().getSimpleName());
             }
+            tEnv.sqlUpdate(splitSql);
         }
         linkList.forEach(link -> {
             SqlParseNode sourNode = nodeMap.get(link.getSourceName());

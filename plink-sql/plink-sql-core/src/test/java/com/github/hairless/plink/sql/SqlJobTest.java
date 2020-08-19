@@ -3,6 +3,7 @@ package com.github.hairless.plink.sql;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.hairless.plink.sql.model.SqlConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.stream.Stream;
  * @author: silence
  * @date: 2020/3/14
  */
+@Slf4j
 public class SqlJobTest {
     public static String sql;
 
@@ -26,7 +28,7 @@ public class SqlJobTest {
         ).collect(Collectors.toList());
 
         String sourceDDL =
-                "create table t1( a int,b string, c int) with ( 'connector.type' = 'collection','data'='" + JSON.toJSONString(sourceData) + "','format.type'='json');";
+                "set a=b;create table t1( a int,b string, c int) with ( 'connector' = 'collection','data'='" + JSON.toJSONString(sourceData) + "');";
         String sinkDDL =
                 "create table t2(a int comment '测试',b string,c int) with ( 'connector' = 'print');";
         String viewSql =
@@ -45,6 +47,7 @@ public class SqlJobTest {
             SqlJob sqlJob = new SqlJob(config);
             sqlJob.start();
         } catch (Exception e) {
+            log.error("sqlJobTest error", e);
             exception = e;
         }
         assert exception == null;
