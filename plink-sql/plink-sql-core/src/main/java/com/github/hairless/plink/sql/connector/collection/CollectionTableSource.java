@@ -2,65 +2,80 @@ package com.github.hairless.plink.sql.connector.collection;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.table.api.TableSchema;
-import org.apache.flink.table.sources.StreamTableSource;
+import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunction;
+import org.apache.flink.table.connector.ChangelogMode;
+import org.apache.flink.table.connector.format.DecodingFormat;
+import org.apache.flink.table.connector.source.DynamicTableSource;
+import org.apache.flink.table.connector.source.ScanTableSource;
+import org.apache.flink.table.connector.source.SourceFunctionProvider;
+import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.types.DataType;
-import org.apache.flink.types.Row;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author: silence
  * @date: 2020/7/8
  */
 @Slf4j
-public class CollectionTableSource implements StreamTableSource<Row> {
-    private final TableSchema tableSchema;
-    private final List<Row> rowList;
+public class CollectionTableSource implements ScanTableSource {
+    private final List<String> dataList;
+    private final DataType producedDataType;
+    private final DecodingFormat<DeserializationSchema<RowData>> decodingFormat;
 
-    public CollectionTableSource(TableSchema tableSchema, List<Row> rowList) {
-        this.tableSchema = tableSchema;
-        this.rowList = rowList;
-    }
-
-    public CollectionTableSource(TableSchema tableSchema, List<String> dataList, DeserializationSchema<Row> deserializationSchema) {
-        this.tableSchema = tableSchema;
-        this.rowList = dataList.stream().map(s -> {
-            try {
-                return deserializationSchema.deserialize(s.getBytes());
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }).collect(Collectors.toList());
+    public CollectionTableSource(List<String> dataList, DataType producedDataType, DecodingFormat<DeserializationSchema<RowData>> decodingFormat) {
+        this.producedDataType = producedDataType;
+        this.decodingFormat = decodingFormat;
+        this.dataList = dataList;
     }
 
     @Override
-    public boolean isBounded() {
-        return true;
+    public DynamicTableSource copy() {
+        return new CollectionTableSource(dataList, producedDataType, decodingFormat);
     }
 
     @Override
-    public DataStream<Row> getDataStream(StreamExecutionEnvironment execEnv) {
-        return execEnv.fromCollection(rowList);
+    public String asSummaryString() {
+        return "collection source";
     }
 
     @Override
-    public DataType getProducedDataType() {
-        return tableSchema.toRowDataType();
-    }
-
-
-    @Override
-    public TableSchema getTableSchema() {
-        return tableSchema;
+    public ChangelogMode getChangelogMode() {
+        return ChangelogMode.insertOnly();
     }
 
     @Override
-    public String explainSource() {
-        return null;
+    public ScanRuntimeProvider getScanRuntimeProvider(ScanContext runtimeProviderContext) {
+        DeserializationSchema<RowData> deserializationSchema = decodingFormat.createRuntimeDecoder(runtimeProviderContext, producedDataType);
+        return SourceFunctionProvider.of(new ElementsSourceFunction(dataList, deserializationSchema), false);
+    }
+
+    public static class ElementsSourceFunction extends RichParallelSourceFunction<RowData> {
+        private final List<String> dataList;
+        private final DeserializationSchema<RowData> deserializationSchema;
+
+        public ElementsSourceFunction(List<String> dataList, DeserializationSchema<RowData> deserializationSchema) {
+            this.dataList = dataList;
+            this.deserializationSchema = deserializationSchema;
+        }
+
+
+        @Override
+        public void run(SourceContext<RowData> ctx) throws Exception {
+            dataList.stream().map(String::getBytes).map(message -> {
+                try {
+                    return deserializationSchema.deserialize(message);
+                } catch (IOException e) {
+                    log.error("deserialize error: {}", new String(message));
+                }
+                return null;
+            }).forEach(ctx::collect);
+        }
+
+        @Override
+        public void cancel() {
+
+        }
     }
 }

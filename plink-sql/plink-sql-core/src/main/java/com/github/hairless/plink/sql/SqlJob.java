@@ -4,7 +4,9 @@ import com.github.hairless.plink.sql.model.SqlConfig;
 import com.github.hairless.plink.sql.util.PlinkSqlParser;
 import com.github.hairless.plink.sql.util.SkipAnsiCheckSqlDialect;
 import org.apache.calcite.sql.SqlNodeList;
+import org.apache.calcite.sql.SqlSetOption;
 import org.apache.calcite.sql.parser.SqlParser;
+import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
@@ -24,7 +26,7 @@ public class SqlJob {
     }
 
 
-    public void start() throws Exception {
+    public JobExecutionResult start() throws Exception {
         StreamExecutionEnvironment env = new LocalStreamEnvironment();
         EnvironmentSettings settings = EnvironmentSettings.newInstance()
                 .useBlinkPlanner().inStreamingMode().build();
@@ -33,10 +35,16 @@ public class SqlJob {
         SqlParser sqlParser = SqlParser.create(sqlConfig.getSql(), PlinkSqlParser.sqlParserConfig);
         SqlNodeList sqlNodes = sqlParser.parseStmtList();
         sqlNodes.forEach(sqlNode -> {
-            String sql = sqlNode.toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();
-            tEnv.sqlUpdate(sql);
+            if (sqlNode instanceof SqlSetOption) {
+                String name = ((SqlSetOption) sqlNode).getName().getSimple();
+                String value = ((SqlSetOption) sqlNode).getValue().toString();
+                tEnv.getConfig().getConfiguration().setString(name, value);
+            } else {
+                String sql = sqlNode.toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();
+                tEnv.sqlUpdate(sql);
+            }
         });
-        tEnv.execute(sqlConfig.getJobName());
+        return tEnv.execute(sqlConfig.getJobName());
     }
 
 }
