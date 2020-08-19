@@ -16,8 +16,7 @@ import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.sql.parser.ddl.SqlCreateView;
-import org.apache.flink.table.descriptors.ConnectorDescriptorValidator;
-import org.apache.flink.table.descriptors.FormatDescriptorValidator;
+import org.apache.flink.table.factories.FactoryUtil;
 
 import java.util.HashMap;
 import java.util.List;
@@ -81,8 +80,8 @@ public class SqlDebugDriver {
     private static String buildDebugSourceSql(SqlParseNode sourceTable, SqlDebugConfig.SourceConfig sourceConfig) {
         Map<String, String> properties = sourceTable.getProperties();
         Map<String, String> debugProperties = new HashMap<>();
-        debugProperties.put(ConnectorDescriptorValidator.CONNECTOR_TYPE, CollectionTableFactory.COLLECTION);
-        debugProperties.put(CollectionTableFactory.DATA, JSON.toJSONString(sourceConfig.getData()));
+        debugProperties.put(FactoryUtil.CONNECTOR.key(), CollectionTableFactory.COLLECTION);
+        debugProperties.put(CollectionTableFactory.DATA.key(), JSON.toJSONString(sourceConfig.getData()));
         debugProperties.putAll(filterFormatProperties(properties));
         return SqlBuilder.tableBuilder().tableName(sourceTable.getName()).columnList(sourceTable.getColumnList()).properties(debugProperties).build();
     }
@@ -95,12 +94,12 @@ public class SqlDebugDriver {
         Map<String, String> properties = sinkTable.getProperties();
         if (properties == null) {
             properties = new HashMap<>();
-            properties.put(FormatDescriptorValidator.FORMAT_TYPE, "json");
         }
         Map<String, String> debugProperties = new HashMap<>();
-        debugProperties.put(ConnectorDescriptorValidator.CONNECTOR_TYPE, CollectionTableFactory.COLLECTION);
-        debugProperties.put(CollectionTableFactory.IDENTIFIER, identifier);
-        debugProperties.putAll(filterFormatProperties(properties));
+        debugProperties.put(FactoryUtil.CONNECTOR.key(), CollectionTableFactory.COLLECTION);
+        debugProperties.put(CollectionTableFactory.IDENTIFIER.key(), identifier);
+        Map<String, String> formatProperties = filterFormatProperties(properties);
+        debugProperties.putAll(formatProperties);
         return SqlBuilder.tableBuilder()
                 .tableName(StringUtils.isEmpty(newTableName) ? sinkTable.getName() : newTableName)
                 .columnList(sinkTable.getColumnList())
@@ -123,7 +122,7 @@ public class SqlDebugDriver {
 
 
     private static Map<String, String> filterFormatProperties(Map<String, String> properties) {
-        return properties.entrySet().stream().filter(entry -> entry.getKey().startsWith(FormatDescriptorValidator.FORMAT))
+        return properties.entrySet().stream().filter(entry -> entry.getKey().startsWith(FactoryUtil.FORMAT.key()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

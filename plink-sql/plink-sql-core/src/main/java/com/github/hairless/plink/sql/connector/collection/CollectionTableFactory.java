@@ -2,94 +2,86 @@ package com.github.hairless.plink.sql.connector.collection;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
-import org.apache.flink.calcite.shaded.com.google.common.collect.Lists;
-import org.apache.flink.table.catalog.CatalogTable;
-import org.apache.flink.table.descriptors.FormatDescriptorValidator;
+import org.apache.flink.configuration.ConfigOption;
+import org.apache.flink.configuration.ConfigOptions;
+import org.apache.flink.configuration.ReadableConfig;
+import org.apache.flink.table.connector.format.DecodingFormat;
+import org.apache.flink.table.connector.format.EncodingFormat;
+import org.apache.flink.table.connector.sink.DynamicTableSink;
+import org.apache.flink.table.connector.source.DynamicTableSource;
+import org.apache.flink.table.data.RowData;
 import org.apache.flink.table.factories.*;
-import org.apache.flink.table.sinks.TableSink;
-import org.apache.flink.table.sources.TableSource;
-import org.apache.flink.types.Row;
+import org.apache.flink.table.types.DataType;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-
-import static org.apache.flink.table.descriptors.ConnectorDescriptorValidator.CONNECTOR_TYPE;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author: silence
  * @date: 2020/7/8
  */
 @Slf4j
-public class CollectionTableFactory implements StreamTableSourceFactory<Row>, StreamTableSinkFactory<Row> {
+public class CollectionTableFactory implements DynamicTableSourceFactory, DynamicTableSinkFactory {
     public static final String COLLECTION = "collection";
-    public static final String DATA = "data";
-    public static final String IDENTIFIER = "identifier";
+    public static final ConfigOption<String> DEFAULT_FORMAT = ConfigOptions
+            .key("format")
+            .stringType()
+            .defaultValue("json")
+            .withDescription("Defines the format identifier for encoding data. " +
+                    "The identifier is used to discover a suitable format factory.");
+
+    public static final ConfigOption<String> DATA = ConfigOptions
+            .key("data")
+            .stringType()
+            .noDefaultValue()
+            .withDescription("Required 'data' from which the table is read");
+    public static final ConfigOption<String> IDENTIFIER = ConfigOptions
+            .key("identifier")
+            .stringType()
+            .noDefaultValue()
+            .withDescription("Required 'identifier' from which the table is write");
 
     @Override
-    public Map<String, String> requiredContext() {
-        Map<String, String> context = new HashMap<>();
-        context.put(CONNECTOR_TYPE, COLLECTION);
-        return context;
-    }
-
-    @Override
-    public List<String> supportedProperties() {
-        return Lists.newArrayList("*");
-    }
-
-    @Override
-    public TableSink<Row> createTableSink(TableSinkFactory.Context context) {
-        CatalogTable table = context.getTable();
-        Map<String, String> tableProperties = table.toProperties();
+    public DynamicTableSink createDynamicTableSink(Context context) {
+        FactoryUtil.TableFactoryHelper helper = FactoryUtil.createTableFactoryHelper(this, context);
+        ReadableConfig tableOptions = helper.getOptions();
+        String identifier = tableOptions.get(IDENTIFIER);
         String tableName = context.getObjectIdentifier().getObjectName();
-        String identifier = tableProperties.get(IDENTIFIER);
-        SerializationSchema<Row> serializationSchema = getSerializationSchema(tableProperties);
-        return new CollectionTableSink(identifier, tableName, table.getSchema(), serializationSchema);
+        DataType consumedDataType = context.getCatalogTable().getSchema().toPhysicalRowDataType();
+        EncodingFormat<SerializationSchema<RowData>> encodingFormat = helper.discoverEncodingFormat(
+                SerializationFormatFactory.class, DEFAULT_FORMAT);
+        return new CollectionTableSink(identifier, tableName, consumedDataType, encodingFormat);
     }
-
 
     @Override
-    public TableSource<Row> createTableSource(TableSourceFactory.Context context) {
-        Map<String, String> tableProperties = context.getTable().toProperties();
-        DeserializationSchema<Row> deserializationSchema = getDeserializationSchema(tableProperties);
-        String dataString = tableProperties.get(DATA);
+    public DynamicTableSource createDynamicTableSource(Context context) {
+        FactoryUtil.TableFactoryHelper helper = FactoryUtil.createTableFactoryHelper(this, context);
+        ReadableConfig tableOptions = helper.getOptions();
+        String dataString = tableOptions.get(DATA);
         List<String> dataList = JSON.parseArray(dataString, String.class);
-        return new CollectionTableSource(context.getTable().getSchema(), dataList, deserializationSchema);
+        DataType producedDataType = context.getCatalogTable().getSchema().toPhysicalRowDataType();
+        DecodingFormat<DeserializationSchema<RowData>> decodingFormat = helper.discoverDecodingFormat(
+                DeserializationFormatFactory.class, DEFAULT_FORMAT);
+        return new CollectionTableSource(dataList, producedDataType, decodingFormat);
     }
 
-    private DeserializationSchema<Row> getDeserializationSchema(Map<String, String> properties) {
-        String format_type = properties.get(FormatDescriptorValidator.FORMAT_TYPE);
-        try {
-            @SuppressWarnings("unchecked") final DeserializationSchemaFactory<Row> formatFactory = TableFactoryService.find(
-                    DeserializationSchemaFactory.class,
-                    properties,
-                    this.getClass().getClassLoader());
-            return formatFactory.createDeserializationSchema(properties);
-        } catch (Exception e) {
-            log.error("format {} not support", format_type);
-            throw new RuntimeException("format " + format_type + " not support", e);
-        }
+    @Override
+    public String factoryIdentifier() {
+        return COLLECTION;
     }
 
-    private SerializationSchema<Row> getSerializationSchema(Map<String, String> properties) {
-        Map<String, String> newProperties = new HashMap<>(properties);
-        String format_type = properties.get(FormatDescriptorValidator.FORMAT_TYPE);
-        if (StringUtils.isEmpty(format_type)) {
-            newProperties.put(FormatDescriptorValidator.FORMAT_TYPE, "json");
-        }
-        try {
-            @SuppressWarnings("unchecked") final SerializationSchemaFactory<Row> formatFactory = TableFactoryService.find(
-                    SerializationSchemaFactory.class,
-                    newProperties,
-                    this.getClass().getClassLoader());
-            return formatFactory.createSerializationSchema(newProperties);
-        } catch (Exception e) {
-            log.error("format {} not support", format_type);
-            throw new RuntimeException("format " + format_type + " not support", e);
-        }
+    @Override
+    public Set<ConfigOption<?>> requiredOptions() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<ConfigOption<?>> optionalOptions() {
+        return Stream.of(DEFAULT_FORMAT, DATA, IDENTIFIER).collect(Collectors.toSet());
     }
 }
