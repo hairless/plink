@@ -2,8 +2,8 @@ package com.github.hairless.plink.sql;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.esotericsoftware.minlog.Log;
 import com.github.hairless.plink.sql.model.SqlConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.util.List;
@@ -14,6 +14,7 @@ import java.util.stream.Stream;
  * @author: silence
  * @date: 2020/3/14
  */
+@Slf4j
 public class SqlJobTest {
     public static String sql;
 
@@ -46,7 +47,7 @@ public class SqlJobTest {
             SqlJob sqlJob = new SqlJob(config);
             sqlJob.start();
         } catch (Exception e) {
-            Log.error("sqlJobTest error", e);
+            log.error("sqlJobTest error", e);
             exception = e;
         }
         assert exception == null;
