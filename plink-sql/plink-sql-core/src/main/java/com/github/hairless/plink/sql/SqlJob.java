@@ -3,6 +3,7 @@ package com.github.hairless.plink.sql;
 import com.github.hairless.plink.sql.model.SqlConfig;
 import com.github.hairless.plink.sql.util.PlinkSqlParser;
 import com.github.hairless.plink.sql.util.SkipAnsiCheckSqlDialect;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlNodeList;
 import org.apache.calcite.sql.SqlSetOption;
 import org.apache.calcite.sql.parser.SqlParser;
@@ -17,7 +18,7 @@ import org.apache.flink.table.api.internal.TableEnvironmentImpl;
  * @author: silence
  * @date: 2020/7/8
  */
-
+@Slf4j
 public class SqlJob {
     private final SqlConfig sqlConfig;
 
@@ -27,6 +28,7 @@ public class SqlJob {
 
 
     public JobExecutionResult start() throws Exception {
+        log.info("sql job {} staring...", sqlConfig.getJobName());
         StreamExecutionEnvironment env = new LocalStreamEnvironment();
         EnvironmentSettings settings = EnvironmentSettings.newInstance()
                 .useBlinkPlanner().inStreamingMode().build();
