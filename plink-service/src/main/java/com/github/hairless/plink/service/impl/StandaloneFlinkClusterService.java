@@ -29,7 +29,7 @@ public class StandaloneFlinkClusterService implements FlinkClusterService {
 
         String osName = System.getProperties().getProperty("os.name");
         String linuxOsName = "linux";
-        if(osName.toLowerCase().contains(linuxOsName)) {
+        if (osName.toLowerCase().contains(linuxOsName)) {
             flinkRestRpcService.deleteJar(jarId);
         } else {
             // flinkRestRpcService.deleteJar(jarId);  // 在 Windows 10 下经常会出现删除失败，原因还未排查。如: "Failed to delete jar C:\\Users\\ADMINI~1\\AppData\\Local\\Temp\\flink-web-5c6d47c2-1b77-4947-a587-7bda179180ec\\flink-web-upload\\1e0fa41e-342e-4317-bc5c-00f0dc6369f9_WordCount.jar."

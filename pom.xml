@@ -81,6 +81,7 @@
             <dependency>
                 <groupId>com.github.hairless</groupId>
                 <artifactId>plink-sql</artifactId>
+                <type>pom</type>
                 <version>${project.version}</version>
             </dependency>
 
@@ -102,7 +103,7 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
-                <version>1.1.21</version>
+                <version>1.1.20</version>
             </dependency>
             <dependency>
                 <groupId>tk.mybatis</groupId>
