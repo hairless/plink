@@ -1,4 +1,4 @@
-package com.github.hairless.plink.common;
+package com.github.hairless.plink.common.util;
 
 /**
  * @author: silence

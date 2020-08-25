@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.arronlong.httpclientutil.HttpClientUtil;
 import com.arronlong.httpclientutil.common.HttpConfig;
-import com.github.hairless.plink.common.FlinkConfigUtil;
+import com.github.hairless.plink.common.util.FlinkConfigUtil;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.rpc.FlinkRestRpcService;
 import lombok.extern.slf4j.Slf4j;

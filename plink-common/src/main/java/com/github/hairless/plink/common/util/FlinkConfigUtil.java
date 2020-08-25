@@ -1,4 +1,4 @@
-package com.github.hairless.plink.common;
+package com.github.hairless.plink.common.util;
 
 import com.github.hairless.plink.model.exception.PlinkException;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;

@@ -1,7 +1,7 @@
 package com.github.hairless.plink.service.impl;
 
-import com.github.hairless.plink.common.UploadUtil;
-import com.github.hairless.plink.common.ValidatorUtil;
+import com.github.hairless.plink.common.util.UploadUtil;
+import com.github.hairless.plink.common.util.ValidatorUtil;
 import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.dto.JobDTO;
