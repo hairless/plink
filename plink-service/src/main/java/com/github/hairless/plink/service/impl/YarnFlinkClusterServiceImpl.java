@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
  * @author: silence
  * @date: 2020/1/19
  */
-@Component("yarnFlinkClusterService")
-public class YarnFlinkClusterService implements FlinkClusterService {
-    private FlinkShellSubmitAssist flinkShellSubmitAssist =
+@Component("yarnFlinkClusterServiceImpl")
+public class YarnFlinkClusterServiceImpl implements FlinkClusterService {
+    private final FlinkShellSubmitAssist flinkShellSubmitAssist =
             new FlinkShellSubmitAssist(YarnCommandBuilder.INSTANCE, "Submitting application master (application_[0-9_]+)");
 
     @Override

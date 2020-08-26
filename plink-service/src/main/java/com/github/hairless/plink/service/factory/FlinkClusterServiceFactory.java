@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class FlinkClusterServiceFactory {
 
-    public static String DEFAULT_CLUSTER_MODE = "standalone";
+    public static String DEFAULT_CLUSTER_MODE = "yarn";
     public static String FLINK_CLUSTER_SERVICE_SUFFIX = "FlinkClusterServiceImpl";
 
     @Autowired
@@ -25,9 +25,10 @@ public class FlinkClusterServiceFactory {
     }
 
     public FlinkClusterService getFlinkClusterService(String mode) {
-        FlinkClusterService flinkClusterService = flinkClusterServiceMap.get(mode + FLINK_CLUSTER_SERVICE_SUFFIX);
+        String serviceName = mode + FLINK_CLUSTER_SERVICE_SUFFIX;
+        FlinkClusterService flinkClusterService = flinkClusterServiceMap.get(serviceName);
         if (flinkClusterService == null) {
-            throw new RuntimeException("no flinkClusterService defined");
+            throw new RuntimeException("no flinkClusterService defined" + serviceName);
         }
         return flinkClusterService;
     }

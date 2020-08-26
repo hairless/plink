@@ -18,7 +18,7 @@ public class StandaloneFlinkClusterServiceImpl implements FlinkClusterService {
     @Autowired
     private FlinkRestRpcService flinkRestRpcService;
 
-    private FlinkShellSubmitAssist flinkShellSubmitAssist =
+    private final FlinkShellSubmitAssist flinkShellSubmitAssist =
             new FlinkShellSubmitAssist(StandaloneCommandBuilder.INSTANCE, "Job has been submitted with JobID ([a-zA-Z0-9]+)");
 
     @Override

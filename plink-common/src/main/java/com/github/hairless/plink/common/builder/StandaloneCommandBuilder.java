@@ -4,6 +4,7 @@ import com.github.hairless.plink.common.util.FlinkConfigUtil;
 import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.common.FlinkSubmitOptions;
 import com.github.hairless.plink.model.exception.PlinkException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.util.Preconditions;
 
 import java.util.stream.Collectors;
@@ -40,11 +41,11 @@ public class StandaloneCommandBuilder implements ShellCommandBuilder {
         if (flinkConfig.getConfigs() != null) {
             builder.append(flinkConfig.getConfigs().stream().map(c -> format(confItem, c)).collect(Collectors.joining()));
         }
-        if (flinkConfig.getMainClass() != null) {
+        if (StringUtils.isNotBlank(flinkConfig.getMainClass())) {
             builder.append(format(mainClass, flinkConfig.getMainClass()));
         }
         builder.append(format(mainJarPath, Preconditions.checkNotNull(flinkSubmitOptions.getMainJarPath())));
-        if (flinkConfig.getArgs() != null) {
+        if (StringUtils.isNotBlank(flinkConfig.getArgs())) {
             builder.append(format(args, flinkConfig.getArgs()));
         }
         return builder.toString();

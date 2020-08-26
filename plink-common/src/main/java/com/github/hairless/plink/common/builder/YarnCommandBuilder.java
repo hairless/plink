@@ -4,6 +4,7 @@ import com.github.hairless.plink.common.util.FlinkConfigUtil;
 import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.common.FlinkSubmitOptions;
 import com.github.hairless.plink.model.exception.PlinkException;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.util.Preconditions;
 
 import java.util.stream.Collectors;
@@ -21,8 +22,9 @@ public class YarnCommandBuilder implements ShellCommandBuilder {
     private YarnCommandBuilder() {
     }
 
+    private static final String exportHadoopClasspath = "export HADOOP_CLASSPATH=`$HADOOP_HOME/bin/hadoop classpath` && ";
     private static final String runScript = "{0}/bin/flink run ";
-    private static final String jobName = "-ynm {0} ";
+    private static final String jobName = "-ynm \"{0}\" ";
     private static final String mode = "-m yarn-cluster ";
     private static final String detached = "-d ";
     private static final String queue = "-yqu {0} ";
@@ -40,17 +42,17 @@ public class YarnCommandBuilder implements ShellCommandBuilder {
     public String buildRunCommand(FlinkSubmitOptions flinkSubmitOptions) throws PlinkException {
         FlinkConfig flinkConfig = flinkSubmitOptions.getFlinkConfig();
         StringBuilder builder = new StringBuilder();
-        builder.append(format(runScript, FlinkConfigUtil.getFlinkHome())).append(mode).append(detached);
-        if (flinkSubmitOptions.getJobName() != null) {
+        builder.append(exportHadoopClasspath).append(format(runScript, FlinkConfigUtil.getFlinkHome())).append(mode).append(detached);
+        if (StringUtils.isNotBlank(flinkSubmitOptions.getJobName())) {
             builder.append(format(jobName, flinkSubmitOptions.getJobName()));
         }
-        if (flinkSubmitOptions.getQueue() != null) {
+        if (StringUtils.isNotBlank(flinkSubmitOptions.getQueue())) {
             builder.append(format(queue, flinkSubmitOptions.getQueue()));
         }
-        if (flinkConfig.getJobManagerMemory() != null) {
+        if (StringUtils.isNotBlank(flinkConfig.getJobManagerMemory())) {
             builder.append(format(jobManagerMemory, flinkConfig.getJobManagerMemory()));
         }
-        if (flinkConfig.getTaskManagerMemory() != null) {
+        if (StringUtils.isNotBlank(flinkConfig.getTaskManagerMemory())) {
             builder.append(format(taskManagerMemory, flinkConfig.getTaskManagerMemory()));
         }
         if (flinkConfig.getTaskManagerSlots() != null) {
@@ -62,14 +64,14 @@ public class YarnCommandBuilder implements ShellCommandBuilder {
         if (flinkConfig.getConfigs() != null) {
             builder.append(flinkConfig.getConfigs().stream().map(c -> format(confItem, c)).collect(Collectors.joining()));
         }
-        if (flinkSubmitOptions.getLibPath() != null) {
+        if (StringUtils.isNotBlank(flinkSubmitOptions.getLibPath())) {
             builder.append(format(yarnShip, flinkSubmitOptions.getLibPath()));
         }
-        if (flinkConfig.getMainClass() != null) {
+        if (StringUtils.isNotBlank(flinkConfig.getMainClass())) {
             builder.append(format(mainClass, flinkConfig.getMainClass()));
         }
-        builder.append(format(mainJarPath, Preconditions.checkNotNull(flinkConfig.getJarName())));
-        if (flinkConfig.getArgs() != null) {
+        builder.append(format(mainJarPath, Preconditions.checkNotNull(flinkSubmitOptions.getMainJarPath())));
+        if (StringUtils.isNotBlank(flinkConfig.getArgs())) {
             builder.append(format(args, flinkConfig.getArgs()));
         }
         return builder.toString();
