@@ -16,5 +16,6 @@ public class FlinkSubmitOptions {
     private String queue;
     private String savePointPath;
     private String libPath;
+    private String mainJarPath;
     private FlinkConfig flinkConfig;
 }

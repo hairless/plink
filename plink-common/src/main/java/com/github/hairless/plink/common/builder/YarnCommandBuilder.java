@@ -14,7 +14,12 @@ import static com.github.hairless.plink.common.util.MessageFormatUtil.format;
  * @author: silence
  * @date: 2020/8/24
  */
-public class YarnCommandBuilder {
+public class YarnCommandBuilder implements ShellCommandBuilder {
+
+    public static final YarnCommandBuilder INSTANCE = new YarnCommandBuilder();
+
+    private YarnCommandBuilder() {
+    }
 
     private static final String runScript = "{0}/bin/flink run ";
     private static final String jobName = "-ynm {0} ";
@@ -28,10 +33,11 @@ public class YarnCommandBuilder {
     private static final String confItem = "-yd {0} ";
     private static final String yarnShip = "-yt {0} ";
     private static final String mainClass = "-c {0} ";
-    private static final String jarName = "{0} ";
+    private static final String mainJarPath = "{0} ";
     private static final String args = "{0}";
 
-    public static String buildRunCommand(FlinkSubmitOptions flinkSubmitOptions) throws PlinkException {
+    @Override
+    public String buildRunCommand(FlinkSubmitOptions flinkSubmitOptions) throws PlinkException {
         FlinkConfig flinkConfig = flinkSubmitOptions.getFlinkConfig();
         StringBuilder builder = new StringBuilder();
         builder.append(format(runScript, FlinkConfigUtil.getFlinkHome())).append(mode).append(detached);
@@ -62,7 +68,7 @@ public class YarnCommandBuilder {
         if (flinkConfig.getMainClass() != null) {
             builder.append(format(mainClass, flinkConfig.getMainClass()));
         }
-        builder.append(format(jarName, Preconditions.checkNotNull(flinkConfig.getJarName())));
+        builder.append(format(mainJarPath, Preconditions.checkNotNull(flinkConfig.getJarName())));
         if (flinkConfig.getArgs() != null) {
             builder.append(format(args, flinkConfig.getArgs()));
         }

@@ -79,4 +79,7 @@
         <appender-ref ref="error.log"/>
     </root>
 
+    <logger name="org.apache.flink.configuration.Configuration" level="WARN">
+    </logger>
+
 </configuration>

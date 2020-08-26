@@ -14,17 +14,23 @@ import static com.github.hairless.plink.common.util.MessageFormatUtil.format;
  * @author: silence
  * @date: 2020/8/24
  */
-public class StandaloneCommandBuilder {
+public class StandaloneCommandBuilder implements ShellCommandBuilder {
+
+    public static final StandaloneCommandBuilder INSTANCE = new StandaloneCommandBuilder();
+
+    private StandaloneCommandBuilder() {
+    }
 
     private static final String runScript = "{0}/bin/flink run ";
     private static final String detached = "-d ";
     private static final String parallelism = "-p {0} ";
     private static final String confItem = "-D {0} ";
     private static final String mainClass = "-c {0} ";
-    private static final String jarName = "{0} ";
+    private static final String mainJarPath = "{0} ";
     private static final String args = "{0}";
 
-    public static String buildRunCommand(FlinkSubmitOptions flinkSubmitOptions) throws PlinkException {
+    @Override
+    public String buildRunCommand(FlinkSubmitOptions flinkSubmitOptions) throws PlinkException {
         FlinkConfig flinkConfig = flinkSubmitOptions.getFlinkConfig();
         StringBuilder builder = new StringBuilder();
         builder.append(format(runScript, FlinkConfigUtil.getFlinkHome())).append(detached);
@@ -37,7 +43,7 @@ public class StandaloneCommandBuilder {
         if (flinkConfig.getMainClass() != null) {
             builder.append(format(mainClass, flinkConfig.getMainClass()));
         }
-        builder.append(format(jarName, Preconditions.checkNotNull(flinkConfig.getJarName())));
+        builder.append(format(mainJarPath, Preconditions.checkNotNull(flinkSubmitOptions.getMainJarPath())));
         if (flinkConfig.getArgs() != null) {
             builder.append(format(args, flinkConfig.getArgs()));
         }

@@ -1,17 +1,11 @@
 package com.github.hairless.plink.service.impl;
 
+import com.github.hairless.plink.common.Assist.FlinkShellSubmitAssist;
 import com.github.hairless.plink.common.builder.YarnCommandBuilder;
-import com.github.hairless.plink.model.common.FlinkSubmitOptions;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
-import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.service.FlinkClusterService;
-import com.google.common.io.CharStreams;
 import org.springframework.stereotype.Component;
-
-import java.io.InputStreamReader;
-
-import static com.github.hairless.plink.common.util.MessageFormatUtil.format;
 
 /**
  * @author: silence
@@ -19,21 +13,12 @@ import static com.github.hairless.plink.common.util.MessageFormatUtil.format;
  */
 @Component("yarnFlinkClusterService")
 public class YarnFlinkClusterService implements FlinkClusterService {
+    private FlinkShellSubmitAssist flinkShellSubmitAssist =
+            new FlinkShellSubmitAssist(YarnCommandBuilder.INSTANCE, "Submitting application master (application_[0-9_]+)");
 
     @Override
     public String submitJob(JobInstanceDTO jobInstanceDTO, String logFile) throws Exception {
-        FlinkSubmitOptions flinkSubmitOptions = new FlinkSubmitOptions();
-        flinkSubmitOptions.setJobName(jobInstanceDTO.getJob().getName());
-        flinkSubmitOptions.setFlinkConfig(jobInstanceDTO.getConfig());
-        String runCommand = YarnCommandBuilder.buildRunCommand(flinkSubmitOptions);
-        String[] cmd = new String[]{"/bin/sh", "-c", format("{0} >> {1} 2>&1", runCommand, logFile)};
-        Process process = Runtime.getRuntime().exec(cmd);
-        int exitCode = process.waitFor();
-        if (exitCode < 0) {
-            throw new PlinkMessageException("submit job failed!");
-        }
-        String log = CharStreams.toString(new InputStreamReader(process.getInputStream()));
-        return null;
+        return flinkShellSubmitAssist.submitJob(jobInstanceDTO, logFile);
     }
 
     @Override

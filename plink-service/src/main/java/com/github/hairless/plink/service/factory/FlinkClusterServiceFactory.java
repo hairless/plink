@@ -14,8 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class FlinkClusterServiceFactory {
 
-    public static String DEFAULT_CLUSTER_MODE = "stand";
-    public static String FLINK_CLUSTER_SERVICE_SUFFIX = "FlinkClusterService";
+    public static String DEFAULT_CLUSTER_MODE = "standalone";
+    public static String FLINK_CLUSTER_SERVICE_SUFFIX = "FlinkClusterServiceImpl";
 
     @Autowired
     Map<String, FlinkClusterService> flinkClusterServiceMap = new ConcurrentHashMap<>();
