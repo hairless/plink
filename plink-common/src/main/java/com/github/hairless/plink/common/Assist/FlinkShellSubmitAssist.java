@@ -36,9 +36,12 @@ public class FlinkShellSubmitAssist {
         flinkSubmitOptions.setFlinkConfig(jobInstanceDTO.getConfig());
         String runCommand = shellCommandBuilder.buildRunCommand(flinkSubmitOptions);
         log.debug("runCommand:{}", runCommand);
-        String[] cmd = new String[]{"/bin/sh", "-c", format("{0} >> {1} 2>&1", runCommand, logFile)};
-        Process process = Runtime.getRuntime().exec(cmd);
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.command("/bin/sh", "-c", format("{0} >> {1} 2>&1", runCommand, logFile));
+        log.info("--------------------------------submit client log begin----------------------------------");
+        Process process = processBuilder.start();
         int exitCode = process.waitFor();
+        log.info("--------------------------------submit client log end----------------------------------");
         if (exitCode < 0) {
             throw new PlinkMessageException("submit job failed!");
         }
