@@ -9,19 +9,21 @@ import com.github.hairless.plink.sql.model.SqlDebugConfig;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseNode;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseNodeActionEnum;
 import com.github.hairless.plink.sql.util.PlinkSqlParser;
+import com.github.hairless.plink.sql.util.SkipAnsiCheckSqlDialect;
 import com.github.hairless.plink.sql.util.SqlBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlInsert;
+import org.apache.calcite.sql.SqlLiteral;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.parser.SqlParseException;
+import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.sql.parser.ddl.SqlCreateTable;
 import org.apache.flink.sql.parser.ddl.SqlCreateView;
+import org.apache.flink.sql.parser.ddl.SqlTableOption;
 import org.apache.flink.table.factories.FactoryUtil;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -78,12 +80,14 @@ public class SqlDebugDriver {
     }
 
     private static String buildDebugSourceSql(SqlParseNode sourceTable, SqlDebugConfig.SourceConfig sourceConfig) {
-        Map<String, String> properties = sourceTable.getProperties();
-        Map<String, String> debugProperties = new HashMap<>();
-        debugProperties.put(FactoryUtil.CONNECTOR.key(), CollectionTableFactory.COLLECTION);
-        debugProperties.put(CollectionTableFactory.DATA.key(), JSON.toJSONString(sourceConfig.getData()));
-        debugProperties.putAll(filterFormatProperties(properties));
-        return SqlBuilder.tableBuilder().tableName(sourceTable.getName()).columnList(sourceTable.getColumnList()).properties(debugProperties).build();
+        List<SqlNode> tableOptions = ((SqlCreateTable) sourceTable.getCalciteSqlNode()).getPropertyList().getList();
+        List<SqlNode> newTableOptions = new ArrayList<>();
+        newTableOptions.addAll(tableOptions.stream().filter(node -> ((SqlTableOption) node).getKeyString().startsWith(FactoryUtil.FORMAT.key())).collect(Collectors.toList()));
+        newTableOptions.add(newSqlTableOption(FactoryUtil.CONNECTOR.key(), CollectionTableFactory.COLLECTION));
+        newTableOptions.add(newSqlTableOption(CollectionTableFactory.DATA.key(), JSON.toJSONString(sourceConfig.getData())));
+        tableOptions.clear();
+        tableOptions.addAll(newTableOptions);
+        return sourceTable.getCalciteSqlNode().toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql() + ";";
     }
 
     private static String buildDebugSinkSql(String identifier, SqlParseNode sinkTable) {
@@ -111,9 +115,9 @@ public class SqlDebugDriver {
         SqlNode calciteSqlNode = fromTable.getCalciteSqlNode();
         String query;
         if (calciteSqlNode instanceof SqlCreateView) {
-            query = ((SqlCreateView) calciteSqlNode).getQuery().toString();
+            query = ((SqlCreateView) calciteSqlNode).getQuery().toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();
         } else if (calciteSqlNode instanceof SqlInsert) {
-            query = ((SqlInsert) calciteSqlNode).getSource().toString();
+            query = ((SqlInsert) calciteSqlNode).getSource().toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();
         } else {
             throw new RuntimeException(calciteSqlNode.getClass().getSimpleName() + "not support");
         }
@@ -124,5 +128,9 @@ public class SqlDebugDriver {
     private static Map<String, String> filterFormatProperties(Map<String, String> properties) {
         return properties.entrySet().stream().filter(entry -> entry.getKey().startsWith(FactoryUtil.FORMAT.key()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    private static SqlTableOption newSqlTableOption(String key, String value) {
+        return new SqlTableOption(SqlLiteral.createCharString(key, SqlParserPos.ZERO), SqlLiteral.createCharString(value, SqlParserPos.ZERO), SqlParserPos.ZERO);
     }
 }
