@@ -10,5 +10,8 @@ import lombok.Data;
 public class SqlParseColumn {
     private String name;
     private String type;
-    private String desc;
+    private Boolean nullable;
+    private String constraint;
+    private String comment;
+    private Boolean isPhysical = true;
 }
