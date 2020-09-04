@@ -4,8 +4,6 @@ import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-
 import javax.persistence.Id;
 import javax.persistence.OrderBy;
 import javax.validation.constraints.Min;
