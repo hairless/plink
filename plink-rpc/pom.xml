@@ -18,6 +18,16 @@
             <artifactId>plink-common</artifactId>
         </dependency>
 
+        <!-- hadoop -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-yarn-client</artifactId>
+        </dependency>
+
         <!-- utils -->
         <dependency>
             <groupId>org.projectlombok</groupId>

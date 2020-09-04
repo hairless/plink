@@ -15,7 +15,7 @@ import static com.github.hairless.plink.common.util.MessageFormatUtil.format;
  * @author: silence
  * @date: 2020/8/24
  */
-public class YarnCommandBuilder implements ShellCommandBuilder {
+public class YarnCommandBuilder implements FlinkShellCommandBuilder {
 
     public static final YarnCommandBuilder INSTANCE = new YarnCommandBuilder();
 

@@ -45,7 +45,6 @@ devtools:
   restart:
     enabled: true #是否支持热部署
 
-flink:
-  restful:
-    ip: localhost
-    port: 8081
+kerberos:
+  keytab: /home/work/.keytab/bigdata_off03-bigdata.mars.ljnode.com.keytab
+  principal: bigdata/off03-bigdata.mars.ljnode.com@HADOOP.COM
