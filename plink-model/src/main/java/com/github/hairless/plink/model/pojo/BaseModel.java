@@ -3,6 +3,7 @@ package com.github.hairless.plink.model.pojo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.Id;
 import javax.persistence.OrderBy;
@@ -35,5 +36,10 @@ public class BaseModel implements Serializable {
      * 记录修改时间
      */
     private Date updateTime;
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
+    }
 
 }
