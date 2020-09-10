@@ -68,7 +68,7 @@ public class YarnFlinkClusterServiceImpl implements FlinkClusterService {
         if (StringUtils.isBlank(jobInstanceDTO.getAppId())) {
             return null;
         }
-        String resourceManagerAddress = WebAppUtils.getResolvedRMWebAppURLWithScheme(HadoopConfigUtil.getConfiguration());
+        String resourceManagerAddress = WebAppUtils.getResolvedRemoteRMWebAppURLWithScheme(HadoopConfigUtil.getConfiguration());
         JobInstanceStatusEnum jobInstanceStatusEnum = JobInstanceStatusEnum.getEnum(jobInstanceDTO.getStatus());
         switch (jobInstanceStatusEnum) {
             case RUNNING:
