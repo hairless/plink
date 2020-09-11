@@ -1,4 +1,4 @@
-package com.github.hairless.plink.common;
+package com.github.hairless.plink.common.util;
 
 import com.github.hairless.plink.model.exception.PlinkException;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
@@ -21,7 +21,7 @@ import java.util.stream.Stream;
  * @date: 2020/2/17
  */
 public class FlinkConfigUtil {
-    private static Map<String, Object> cache = new ConcurrentHashMap<>();
+    private static final Map<String, Object> cache = new ConcurrentHashMap<>();
 
     private static final String CONF_SUFFIX = "/conf";
     private static final String LIB_SUFFIX = "/lib";

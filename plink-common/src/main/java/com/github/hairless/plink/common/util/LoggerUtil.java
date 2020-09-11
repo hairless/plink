@@ -1,4 +1,4 @@
-package com.github.hairless.plink.common;
+package com.github.hairless.plink.common.util;
 
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
@@ -19,9 +19,9 @@ import java.nio.charset.StandardCharsets;
  */
 public class LoggerUtil {
 
-    private static LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-    private static Logger rootLogger = context.getLogger("ROOT");
-    private static String pattern = OptionHelper.substVars("${LOG_PATTERN}", context);
+    private final static LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+    private final static Logger rootLogger = context.getLogger("ROOT");
+    private final static String pattern = OptionHelper.substVars("${LOG_PATTERN}", context);
 
     public static Appender<ILoggingEvent> registerThreadFileAppender(String appenderName, String fileName) {
         FileAppender<ILoggingEvent> fileAppender = new FileAppender<>();

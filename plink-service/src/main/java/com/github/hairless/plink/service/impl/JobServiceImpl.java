@@ -1,7 +1,7 @@
 package com.github.hairless.plink.service.impl;
 
-import com.github.hairless.plink.common.UploadUtil;
-import com.github.hairless.plink.common.ValidatorUtil;
+import com.github.hairless.plink.common.util.UploadUtil;
+import com.github.hairless.plink.common.util.ValidatorUtil;
 import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.dto.JobDTO;
@@ -134,7 +134,7 @@ public class JobServiceImpl implements JobService {
             throw new PlinkMessageException("the file is empty");
         }
         String filename = file.getOriginalFilename();
-        File uploadPath = new File(UploadUtil.getJobJarsPath() + jobId);
+        File uploadPath = new File(UploadUtil.getJobJarsPath(jobId));
         if (!uploadPath.exists()) {
             if (!uploadPath.mkdirs()) {
                 throw new PlinkMessageException("make upload dir fail!");
@@ -150,7 +150,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<String> jarList(Long jobId) {
-        File uploadPath = new File(UploadUtil.getJobJarsPath() + jobId);
+        File uploadPath = new File(UploadUtil.getJobJarsPath(jobId));
         if (uploadPath.exists()) {
             String[] fileNames = uploadPath.list();
             if (fileNames != null) {

@@ -48,7 +48,7 @@ public class JobInstanceTransform implements Transform<JobInstanceDTO, JobInstan
         if (jobInstance.getAppId() != null) {
             FlinkClusterService defaultFlinkClusterService = flinkClusterServiceFactory.getDefaultFlinkClusterService();
             try {
-                jobInstanceDTO.setUiAddress(defaultFlinkClusterService.getJobUiAddress(jobInstance.getAppId()));
+                jobInstanceDTO.setUiAddress(defaultFlinkClusterService.getJobUiAddress(jobInstanceDTO));
             } catch (Exception e) {
                 throw new PlinkRuntimeException(e);
             }
