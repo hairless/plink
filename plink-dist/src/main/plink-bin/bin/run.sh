@@ -27,7 +27,7 @@ case "$1" in
         touch "$LOG_FILE"
         exec java -jar "$JARFILE" "$profile" --spring.config.location=$SERVER_ROOT_PATH/config/ >> "${LOG_FILE}" 2>&1 &
         echo "server starting log to " "${LOG_FILE}"
-        tail -f "${LOG_FILE}"
+        tail -f -n 0 "${LOG_FILE}"
     ;;
 
     *)

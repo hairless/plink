@@ -5,8 +5,8 @@ logging:
   dir: log
   config: classpath:config/logback.xml
   instance:
-    dir: log/intance-log
-    pattern: /job-id-%s/instance-id-%s.log
+    dir: log/intance_log
+    pattern: /job_id_%s/instance_id_%s.log
 
 spring:
   thymeleaf:
@@ -46,5 +46,5 @@ devtools:
     enabled: true #是否支持热部署
 
 kerberos:
-  keytab: /home/work/.keytab/bigdata_off03-bigdata.mars.ljnode.com.keytab
-  principal: bigdata/off03-bigdata.mars.ljnode.com@HADOOP.COM
+  keytab:
+  principal:

@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.util.Preconditions;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.UserGroupInformation;
+import org.apache.hadoop.service.Service.STATE;
 import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.client.api.YarnClient;
@@ -29,9 +30,12 @@ public class YarnClientRpcServiceImpl implements YarnClientRpcService {
     @Value("${kerberos.principal}")
     private String kerberosPrincipal;
 
+    private YarnClient reusableYarnClient;
+
     @Override
     public void killApplication(String appId) throws PlinkException {
-        try (YarnClient yarnClient = getYarnClient()) {
+        try {
+            YarnClient yarnClient = getReusableYarnClient();
             yarnClient.killApplication(ConverterUtils.toApplicationId(appId));
         } catch (Exception e) {
             throw new PlinkException(e);
@@ -46,7 +50,8 @@ public class YarnClientRpcServiceImpl implements YarnClientRpcService {
     public YarnApplicationState getYarnApplicationState(String hadoopHome, String appId) {
         Preconditions.checkArgument(StringUtils.isNotBlank(hadoopHome), "hadoopHome is empty");
         Preconditions.checkArgument(StringUtils.isNotBlank(appId), "appId is empty");
-        try (YarnClient yarnClient = getYarnClient()) {
+        try {
+            YarnClient yarnClient = getReusableYarnClient();
             ApplicationReport report = yarnClient.getApplicationReport(ConverterUtils.toApplicationId(appId));
             Preconditions.checkNotNull(report, "getYarnApplicationReport is null");
             return report.getYarnApplicationState();
@@ -66,6 +71,13 @@ public class YarnClientRpcServiceImpl implements YarnClientRpcService {
         yarnClient.init(config);
         yarnClient.start();
         return yarnClient;
+    }
+
+    private synchronized YarnClient getReusableYarnClient() throws PlinkException, IOException {
+        if (reusableYarnClient == null || !reusableYarnClient.isInState(STATE.STARTED)) {
+            reusableYarnClient = getYarnClient();
+        }
+        return reusableYarnClient;
     }
 
 }
