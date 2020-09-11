@@ -48,3 +48,6 @@ devtools:
 kerberos:
   keytab:
   principal:
+
+cluster:
+  mode: yarn
