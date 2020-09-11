@@ -14,7 +14,7 @@ public interface FlinkClusterService {
      * @param jobInstanceDTO 作业实例信息
      * @return appId
      */
-    String submitJob(JobInstanceDTO jobInstanceDTO) throws Exception;
+    String submitJob(JobInstanceDTO jobInstanceDTO, String logFile) throws Exception;
 
     /**
      * 查询flink job的状态对应的作业实例状态
@@ -35,8 +35,8 @@ public interface FlinkClusterService {
     /**
      * 获取任务的ui地址
      *
-     * @param appId 任务提交返回的id
+     * @param jobInstanceDTO 作业实例信息
      * @return 是否成功
      */
-    String getJobUiAddress(String appId) throws Exception;
+    String getJobUiAddress(JobInstanceDTO jobInstanceDTO) throws Exception;
 }

@@ -1,6 +1,6 @@
 package com.github.hairless.plink.schedule.task;
 
-import com.github.hairless.plink.common.LoggerUtil;
+import com.github.hairless.plink.common.util.LoggerUtil;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.model.pojo.JobInstance;
@@ -38,7 +38,8 @@ public class SubmitJobTask {
 
     @Async("commonThreadExecutor")
     public void asyncSubmitJobTask(JobInstance jobInstance) {
-        LoggerUtil.registerThreadFileAppender(String.valueOf(jobInstance.getId()), String.format(instanceLogDir + instanceLogPattern, jobInstance.getJobId(), jobInstance.getId()));
+        String logFile = String.format(instanceLogDir + instanceLogPattern, jobInstance.getJobId(), jobInstance.getId());
+        LoggerUtil.registerThreadFileAppender(String.valueOf(jobInstance.getId()), logFile);
 
         log.info("prepare starting job instance, jobId={}, instanceId={}", jobInstance.getJobId(), jobInstance.getId());
         try {
@@ -58,7 +59,7 @@ public class SubmitJobTask {
             try {
                 //提交平台实例（flink job）到flink集群
                 FlinkClusterService defaultFlinkClusterService = flinkClusterServiceFactory.getDefaultFlinkClusterService();
-                appId = defaultFlinkClusterService.submitJob(jobInstanceTransform.transform(jobInstance));
+                appId = defaultFlinkClusterService.submitJob(jobInstanceTransform.transform(jobInstance), logFile);
                 if (StringUtils.isBlank(appId)) {
                     throw new PlinkMessageException("appId is empty");
                 }

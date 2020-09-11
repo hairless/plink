@@ -24,6 +24,12 @@
             <artifactId>flink-core</artifactId>
         </dependency>
 
+        <!-- hadoop -->
+        <dependency>
+            <groupId>org.apache.hadoop</groupId>
+            <artifactId>hadoop-common</artifactId>
+        </dependency>
+
         <!-- utils -->
         <dependency>
             <groupId>org.projectlombok</groupId>

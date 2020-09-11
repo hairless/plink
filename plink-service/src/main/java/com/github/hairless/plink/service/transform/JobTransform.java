@@ -3,6 +3,7 @@ package com.github.hairless.plink.service.transform;
 import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.dto.JobDTO;
+import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobClientVersionEnum;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.enums.JobTypeEnum;
@@ -55,7 +56,10 @@ public class JobTransform implements Transform<JobDTO, Job> {
         if (job.getLastAppId() != null) {
             FlinkClusterService defaultFlinkClusterService = flinkClusterServiceFactory.getDefaultFlinkClusterService();
             try {
-                jobDTO.setLastUiAddress(defaultFlinkClusterService.getJobUiAddress(job.getLastAppId()));
+                JobInstanceDTO jobInstanceDTO = new JobInstanceDTO();
+                jobInstanceDTO.setAppId(job.getLastAppId());
+                jobInstanceDTO.setStatus(job.getLastStatus());
+                jobDTO.setLastUiAddress(defaultFlinkClusterService.getJobUiAddress(jobInstanceDTO));
             } catch (Exception e) {
                 throw new PlinkRuntimeException(e);
             }

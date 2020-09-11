@@ -1,5 +1,6 @@
 package com.github.hairless.plink.common;
 
+import com.github.hairless.plink.common.util.FlinkConfigUtil;
 import com.github.hairless.plink.model.exception.PlinkException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.Configuration;
