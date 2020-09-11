@@ -14,7 +14,7 @@ public class FlinkShellSubmitAssistTest {
     @Test
     public void asyncExecShellCommand() throws IOException, InterruptedException {
         if (SystemUtil.isUnix()) {
-            int exitCode = FlinkShellSubmitAssist.syncExecShellCommand("hello plink");
+            int exitCode = FlinkShellSubmitAssist.syncExecShellCommand("echo hello plink");
             assert exitCode == 0;
         }
     }
