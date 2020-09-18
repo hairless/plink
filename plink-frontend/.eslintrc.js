@@ -3,21 +3,14 @@ module.exports = {
   env: {
     node: true
   },
-  extends: ["plugin:vue/essential", "@vue/prettier", "@vue/typescript"],
-  rules: {
-    "no-console": process.env.NODE_ENV === "production" ? "error" : "off",
-    "no-debugger": process.env.NODE_ENV === "production" ? "error" : "off",
-    "vue/no-parsing-error": [2, { "x-invalid-end-tag": false }],  // ViewUi Col
-    "max-len": [2, {  // Code Max Len
-      "code": 120,
-      "tabWidth": 4,
-      "ignoreUrls": true,
-      "ignoreTrailingComments": true,
-      "ignoreTemplateLiterals": true,
-    }]
-  },
+  extends: ["plugin:vue/essential", "eslint:recommended", "@vue/prettier"],
   parserOptions: {
-    parser: "@typescript-eslint/parser"
+    parser: "babel-eslint"
+  },
+  rules: {
+    "no-console": process.env.NODE_ENV === "prod" ? "warn" : "off",
+    "no-debugger": process.env.NODE_ENV === "prod" ? "warn" : "off",
+    "keyword-spacing": [2, { before: true }]
   },
   overrides: [
     {
