@@ -28,7 +28,7 @@ public class SqlJobTest {
         ).collect(Collectors.toList());
 
         String sourceDDL =
-                "create table t1( a int,b string, c int) with ( 'connector.type' = 'collection','data'='" + JSON.toJSONString(sourceData) + "','format.type'='json');";
+                "set a=b;create table t1( a int,b string, c int) with ( 'connector' = 'collection','data'='" + JSON.toJSONString(sourceData) + "');";
         String sinkDDL =
                 "create table t2(a int comment '测试',b string,c int) with ( 'connector' = 'print');";
         String viewSql =
