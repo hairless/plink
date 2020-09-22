@@ -17,6 +17,7 @@ public class SqlParseNode {
     private String name;
     private SqlParseNodeTypeEnum type;
     private List<SqlParseColumn> columnList;
+    private String comment;
     private String sql;
     private Map<String, String> properties;
     private Set<SqlParseNodeActionEnum> actions = new HashSet<>();
