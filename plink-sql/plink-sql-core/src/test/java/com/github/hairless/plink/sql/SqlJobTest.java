@@ -41,6 +41,36 @@ public class SqlJobTest {
 
     @Test
     public void sqlJobTest() {
+
+        Exception exception = null;
+        try {
+            SqlConfig config = SqlConfig.builder().sql(sql).jobName("sql_job_test").build();
+            SqlJob sqlJob = new SqlJob(config);
+            sqlJob.start();
+        } catch (Exception e) {
+            log.error("sqlJobTest error", e);
+            exception = e;
+        }
+        assert exception == null;
+    }
+
+    @Test
+    public void sqlJobWatermarkTest() {
+        List<JSONObject> sourceData = Stream.of(
+                new JSONObject().fluentPut("data_time", "2020-01-01 12:00:01"),
+                new JSONObject().fluentPut("data_time", "2020-01-01 12:00:02"),
+                new JSONObject().fluentPut("data_time", "2020-01-01 12:00:03"),
+                new JSONObject().fluentPut("data_time", "2020-01-01 12:01:01")
+        ).collect(Collectors.toList());
+        String sql = "create table t1( " +
+                "data_time STRING, " +
+                "row1_time AS to_timestamp(data_time)," +
+                "WATERMARK FOR row1_time AS row1_time - INTERVAL '5' SECOND " +
+                ") with ( 'connector' = 'collection','data'='"+JSON.toJSONString(sourceData)+"');" +
+                "create table t2(stime TIMESTAMP(3),cnt bigint) with ( 'connector' = 'print');" +
+                "insert into t2 select TUMBLE_START(row1_time, INTERVAL '1' MINUTE) as stime,count(1) cnt from t1 group by TUMBLE(row1_time, INTERVAL '1' MINUTE);;";
+
+
         Exception exception = null;
         try {
             SqlConfig config = SqlConfig.builder().sql(sql).jobName("sql_job_test").build();

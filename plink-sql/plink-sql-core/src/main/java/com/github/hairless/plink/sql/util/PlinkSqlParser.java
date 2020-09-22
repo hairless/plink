@@ -1,5 +1,6 @@
 package com.github.hairless.plink.sql.util;
 
+import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.sql.model.sqlparse.*;
 import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.*;
@@ -97,12 +98,26 @@ public class PlinkSqlParser {
                 node.setName(sqlCreateTable.getTableName().getSimple());
                 node.setType(SqlParseNodeTypeEnum.TABLE);
                 List<SqlParseColumn> sqlParseColumnList = sqlCreateTable.getColumnList().getList().stream().map(c -> {
-                    SqlTableColumn sqlTableColumn = (SqlTableColumn) c;
                     SqlParseColumn sqlParseColumn = new SqlParseColumn();
-                    sqlParseColumn.setName(sqlTableColumn.getName().getSimple());
-                    sqlParseColumn.setType(sqlTableColumn.getType().toString());
-                    if (sqlTableColumn.getComment().isPresent()) {
-                        sqlParseColumn.setDesc(sqlTableColumn.getComment().get().getStringValue());
+                    if (c instanceof SqlTableColumn) {
+                        SqlTableColumn sqlTableColumn = (SqlTableColumn) c;
+                        sqlParseColumn.setName(sqlTableColumn.getName().getSimple());
+                        sqlParseColumn.setType(sqlTableColumn.getType().toString());
+                        sqlParseColumn.setNullable(sqlTableColumn.getType().getNullable());
+                        if(sqlTableColumn.getConstraint().isPresent()){
+                            sqlParseColumn.setConstraint(sqlTableColumn.getConstraint().get().toString());
+                        }
+                        if (sqlTableColumn.getComment().isPresent()) {
+                            sqlParseColumn.setComment(sqlTableColumn.getComment().get().toString());
+                        }
+                    } else if (c instanceof SqlBasicCall && ((SqlBasicCall) c).getOperator() instanceof SqlAsOperator) {
+                        SqlNode[] operands = ((SqlBasicCall) c).getOperands();
+                        sqlParseColumn.setName(operands[1].toString());
+                        sqlParseColumn.setType(operands[0].toString());
+                        sqlParseColumn.setComment(c.toString());
+                        sqlParseColumn.setIsPhysical(false);
+                    } else {
+                        throw new PlinkMessageException("not support operation: " + c.getClass().getSimpleName());
                     }
                     return sqlParseColumn;
                 }).collect(Collectors.toList());
@@ -111,6 +126,11 @@ public class PlinkSqlParser {
                         .collect(Collectors.toMap(SqlTableOption::getKeyString, SqlTableOption::getValueString));
                 node.setProperties(properties);
                 node.setCalciteSqlNode(sqlNode);
+                if (sqlCreateTable.getComment().isPresent()) {
+                    node.setComment(sqlCreateTable.getComment().get().toString());
+                } else {
+                    node.setComment(sqlCreateTable.getTableName().toString());
+                }
                 nodeMap.put(node.getName(), node);
             } else if (sqlNode instanceof SqlCreateView) {
                 SqlCreateView sqlCreateView = (SqlCreateView) sqlNode;
@@ -128,6 +148,7 @@ public class PlinkSqlParser {
                 }).collect(Collectors.toList());
                 node.setColumnList(sqlParseColumnList);
                 node.setCalciteSqlNode(sqlNode);
+                node.setComment(viewName);
                 nodeMap.put(node.getName(), node);
                 List<String> selectTableList = lookupSelectTable(sqlCreateView.getQuery());
                 List<SqlParseLink> viewLinkList = selectTable2Link(selectTableList, viewName);
@@ -167,7 +188,7 @@ public class PlinkSqlParser {
                 tEnv.getConfig().getConfiguration().setString(name, value);
                 continue;
             } else {
-                throw new RuntimeException("not support operation: " + sqlNode.getClass().getSimpleName());
+                throw new PlinkMessageException("not support operation: " + sqlNode.getClass().getSimpleName());
             }
             tEnv.sqlUpdate(splitSql);
         }

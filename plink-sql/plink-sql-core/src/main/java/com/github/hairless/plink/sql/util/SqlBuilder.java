@@ -52,7 +52,9 @@ public class SqlBuilder {
             this.checkParams();
             StringBuilder sql = new StringBuilder();
             sql.append("CREATE TABLE `").append(tableName).append("`(");
-            String columnString = columnList.stream().map(column -> String.format("`%s` %s", column.getName(), column.getType())).collect(Collectors.joining(","));
+            String columnString = columnList.stream()
+                    .peek(column -> column.setType(column.getType().replace("*ROWTIME*", "")))
+                    .map(column -> String.format("`%s` %s", column.getName(), column.getType())).collect(Collectors.joining(","));
             sql.append(columnString).append(") WITH(");
             String propertiesString = properties.entrySet().stream().map(prop -> String.format("'%s'='%s'", prop.getKey(), prop.getValue())).collect(Collectors.joining(","));
             sql.append(propertiesString).append(");");
@@ -93,7 +95,8 @@ public class SqlBuilder {
             this.checkParams();
             StringBuilder sql = new StringBuilder();
             sql.append("INSERT INTO `").append(targetTableName).append("`(");
-            String columnString = columnList.stream().map(column -> String.format("`%s`", column.getName())).collect(Collectors.joining(","));
+            String columnString = columnList.stream()
+                    .map(column -> String.format("`%s`", column.getName())).collect(Collectors.joining(","));
             sql.append(columnString).append(") ").append(query).append(";");
             return sql.toString();
         }
