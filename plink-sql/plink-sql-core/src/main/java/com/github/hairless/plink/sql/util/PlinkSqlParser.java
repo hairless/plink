@@ -1,6 +1,5 @@
 package com.github.hairless.plink.sql.util;
 
-import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.sql.model.sqlparse.*;
 import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.*;
@@ -117,7 +116,7 @@ public class PlinkSqlParser {
                         sqlParseColumn.setComment(c.toString());
                         sqlParseColumn.setIsPhysical(false);
                     } else {
-                        throw new PlinkMessageException("not support operation: " + c.getClass().getSimpleName());
+                        throw new RuntimeException("not support operation: " + c.getClass().getSimpleName());
                     }
                     return sqlParseColumn;
                 }).collect(Collectors.toList());
@@ -188,7 +187,7 @@ public class PlinkSqlParser {
                 tEnv.getConfig().getConfiguration().setString(name, value);
                 continue;
             } else {
-                throw new PlinkMessageException("not support operation: " + sqlNode.getClass().getSimpleName());
+                throw new RuntimeException("not support operation: " + sqlNode.getClass().getSimpleName());
             }
             tEnv.sqlUpdate(splitSql);
         }

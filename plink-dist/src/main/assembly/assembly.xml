@@ -11,18 +11,18 @@
             <unpack>false</unpack>
         </dependencySet>
     </dependencySets>
-    <fileSets>
+    <files>
         <!-- README -->
-        <fileSet>
-            <directory>../${basedir}/</directory>
-            <includes>
-                <include>README.md</include>
-            </includes>
-        </fileSet>
+        <file>
+            <source>../README.md</source>
+            <outputDirectory>/</outputDirectory>
+        </file>
+    </files>
 
+    <fileSets>
         <!-- bin -->
         <fileSet>
-            <directory>${basedir}/src/main/plink-bin/bin</directory>
+            <directory>./src/main/plink-bin/bin</directory>
             <outputDirectory>/bin</outputDirectory>
             <includes>
                 <include>run.sh</include>
@@ -30,32 +30,27 @@
             </includes>
         </fileSet>
 
-        <!-- boot -->
-        <!--<fileSet>
-            <directory>${basedir}/target</directory>
-            <outputDirectory>boot</outputDirectory>
-            <fileMode>0755</fileMode>
-            <includes>
-                <include>${project.build.finalName}.jar</include>
-            </includes>
-        </fileSet>-->
-
         <!-- config -->
         <fileSet>
-            <directory>../${basedir}/plink-web/target/classes</directory>
+            <directory>../plink-web/target/classes</directory>
             <outputDirectory>/config</outputDirectory>
             <fileMode>0755</fileMode>
             <includes>
                 <include>application.yml</include>
                 <include>application-local.yml</include>
                 <include>application-test.yml</include>
-                <include>banner.txt</include>
             </includes>
+        </fileSet>
+
+        <!-- module -->
+        <fileSet>
+            <directory>../module</directory>
+            <outputDirectory>/module</outputDirectory>
         </fileSet>
 
         <!-- docs -->
         <fileSet>
-            <directory>../${basedir}/docs</directory>
+            <directory>../docs</directory>
             <outputDirectory>/docs</outputDirectory>
         </fileSet>
     </fileSets>
