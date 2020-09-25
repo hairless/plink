@@ -13,7 +13,7 @@ import java.util.Map;
 @Data
 public class SqlDebugConfig {
 
-    private Map<String, SourceConfig> map;
+    private Map<String, SourceConfig> sourceConfigMap;
 
     @Data
     @AllArgsConstructor

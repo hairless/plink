@@ -1,6 +1,7 @@
 package com.github.hairless.plink.sql;
 
 import com.alibaba.fastjson.JSON;
+import com.github.hairless.plink.sql.SqlJob;
 import com.github.hairless.plink.sql.connector.collection.CollectionDataWarehouse;
 import com.github.hairless.plink.sql.connector.collection.CollectionTableFactory;
 import com.github.hairless.plink.sql.connector.collection.CollectionTableSink;
@@ -53,7 +54,7 @@ public class SqlDebugDriver {
         StringBuilder sqlBuilder = new StringBuilder();
         List<SqlParseNode> sourceTableList = plinkSqlParser.getTableList(SqlParseNodeActionEnum.SOURCE);
         sourceTableList.forEach(sourceTable -> {
-            SqlDebugConfig.SourceConfig sourceConfig = sqlDebugConfig.getMap().get(sourceTable.getName());
+            SqlDebugConfig.SourceConfig sourceConfig = sqlDebugConfig.getSourceConfigMap().get(sourceTable.getName());
             sqlBuilder.append(buildDebugSourceSql(sourceTable, sourceConfig));
         });
         List<SqlParseNode> sinkTableList = plinkSqlParser.getTableList(SqlParseNodeActionEnum.SINK);
@@ -87,7 +88,7 @@ public class SqlDebugDriver {
         newTableOptions.add(newSqlTableOption(CollectionTableFactory.DATA.key(), JSON.toJSONString(sourceConfig.getData())));
         tableOptions.clear();
         tableOptions.addAll(newTableOptions);
-        return sourceTable.getCalciteSqlNode().toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql() + ";";
+        return ((SqlNode)sourceTable.getCalciteSqlNode()).toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql() + ";";
     }
 
     private static String buildDebugSinkSql(String identifier, SqlParseNode sinkTable) {
@@ -112,7 +113,7 @@ public class SqlDebugDriver {
     }
 
     private static String buildDebugInsertSql(SqlParseNode fromTable, String targetTableName) {
-        SqlNode calciteSqlNode = fromTable.getCalciteSqlNode();
+        SqlNode calciteSqlNode = (SqlNode)fromTable.getCalciteSqlNode();
         String query;
         if (calciteSqlNode instanceof SqlCreateView) {
             query = ((SqlCreateView) calciteSqlNode).getQuery().toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();

@@ -11,13 +11,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.webapp.util.WebAppUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * @author: silence
  * @date: 2020/1/19
  */
-@Component("yarnFlinkClusterServiceImpl")
+@Service("yarnFlinkClusterServiceImpl")
 public class YarnFlinkClusterServiceImpl implements FlinkClusterService {
     @Autowired
     private YarnClientRpcService yarnClientRpcService;

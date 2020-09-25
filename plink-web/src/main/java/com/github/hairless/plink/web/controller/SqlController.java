@@ -3,6 +3,9 @@ package com.github.hairless.plink.web.controller;
 import com.github.hairless.plink.model.dto.JobDTO;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.model.resp.ResultCode;
+import com.github.hairless.plink.service.PlinkSqlService;
+import com.github.hairless.plink.sql.model.sqlparse.SqlParseInfo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,15 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/mng/sql")
 public class SqlController {
+    @Autowired
+    private PlinkSqlService plinkSqlService;
+
 
     /**
-     * 添加作业
-     *
-     * @param jobDTO 作业请求对象
+     * parse sql
+     * @param sql
+     * @return
      */
-    @RequestMapping("/graph")
-    public Result<Object> addJob(@RequestBody JobDTO jobDTO) {
-
-        return new Result<>(ResultCode.SUCCESS, new Object());
+    @RequestMapping("/parse")
+    public Result<SqlParseInfo> parse(String sql) {
+        return new Result<>(ResultCode.SUCCESS, plinkSqlService.parse(sql));
     }
 }

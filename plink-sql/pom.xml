@@ -15,6 +15,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>plink-sql-model</module>
         <module>plink-sql-core</module>
         <module>plink-sql-dependency</module>
     </modules>
@@ -22,6 +23,11 @@
     <dependencyManagement>
         <dependencies>
             <!--project modules-->
+            <dependency>
+                <groupId>com.github.hairless</groupId>
+                <artifactId>plink-sql-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.github.hairless</groupId>
                 <artifactId>plink-sql-core</artifactId>

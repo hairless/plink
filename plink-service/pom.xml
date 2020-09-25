@@ -25,6 +25,10 @@
             <groupId>com.github.hairless</groupId>
             <artifactId>plink-rpc</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.hairless</groupId>
+            <artifactId>plink-sql-model</artifactId>
+        </dependency>
 
         <!--spring boot jars-->
         <dependency>

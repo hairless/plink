@@ -103,7 +103,7 @@ public class PlinkSqlParser {
                         sqlParseColumn.setName(sqlTableColumn.getName().getSimple());
                         sqlParseColumn.setType(sqlTableColumn.getType().toString());
                         sqlParseColumn.setNullable(sqlTableColumn.getType().getNullable());
-                        if(sqlTableColumn.getConstraint().isPresent()){
+                        if (sqlTableColumn.getConstraint().isPresent()) {
                             sqlParseColumn.setConstraint(sqlTableColumn.getConstraint().get().toString());
                         }
                         if (sqlTableColumn.getComment().isPresent()) {

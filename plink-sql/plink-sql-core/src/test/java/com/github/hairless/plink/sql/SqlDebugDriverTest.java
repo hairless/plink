@@ -34,7 +34,7 @@ public class SqlDebugDriverTest {
         SqlDebugConfig sqlDebugConfig = new SqlDebugConfig();
         HashMap<String, SqlDebugConfig.SourceConfig> sourceConfigMap = new HashMap<>();
         sourceConfigMap.put("t1", new SqlDebugConfig.SourceConfig(sourceData));
-        sqlDebugConfig.setMap(sourceConfigMap);
+        sqlDebugConfig.setSourceConfigMap(sourceConfigMap);
         Map<String, List<String>> debugResult = SqlDebugDriver.debug(sql, sqlDebugConfig);
         assert MapUtils.isNotEmpty(debugResult);
     }
@@ -57,7 +57,7 @@ public class SqlDebugDriverTest {
         SqlDebugConfig sqlDebugConfig = new SqlDebugConfig();
         HashMap<String, SqlDebugConfig.SourceConfig> sourceConfigMap = new HashMap<>();
         sourceConfigMap.put("t1", new SqlDebugConfig.SourceConfig(sourceData));
-        sqlDebugConfig.setMap(sourceConfigMap);
+        sqlDebugConfig.setSourceConfigMap(sourceConfigMap);
         Map<String, List<String>> debugResult = SqlDebugDriver.debug(sql, sqlDebugConfig);
         List<String> t2 = debugResult.get("t2");
         assert t2 != null && t2.size() > 0;
