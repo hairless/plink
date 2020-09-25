@@ -1,12 +1,10 @@
 package com.github.hairless.plink.web.controller;
 
-import com.github.hairless.plink.model.dto.JobDTO;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.service.PlinkSqlService;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -23,6 +21,7 @@ public class SqlController {
 
     /**
      * parse sql
+     *
      * @param sql
      * @return
      */

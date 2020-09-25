@@ -52,6 +52,7 @@ public class PlinkSqlServiceImpl implements PlinkSqlService {
     /**
      * 调用plink-sql-core模块的{@link com.github.hairless.plink.sql.util.PlinkSqlParser}
      * PlinkSqlParser.create(sql).getSqlParseInfo()
+     *
      * @param sql flink sql
      * @return SqlParseInfo {@link com.github.hairless.plink.sql.model.sqlparse.SqlParseInfo}
      */
@@ -64,7 +65,7 @@ public class PlinkSqlServiceImpl implements PlinkSqlService {
             //exec PlinkSqlParser.create(sql).getSqlParseInfo()
             Class<?> plinkSqlParserClass = sqlBaseClassLoader.loadClass(PLINK_SQL_PARSER_CLASS_NAME);
             Object plinkSqlParser = plinkSqlParserClass.getMethod("create", String.class).invoke(null, sql);
-            return (SqlParseInfo)plinkSqlParserClass.getMethod("getSqlParseInfo").invoke(plinkSqlParser);
+            return (SqlParseInfo) plinkSqlParserClass.getMethod("getSqlParseInfo").invoke(plinkSqlParser);
 
         } catch (InvocationTargetException e) {
             throw new PlinkRuntimeException("sql parse error", e.getTargetException());
