@@ -9,6 +9,9 @@ logging:
     pattern: /job_id_%s/instance_id_%s.log
 
 spring:
+  jackson:
+    mapper:
+      propagate-transient-marker: true
   thymeleaf:
     prefix: "classpath:/static/"
   datasource:
