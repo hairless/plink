@@ -47,7 +47,7 @@ public class PlinkSqlServiceImpl implements PlinkSqlService {
         //plink sql shape jars
         File sqlShapeDir = new File(plinkHome + SQL_SHAPE_DIR_PATH);
         if (!sqlShapeDir.exists()) {
-            throw new PlinkRuntimeException("sql shape dir not exist,path=" + sqlCoreJarFile.getAbsolutePath() +
+            throw new PlinkRuntimeException("sql shape dir not exist,path=" + sqlShapeDir.getAbsolutePath() +
                     ",you can try 'mvn package' in plink-sql module");
         }
         File[] sqlShapeJars = sqlShapeDir.listFiles();
