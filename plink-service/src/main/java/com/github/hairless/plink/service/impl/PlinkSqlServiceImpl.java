@@ -1,6 +1,7 @@
 package com.github.hairless.plink.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.github.hairless.plink.common.util.PlinkUtil;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.service.PlinkSqlService;
 import com.github.hairless.plink.sql.model.SqlDebugConfig;
@@ -33,18 +34,18 @@ public class PlinkSqlServiceImpl implements PlinkSqlService {
     private final ClassLoader sqlBaseClassLoader;
 
     public PlinkSqlServiceImpl() throws Exception {
-        String userDir = System.getProperty("user.dir");
+        String plinkHome = PlinkUtil.getPlinkHome();
         List<URL> sqlClassPathUrlList = new ArrayList<>();
         //plink sql core jar
-        File sqlCoreJarFile = new File(userDir + SQL_CORE_JAR_FILE);
+        File sqlCoreJarFile = new File(plinkHome + SQL_CORE_JAR_FILE);
         if (!sqlCoreJarFile.exists()) {
             throw new PlinkRuntimeException("sql core jar file not exist!,path=" + sqlCoreJarFile.getAbsolutePath() +
                     ",you can try 'mvn package' in plink-sql module");
         }
-        sqlClassPathUrlList.add(new File(userDir + SQL_CORE_JAR_FILE).toURI().toURL());
+        sqlClassPathUrlList.add(new File(plinkHome + SQL_CORE_JAR_FILE).toURI().toURL());
 
         //plink sql shape jars
-        File sqlShapeDir = new File(userDir + SQL_SHAPE_DIR_PATH);
+        File sqlShapeDir = new File(plinkHome + SQL_SHAPE_DIR_PATH);
         if (!sqlShapeDir.exists()) {
             throw new PlinkRuntimeException("sql shape dir not exist,path=" + sqlCoreJarFile.getAbsolutePath() +
                     ",you can try 'mvn package' in plink-sql module");

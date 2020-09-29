@@ -1,11 +1,10 @@
 language: java
 jdk:
   - openjdk8
-#install:
+install: mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true
 script:
   # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
-  - mvn clean install -DskipTests=true -Dmaven.javadoc.skip=true sonar:sonar -Dsonar.projectKey=hairless_plink
-  - mvn test -Dspring.profiles.active=test org.jacoco:jacoco-maven-plugin:prepare-agent
+  - mvn test -Dspring.profiles.active=test org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=hairless_plink
 cache:
   directories:
     - "$HOME/.m2"
