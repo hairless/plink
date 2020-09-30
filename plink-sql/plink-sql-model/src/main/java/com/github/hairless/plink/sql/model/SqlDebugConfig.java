@@ -2,6 +2,7 @@ package com.github.hairless.plink.sql.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
@@ -13,9 +14,11 @@ import java.util.Map;
 @Data
 public class SqlDebugConfig {
 
-    private Map<String, SourceConfig> map;
+    private String sql;
+    private Map<String, SourceConfig> sourceConfigMap;
 
     @Data
+    @NoArgsConstructor
     @AllArgsConstructor
     public static class SourceConfig {
         private List<String> data;

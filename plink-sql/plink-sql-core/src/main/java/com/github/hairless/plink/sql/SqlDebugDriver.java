@@ -22,6 +22,7 @@ import org.apache.flink.sql.parser.ddl.SqlCreateTable;
 import org.apache.flink.sql.parser.ddl.SqlCreateView;
 import org.apache.flink.sql.parser.ddl.SqlTableOption;
 import org.apache.flink.table.factories.FactoryUtil;
+import org.apache.flink.util.Preconditions;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,9 +34,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SqlDebugDriver {
 
-    public static Map<String, List<String>> debug(String sql, SqlDebugConfig sqlDebugConfig) throws Exception {
+    public static Map<String, List<String>> debug(SqlDebugConfig sqlDebugConfig) throws Exception {
+        Preconditions.checkNotNull(sqlDebugConfig, "sqlDebugConfig should be not null");
+        Preconditions.checkNotNull(sqlDebugConfig.getSql(), "sql should be not null");
         String identifier = UUID.randomUUID().toString();
-        String debugSql = handleDebugSql(identifier, sql, sqlDebugConfig);
+        String debugSql = handleDebugSql(identifier, sqlDebugConfig.getSql(), sqlDebugConfig);
         log.debug("start sql debug,sql:{}", debugSql);
         SqlConfig config = SqlConfig.builder().sql(debugSql).jobName("sql_job_debug_test").build();
         SqlJob sqlJob = new SqlJob(config);
@@ -53,7 +56,7 @@ public class SqlDebugDriver {
         StringBuilder sqlBuilder = new StringBuilder();
         List<SqlParseNode> sourceTableList = plinkSqlParser.getTableList(SqlParseNodeActionEnum.SOURCE);
         sourceTableList.forEach(sourceTable -> {
-            SqlDebugConfig.SourceConfig sourceConfig = sqlDebugConfig.getMap().get(sourceTable.getName());
+            SqlDebugConfig.SourceConfig sourceConfig = sqlDebugConfig.getSourceConfigMap().get(sourceTable.getName());
             sqlBuilder.append(buildDebugSourceSql(sourceTable, sourceConfig));
         });
         List<SqlParseNode> sinkTableList = plinkSqlParser.getTableList(SqlParseNodeActionEnum.SINK);
@@ -87,7 +90,7 @@ public class SqlDebugDriver {
         newTableOptions.add(newSqlTableOption(CollectionTableFactory.DATA.key(), JSON.toJSONString(sourceConfig.getData())));
         tableOptions.clear();
         tableOptions.addAll(newTableOptions);
-        return sourceTable.getCalciteSqlNode().toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql() + ";";
+        return ((SqlNode) sourceTable.getCalciteSqlNode()).toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql() + ";";
     }
 
     private static String buildDebugSinkSql(String identifier, SqlParseNode sinkTable) {
@@ -112,7 +115,7 @@ public class SqlDebugDriver {
     }
 
     private static String buildDebugInsertSql(SqlParseNode fromTable, String targetTableName) {
-        SqlNode calciteSqlNode = fromTable.getCalciteSqlNode();
+        SqlNode calciteSqlNode = (SqlNode) fromTable.getCalciteSqlNode();
         String query;
         if (calciteSqlNode instanceof SqlCreateView) {
             query = ((SqlCreateView) calciteSqlNode).getQuery().toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();

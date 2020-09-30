@@ -7,13 +7,13 @@ import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.rpc.FlinkRestRpcService;
 import com.github.hairless.plink.service.FlinkClusterService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * @author: silence
  * @date: 2020/1/19
  */
-@Component("standaloneFlinkClusterServiceImpl")
+@Service("standaloneFlinkClusterServiceImpl")
 public class StandaloneFlinkClusterServiceImpl implements FlinkClusterService {
     @Autowired
     private FlinkRestRpcService flinkRestRpcService;

@@ -6,6 +6,13 @@ SERVER_ROOT_PATH=$(cd "$(dirname "$0")"; cd ..; pwd)
 
 cd "$SERVER_ROOT_PATH"
 
+if [ $PLINK_HOME ]; then
+  echo  "PLINK_HOME is $PLINK_HOME"
+else
+  export PLINK_HOME=$SERVER_ROOT_PATH
+  echo  "PLINK_HOME is auto set $PLINK_HOME"
+fi
+
 APP_LOG_DIR="${SERVER_ROOT_PATH}/log"
 LOG_FILE="$APP_LOG_DIR/console.log"
 
@@ -16,7 +23,7 @@ else
     profile="--spring.profiles.active=prod"
 fi
 
-JARFILE="$SERVER_ROOT_PATH/lib/plink-web-0.2.0-SNAPSHOT.jar"
+JARFILE=$(find . -name "$SERVER_ROOT_PATH/lib/plink-web-*.jar" -print)
 
 case "$1" in
 

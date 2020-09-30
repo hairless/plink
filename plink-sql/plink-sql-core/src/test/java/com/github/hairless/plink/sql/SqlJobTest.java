@@ -66,7 +66,7 @@ public class SqlJobTest {
                 "data_time STRING, " +
                 "row1_time AS to_timestamp(data_time)," +
                 "WATERMARK FOR row1_time AS row1_time - INTERVAL '5' SECOND " +
-                ") with ( 'connector' = 'collection','data'='"+JSON.toJSONString(sourceData)+"');" +
+                ") with ( 'connector' = 'collection','data'='" + JSON.toJSONString(sourceData) + "');" +
                 "create table t2(stime TIMESTAMP(3),cnt bigint) with ( 'connector' = 'print');" +
                 "insert into t2 select TUMBLE_START(row1_time, INTERVAL '1' MINUTE) as stime,count(1) cnt from t1 group by TUMBLE(row1_time, INTERVAL '1' MINUTE);;";
 
