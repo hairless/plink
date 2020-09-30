@@ -1,7 +1,9 @@
 package com.github.hairless.plink.sql;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.hairless.plink.sql.model.SqlDebugConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.junit.Test;
 
@@ -15,6 +17,7 @@ import java.util.stream.Stream;
  * @author: silence
  * @date: 2020/7/30
  */
+@Slf4j
 public class SqlDebugDriverTest {
     @Test
     public void debug() throws Exception {
@@ -34,8 +37,10 @@ public class SqlDebugDriverTest {
         SqlDebugConfig sqlDebugConfig = new SqlDebugConfig();
         HashMap<String, SqlDebugConfig.SourceConfig> sourceConfigMap = new HashMap<>();
         sourceConfigMap.put("t1", new SqlDebugConfig.SourceConfig(sourceData));
-        sqlDebugConfig.setMap(sourceConfigMap);
-        Map<String, List<String>> debugResult = SqlDebugDriver.debug(sql, sqlDebugConfig);
+        sqlDebugConfig.setSourceConfigMap(sourceConfigMap);
+        sqlDebugConfig.setSql(sql);
+        log.info("sqlDebugConfig={}", JSON.toJSONString(sqlDebugConfig));
+        Map<String, List<String>> debugResult = SqlDebugDriver.debug(sqlDebugConfig);
         assert MapUtils.isNotEmpty(debugResult);
     }
 
@@ -47,7 +52,7 @@ public class SqlDebugDriverTest {
                 "WATERMARK FOR row1_time AS row1_time - INTERVAL '5' SECOND " +
                 ") with ( 'connector' = 'collection','data'='[]');" +
                 "create table t2(stime TIMESTAMP(3),cnt bigint) with ( 'connector' = 'print');" +
-                "insert into t2 select TUMBLE_START(row1_time, INTERVAL '1' MINUTE) as stime,count(1) cnt from t1 group by TUMBLE(row1_time, INTERVAL '1' MINUTE);;";
+                "insert into t2 select TUMBLE_START(row1_time, INTERVAL '1' MINUTE) as stime,count(1) cnt from t1 group by TUMBLE(row1_time, INTERVAL '1' MINUTE);";
         List<String> sourceData = Stream.of(
                 new JSONObject().fluentPut("data_time", "2020-01-01 12:00:01").toJSONString(),
                 new JSONObject().fluentPut("data_time", "2020-01-01 12:00:02").toJSONString(),
@@ -57,8 +62,10 @@ public class SqlDebugDriverTest {
         SqlDebugConfig sqlDebugConfig = new SqlDebugConfig();
         HashMap<String, SqlDebugConfig.SourceConfig> sourceConfigMap = new HashMap<>();
         sourceConfigMap.put("t1", new SqlDebugConfig.SourceConfig(sourceData));
-        sqlDebugConfig.setMap(sourceConfigMap);
-        Map<String, List<String>> debugResult = SqlDebugDriver.debug(sql, sqlDebugConfig);
+        sqlDebugConfig.setSourceConfigMap(sourceConfigMap);
+        sqlDebugConfig.setSql(sql);
+        log.info("sqlDebugConfig={}", JSON.toJSONString(sqlDebugConfig));
+        Map<String, List<String>> debugResult = SqlDebugDriver.debug(sqlDebugConfig);
         List<String> t2 = debugResult.get("t2");
         assert t2 != null && t2.size() > 0;
         assert "{\"stime\":\"2020-01-01 12:00:00\",\"cnt\":3}".equals(t2.get(0));

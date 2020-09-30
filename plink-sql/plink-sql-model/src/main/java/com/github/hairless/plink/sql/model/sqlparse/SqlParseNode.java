@@ -1,7 +1,6 @@
 package com.github.hairless.plink.sql.model.sqlparse;
 
 import lombok.Data;
-import org.apache.calcite.sql.SqlNode;
 
 import java.util.HashSet;
 import java.util.List;
@@ -22,5 +21,5 @@ public class SqlParseNode {
     private Map<String, String> properties;
     private Set<SqlParseNodeActionEnum> actions = new HashSet<>();
 
-    private transient SqlNode calciteSqlNode;
+    private transient Object calciteSqlNode;
 }

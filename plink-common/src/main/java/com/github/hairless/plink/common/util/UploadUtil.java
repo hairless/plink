@@ -6,8 +6,8 @@ package com.github.hairless.plink.common.util;
  */
 public class UploadUtil {
     public static String getUploadBasePath() {
-        String userDir = System.getProperty("user.dir");
-        return userDir + "/upload/";
+        String plinkHome = PlinkUtil.getPlinkHome();
+        return plinkHome + "/upload/";
     }
 
     public static String getJobJarsPathBase() {
