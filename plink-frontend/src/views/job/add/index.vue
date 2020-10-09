@@ -1,15 +1,33 @@
 <template>
   <div>
-    <JobCustomAddEditDetail :usage-model="'add'" />
+    <template v-if="type === 1">
+      等待实现中 。。。
+    </template>
+    <template v-if="type === 2">
+      等待实现中 。。。
+    </template>
+    <template v-else>
+      等待实现中 。。。
+    </template>
   </div>
 </template>
 
 <script>
-import JobCustomAddEditDetail from "@/views/components/JobCustomAddEditDetail";
 export default {
   name: "JobAdd",
-  components: {
-    JobCustomAddEditDetail
+  data() {
+    return {
+      type: -1
+    };
+  },
+  methods: {
+    parseRoute() {
+      this.jobId = this.$route.query.jobId;
+      this.type = this.$route.query.type;
+    }
+  },
+  created() {
+    this.parseRoute();
   }
 };
 </script>

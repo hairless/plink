@@ -203,7 +203,7 @@ export function getUserRouteList() {
             }
           ]
         },
-        {
+        /*{
           id: 2,
           moduleId: 1,
           moduleName: "Flink SQL",
@@ -222,7 +222,7 @@ export function getUserRouteList() {
           sequence: -1,
           remark: "",
           redirect: "/job/jobList"
-        },
+        },*/
         {
           id: 3,
           moduleId: 1,

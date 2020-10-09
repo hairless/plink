@@ -7,7 +7,7 @@
         <Breadcrumb />
         <a-layout-content
           :style="{
-            background: '#f8fffd',
+            background: '#ffffff',
             padding: '10px',
             margin: 0,
             minHeight: screenHeight + 'px'
@@ -41,4 +41,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+#components-layout-demo-top-side-2 {
+  height: 100%;
+}
+</style>

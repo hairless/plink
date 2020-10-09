@@ -13,7 +13,7 @@ export const constantRoutes = [
   {
     path: "/",
     name: "Home",
-    redirect: "/user/profile"
+    redirect: "/job/jobList"
   },
   {
     path: "/about",

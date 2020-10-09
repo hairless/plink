@@ -1,6 +1,6 @@
 <template>
   <a-layout-sider v-model="collapsed" width="180" style="background: #fff" collapsible>
-    <SideMenu/>
+    <SideMenu />
   </a-layout-sider>
 </template>
 <script>
