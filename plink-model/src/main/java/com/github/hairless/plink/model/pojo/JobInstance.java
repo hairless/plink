@@ -25,9 +25,14 @@ public class JobInstance extends BaseModel {
     private Long jobId;
     /**
      * 实例启动时的镜像作业配置
-     * {@link Job#configJson}
+     * {@link Job#flinkConfigJson}
      */
-    private String configJson;
+    private String flinkConfigJson;
+    /**
+     * 实例启动时的镜像作业配置
+     * {@link Job#extraConfigJson}
+     */
+    private String extraConfigJson;
     /**
      * 状态
      * {@link JobInstanceStatusEnum}

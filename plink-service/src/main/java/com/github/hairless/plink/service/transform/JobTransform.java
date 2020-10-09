@@ -1,6 +1,7 @@
 package com.github.hairless.plink.service.transform;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.dto.JobDTO;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
@@ -31,11 +32,17 @@ public class JobTransform implements Transform<JobDTO, Job> {
         }
         JobDTO jobDTO = new JobDTO();
         BeanUtils.copyProperties(job, jobDTO);
-        //setConfig
-        if (jobDTO.getConfigJson() != null) {
-            jobDTO.setConfig(JSON.parseObject(jobDTO.getConfigJson(), FlinkConfig.class));
+        //setFlinkConfig
+        if (jobDTO.getFlinkConfigJson() != null) {
+            jobDTO.setFlinkConfig(JSON.parseObject(jobDTO.getFlinkConfigJson(), FlinkConfig.class));
         } else {
-            jobDTO.setConfig(new FlinkConfig());
+            jobDTO.setFlinkConfig(new FlinkConfig());
+        }
+        //setExtraConfig
+        if (jobDTO.getFlinkConfigJson() != null) {
+            jobDTO.setExtraConfig(JSON.parseObject(jobDTO.getExtraConfigJson()));
+        } else {
+            jobDTO.setExtraConfig(new JSONObject());
         }
         //setLastStatusDesc
         JobInstanceStatusEnum statusEnum = JobInstanceStatusEnum.getEnum(job.getLastStatus());
@@ -86,8 +93,11 @@ public class JobTransform implements Transform<JobDTO, Job> {
         if (dto == null) {
             return null;
         }
-        if (dto.getConfig() != null) {
-            dto.setConfigJson(JSON.toJSONString(dto.getConfig()));
+        if (dto.getFlinkConfig() != null) {
+            dto.setFlinkConfigJson(JSON.toJSONString(dto.getFlinkConfig()));
+        }
+        if (dto.getExtraConfig() != null) {
+            dto.setExtraConfigJson(JSON.toJSONString(dto.getExtraConfig()));
         }
         return dto;
     }
