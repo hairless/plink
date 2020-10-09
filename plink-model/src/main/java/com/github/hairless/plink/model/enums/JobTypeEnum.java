@@ -13,14 +13,18 @@ import lombok.Getter;
 @Getter
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum JobTypeEnum {
-    CUSTOM(1, "自定义作业");
+    FLINK_JAR(1, "FLINK JAR", true),
+    FLINK_PYTHON(2, "FLINK PYTHON", false),
+    FLINK_SQL(3, "FLINK SQL", true);
 
     private Integer value;
     private String desc;
+    private Boolean enable;
 
-    JobTypeEnum(Integer value, String desc) {
+    JobTypeEnum(Integer value, String desc, Boolean enable) {
         this.value = value;
         this.desc = desc;
+        this.enable = enable;
     }
 
     public static JobTypeEnum getEnum(Integer value) {
