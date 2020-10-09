@@ -43,9 +43,13 @@ public class Job extends BaseModel {
      */
     private String clientVersion;
     /**
-     * 作业配置
+     * 作业flink参数配置
      */
-    private String configJson;
+    private String flinkConfigJson;
+    /**
+     * 作业额外配置
+     */
+    private String extraConfigJson;
     /**
      * 最新实例ID
      */

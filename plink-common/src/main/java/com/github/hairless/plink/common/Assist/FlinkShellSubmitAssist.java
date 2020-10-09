@@ -33,8 +33,8 @@ public class FlinkShellSubmitAssist {
     public String submitJob(JobInstanceDTO jobInstanceDTO, String logFile) throws Exception {
         FlinkSubmitOptions flinkSubmitOptions = new FlinkSubmitOptions();
         flinkSubmitOptions.setJobName(jobInstanceDTO.getJob().getName());
-        flinkSubmitOptions.setMainJarPath(UploadUtil.getJobJarsPath(jobInstanceDTO.getJobId(), jobInstanceDTO.getConfig().getJarName()));
-        flinkSubmitOptions.setFlinkConfig(jobInstanceDTO.getConfig());
+        flinkSubmitOptions.setMainJarPath(UploadUtil.getJobJarsPath(jobInstanceDTO.getJobId(), jobInstanceDTO.getFlinkConfig().getJarName()));
+        flinkSubmitOptions.setFlinkConfig(jobInstanceDTO.getFlinkConfig());
         String runCommand = flinkShellCommandBuilder.buildRunCommand(flinkSubmitOptions);
         String command = format("{0} >> {1} 2>&1", runCommand, logFile);
         log.debug("command:{}", command);
