@@ -182,7 +182,8 @@ public class JobServiceImpl implements JobService {
         }
         JobInstance jobInstance = new JobInstance();
         jobInstance.setJobId(job.getId());
-        jobInstance.setConfigJson(job.getConfigJson());
+        jobInstance.setFlinkConfigJson(job.getFlinkConfigJson());
+        jobInstance.setExtraConfigJson(job.getExtraConfigJson());
         jobInstance.setStatus(JobInstanceStatusEnum.WAITING_START.getValue());
         int rowCnt = jobInstanceMapper.insertSelective(jobInstance);
         if (rowCnt == 0) {

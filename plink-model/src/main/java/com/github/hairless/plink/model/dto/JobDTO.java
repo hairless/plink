@@ -1,5 +1,6 @@
 package com.github.hairless.plink.model.dto;
 
+import com.alibaba.fastjson.JSONObject;
 import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.pojo.Job;
 import lombok.Getter;
@@ -27,7 +28,9 @@ public class JobDTO extends Job {
     private String lastUiAddress;
 
     @Valid
-    private FlinkConfig config;
+    private FlinkConfig flinkConfig;
+
+    private JSONObject extraConfig;
 
     private AuthMap authMap;
 
