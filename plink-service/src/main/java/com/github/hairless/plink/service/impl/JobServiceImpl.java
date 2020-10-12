@@ -230,7 +230,7 @@ public class JobServiceImpl implements JobService {
             throw new PlinkMessageException("instance not found");
         }
         try {
-            flinkClusterServiceFactory.getDefaultFlinkClusterService().stopJob(jobInstanceTransform.transform(jobInstance));
+            flinkClusterServiceFactory.getDefaultFlinkClusterService().stopJob(jobInstance.getAppId());
         } catch (Exception e) {
             throw new PlinkRuntimeException("stop job fail", e);
         }

@@ -59,8 +59,8 @@ public class YarnFlinkClusterServiceImpl implements FlinkClusterService {
     }
 
     @Override
-    public void stopJob(JobInstanceDTO jobInstanceDTO) throws Exception {
-        yarnClientRpcService.killApplication(jobInstanceDTO.getAppId());
+    public void stopJob(String appId) throws Exception {
+        yarnClientRpcService.killApplication(appId);
     }
 
     @Override

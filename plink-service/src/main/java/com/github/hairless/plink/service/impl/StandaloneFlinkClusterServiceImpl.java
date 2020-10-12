@@ -46,8 +46,8 @@ public class StandaloneFlinkClusterServiceImpl implements FlinkClusterService {
     }
 
     @Override
-    public void stopJob(JobInstanceDTO jobInstanceDTO) throws Exception {
-        flinkRestRpcService.stopJob(jobInstanceDTO.getAppId());
+    public void stopJob(String appId) throws Exception {
+        flinkRestRpcService.stopJob(appId);
     }
 
     @Override

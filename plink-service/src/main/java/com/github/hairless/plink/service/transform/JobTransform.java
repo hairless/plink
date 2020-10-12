@@ -16,6 +16,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
+
 /**
  * @author: silence
  * @date: 2020/1/27
@@ -27,78 +31,93 @@ public class JobTransform implements Transform<JobDTO, Job> {
 
     @Override
     public JobDTO transform(Job job) {
-        if (job == null) {
-            return null;
-        }
-        JobDTO jobDTO = new JobDTO();
-        BeanUtils.copyProperties(job, jobDTO);
-        //setFlinkConfig
-        if (jobDTO.getFlinkConfigJson() != null) {
-            jobDTO.setFlinkConfig(JSON.parseObject(jobDTO.getFlinkConfigJson(), FlinkConfig.class));
-        } else {
-            jobDTO.setFlinkConfig(new FlinkConfig());
-        }
-        //setExtraConfig
-        if (jobDTO.getFlinkConfigJson() != null) {
-            jobDTO.setExtraConfig(JSON.parseObject(jobDTO.getExtraConfigJson()));
-        } else {
-            jobDTO.setExtraConfig(new JSONObject());
-        }
-        //setLastStatusDesc
-        JobInstanceStatusEnum statusEnum = JobInstanceStatusEnum.getEnum(job.getLastStatus());
-        if (statusEnum != null) {
-            jobDTO.setLastStatusDesc(statusEnum.getDesc());
-        }
-        //setTypeDesc
-        JobTypeEnum jobTypeEnum = JobTypeEnum.getEnum(job.getType());
-        if (jobTypeEnum != null) {
-            jobDTO.setTypeDesc(jobTypeEnum.getDesc());
-        }
-        //setClientVersionDesc
-        JobClientVersionEnum versionEnum = JobClientVersionEnum.getEnum(job.getClientVersion());
-        if (versionEnum != null) {
-            jobDTO.setClientVersionDesc(versionEnum.getDesc());
-        }
-        //setLastUiAddress
-        if (job.getLastAppId() != null) {
-            FlinkClusterService defaultFlinkClusterService = flinkClusterServiceFactory.getDefaultFlinkClusterService();
-            try {
-                JobInstanceDTO jobInstanceDTO = new JobInstanceDTO();
-                jobInstanceDTO.setAppId(job.getLastAppId());
-                jobInstanceDTO.setStatus(job.getLastStatus());
-                jobDTO.setLastUiAddress(defaultFlinkClusterService.getJobUiAddress(jobInstanceDTO));
-            } catch (Exception e) {
-                throw new PlinkRuntimeException(e);
-            }
-        }
-        //设置权限
-        JobDTO.AuthMap authMap = new JobDTO.AuthMap();
-        JobInstanceStatusEnum jobInstanceStatusEnum = JobInstanceStatusEnum.getEnum(job.getLastStatus());
-        if (jobInstanceStatusEnum == null || jobInstanceStatusEnum.isFinalState()) {
-            authMap.setEdit(true);
-            authMap.setDelete(true);
-            authMap.setStart(true);
-        }
-        if (JobInstanceStatusEnum.RUNNING.equals(jobInstanceStatusEnum)) {
-            authMap.setStop(true);
-            authMap.setRestart(true);
-        }
-        jobDTO.setAuthMap(authMap);
+        return transform(Collections.singletonList(job)).stream().findFirst().orElse(null);
+    }
 
-        return jobDTO;
+    @Override
+    public Collection<JobDTO> transform(Collection<Job> pojoList) {
+        FlinkClusterService defaultFlinkClusterService = flinkClusterServiceFactory.getDefaultFlinkClusterService();
+        return pojoList.stream().map(job -> {
+            if (job == null) {
+                return null;
+            }
+            JobDTO jobDTO = new JobDTO();
+            BeanUtils.copyProperties(job, jobDTO);
+            //setFlinkConfig
+            if (jobDTO.getFlinkConfigJson() != null) {
+                jobDTO.setFlinkConfig(JSON.parseObject(jobDTO.getFlinkConfigJson(), FlinkConfig.class));
+            } else {
+                jobDTO.setFlinkConfig(new FlinkConfig());
+            }
+            //setExtraConfig
+            if (jobDTO.getFlinkConfigJson() != null) {
+                jobDTO.setExtraConfig(JSON.parseObject(jobDTO.getExtraConfigJson()));
+            } else {
+                jobDTO.setExtraConfig(new JSONObject());
+            }
+            //setLastStatusDesc
+            JobInstanceStatusEnum statusEnum = JobInstanceStatusEnum.getEnum(job.getLastStatus());
+            if (statusEnum != null) {
+                jobDTO.setLastStatusDesc(statusEnum.getDesc());
+            }
+            //setTypeDesc
+            JobTypeEnum jobTypeEnum = JobTypeEnum.getEnum(job.getType());
+            if (jobTypeEnum != null) {
+                jobDTO.setTypeDesc(jobTypeEnum.getDesc());
+            }
+            //setClientVersionDesc
+            JobClientVersionEnum versionEnum = JobClientVersionEnum.getEnum(job.getClientVersion());
+            if (versionEnum != null) {
+                jobDTO.setClientVersionDesc(versionEnum.getDesc());
+            }
+            //setLastUiAddress
+            if (job.getLastAppId() != null) {
+                try {
+                    JobInstanceDTO jobInstanceDTO = new JobInstanceDTO();
+                    jobInstanceDTO.setAppId(job.getLastAppId());
+                    jobInstanceDTO.setStatus(job.getLastStatus());
+                    jobDTO.setLastUiAddress(defaultFlinkClusterService.getJobUiAddress(jobInstanceDTO));
+                } catch (Exception e) {
+                    throw new PlinkRuntimeException(e);
+                }
+            }
+            //设置权限
+            JobDTO.AuthMap authMap = new JobDTO.AuthMap();
+            JobInstanceStatusEnum jobInstanceStatusEnum = JobInstanceStatusEnum.getEnum(job.getLastStatus());
+            if (jobInstanceStatusEnum == null || jobInstanceStatusEnum.isFinalState()) {
+                authMap.setEdit(true);
+                authMap.setDelete(true);
+                authMap.setStart(true);
+            }
+            if (JobInstanceStatusEnum.RUNNING.equals(jobInstanceStatusEnum)) {
+                authMap.setStop(true);
+                authMap.setRestart(true);
+            }
+            jobDTO.setAuthMap(authMap);
+
+            return jobDTO;
+        }).collect(Collectors.toList());
     }
 
     @Override
     public Job inverseTransform(JobDTO dto) {
-        if (dto == null) {
-            return null;
-        }
-        if (dto.getFlinkConfig() != null) {
-            dto.setFlinkConfigJson(JSON.toJSONString(dto.getFlinkConfig()));
-        }
-        if (dto.getExtraConfig() != null) {
-            dto.setExtraConfigJson(JSON.toJSONString(dto.getExtraConfig()));
-        }
-        return dto;
+        return inverseTransform(Collections.singletonList(dto)).stream().findFirst().orElse(null);
+
+    }
+
+    @Override
+    public Collection<Job> inverseTransform(Collection<JobDTO> dtoList) {
+        return dtoList.stream().map(dto -> {
+            if (dto == null) {
+                return null;
+            }
+            if (dto.getFlinkConfig() != null) {
+                dto.setFlinkConfigJson(JSON.toJSONString(dto.getFlinkConfig()));
+            }
+            if (dto.getExtraConfig() != null) {
+                dto.setExtraConfigJson(JSON.toJSONString(dto.getExtraConfig()));
+            }
+            return dto;
+        }).collect(Collectors.toList());
     }
 }
