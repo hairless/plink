@@ -1,10 +1,12 @@
-package com.github.hairless.plink.common.Assist;
+package com.github.hairless.plink.common.assist;
 
 import com.github.hairless.plink.common.builder.FlinkShellCommandBuilder;
+import com.github.hairless.plink.common.builder.FlinkSubmitOptionsBuilder;
+import com.github.hairless.plink.common.factory.FlinkSubmitOptionsBuilderFactory;
 import com.github.hairless.plink.common.util.FileUtil;
-import com.github.hairless.plink.common.util.UploadUtil;
 import com.github.hairless.plink.model.common.FlinkSubmitOptions;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
+import com.github.hairless.plink.model.enums.JobTypeEnum;
 import com.github.hairless.plink.model.exception.PlinkMessageException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,10 +33,9 @@ public class FlinkShellSubmitAssist {
     }
 
     public String submitJob(JobInstanceDTO jobInstanceDTO, String logFile) throws Exception {
-        FlinkSubmitOptions flinkSubmitOptions = new FlinkSubmitOptions();
-        flinkSubmitOptions.setJobName(jobInstanceDTO.getJob().getName());
-        flinkSubmitOptions.setMainJarPath(UploadUtil.getJobJarsPath(jobInstanceDTO.getJobId(), jobInstanceDTO.getFlinkConfig().getJarName()));
-        flinkSubmitOptions.setFlinkConfig(jobInstanceDTO.getFlinkConfig());
+        JobTypeEnum jobTypeEnum = JobTypeEnum.getEnum(jobInstanceDTO.getJob().getType());
+        FlinkSubmitOptionsBuilder flinkSubmitOptionsBuilder = FlinkSubmitOptionsBuilderFactory.create(jobTypeEnum);
+        FlinkSubmitOptions flinkSubmitOptions = flinkSubmitOptionsBuilder.builder(jobInstanceDTO);
         String runCommand = flinkShellCommandBuilder.buildRunCommand(flinkSubmitOptions);
         String command = format("{0} >> {1} 2>&1", runCommand, logFile);
         log.debug("command:{}", command);

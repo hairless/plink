@@ -1,6 +1,6 @@
 package com.github.hairless.plink.service.impl;
 
-import com.github.hairless.plink.common.Assist.FlinkShellSubmitAssist;
+import com.github.hairless.plink.common.assist.FlinkShellSubmitAssist;
 import com.github.hairless.plink.common.builder.YarnCommandBuilder;
 import com.github.hairless.plink.common.util.HadoopConfigUtil;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
@@ -59,8 +59,8 @@ public class YarnFlinkClusterServiceImpl implements FlinkClusterService {
     }
 
     @Override
-    public void stopJob(JobInstanceDTO jobInstanceDTO) throws Exception {
-        yarnClientRpcService.killApplication(jobInstanceDTO.getAppId());
+    public void stopJob(String appId) throws Exception {
+        yarnClientRpcService.killApplication(appId);
     }
 
     @Override

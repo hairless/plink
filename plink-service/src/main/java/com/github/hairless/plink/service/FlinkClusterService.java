@@ -30,7 +30,7 @@ public interface FlinkClusterService {
      * @param jobInstanceDTO 作业实例信息
      * @return 是否成功
      */
-    void stopJob(JobInstanceDTO jobInstanceDTO) throws Exception;
+    void stopJob(String appId) throws Exception;
 
     /**
      * 获取任务的ui地址

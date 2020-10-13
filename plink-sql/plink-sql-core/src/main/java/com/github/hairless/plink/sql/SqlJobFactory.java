@@ -24,7 +24,7 @@ public class SqlJobFactory {
     static {
         options.addOption("f", "file", true, "sql config file");
         options.addOption("c", "config", true, "sql config");
-        options.addOption("n", "name", true, "job name");
+        //options.addOption("n", "name", true, "job name");
     }
 
     public static SqlJob create(String[] args) throws ParseException, FileNotFoundException {
