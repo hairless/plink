@@ -29,8 +29,8 @@ public class FlinkSqlSubmitOptionsBuilder implements FlinkSubmitOptionsBuilder {
         sqlConfig.setJobName(jobName);
         sqlConfig.setSql(jobInstanceDTO.getExtraConfig().getString("sql"));
         List<String> args = new ArrayList<>();
-        args.add("-c");
-        args.add(StringEscapeUtils.escapeJava(JSON.toJSONString(sqlConfig)));
+        args.add("\"-c\"");
+        args.add('"' + StringEscapeUtils.escapeJava(JSON.toJSONString(sqlConfig)) + '"');
         flinkConfig.setArgs(String.join(" ", args));
         flinkSubmitOptions.setFlinkConfig(flinkConfig);
         return flinkSubmitOptions;

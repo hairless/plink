@@ -7,6 +7,7 @@ import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.schedule.task.InstanceStatusSyncTask;
 import com.github.hairless.plink.service.transform.JobInstanceTransform;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -32,13 +33,15 @@ public class InstanceStatusSyncSchedule {
 
     @Scheduled(fixedDelay = 10 * 1000, initialDelay = 10 * 1000)
     public void instanceStatusSyncSchedule() throws Exception {
-        log.info("instanceStatusSyncSchedule start");
         JobInstance condition = new JobInstance();
         condition.setStatus(JobInstanceStatusEnum.RUNNING.getValue());
         List<JobInstance> jobInstances = jobInstanceMapper.select(condition);
         Collection<JobInstanceDTO> jobInstanceDTOS = jobInstanceTransform.transform(jobInstances);
-        for (JobInstanceDTO jobInstanceDTO : jobInstanceDTOS) {
-            instanceStatusSyncTask.asyncInstanceStatusSyncTask(jobInstanceDTO);
+        if (CollectionUtils.isNotEmpty(jobInstanceDTOS)) {
+            log.info("instanceStatusSyncSchedule start");
+            for (JobInstanceDTO jobInstanceDTO : jobInstanceDTOS) {
+                instanceStatusSyncTask.asyncInstanceStatusSyncTask(jobInstanceDTO);
+            }
         }
     }
 }
