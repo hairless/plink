@@ -3,8 +3,8 @@
     <template v-if="type === 1">
       <JobCustomAddEditDetail :usage-model="'detail'" :data-id="jobId" />
     </template>
-    <template v-else-if="type === 2">
-      <JobSqlDetail :usage-model="'detail'" :data-id="jobId" />
+    <template v-else-if="type === 3">
+      <JobSqlAddEditDetail :usage-model="'detail'" :data-id="jobId" />
     </template>
     <template v-else>
       等待实现中 。。。
@@ -14,11 +14,11 @@
 
 <script>
 import JobCustomAddEditDetail from "@/views/components/JobCustomAddEditDetail";
-import JobSqlDetail from "@/views/components/JobSqlDetail";
+import JobSqlAddEditDetail from "@/views/components/JobSqlAddEditDetail";
 export default {
   components: {
     JobCustomAddEditDetail,
-    JobSqlDetail
+    JobSqlAddEditDetail
   },
   name: "JobDetail",
   data() {
@@ -30,7 +30,7 @@ export default {
   methods: {
     parseRoute() {
       this.jobId = this.$route.query.jobId;
-      this.type = this.$route.query.type;
+      this.type = Number(this.$route.query.type);
     }
   },
   created() {

@@ -108,8 +108,8 @@
             <a-input v-model="jobAddModal.data.name" />
           </a-form-model-item>
           <a-form-model-item label="作业类型" prop="type">
-            <a-select :default-value="jobAddModal.data.type" placeholder="请选择角色">
-              <a-select-option v-for="(item, index) in helper.jobTypeList" :key="index" :value="item.value">
+            <a-select v-model="jobAddModal.data.type">
+              <a-select-option v-for="(item, index) in helper.jobTypeList" :key="index" :value="item.value" :disabled="!item.enable">
                 {{ item.desc }}
               </a-select-option>
             </a-select>

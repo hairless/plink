@@ -3,7 +3,7 @@
     <template v-if="type === 1">
       等待实现中 。。。
     </template>
-    <template v-if="type === 2">
+    <template v-else-if="type === 2">
       等待实现中 。。。
     </template>
     <template v-else>
@@ -22,7 +22,6 @@ export default {
   },
   methods: {
     parseRoute() {
-      this.jobId = this.$route.query.jobId;
       this.type = this.$route.query.type;
     }
   },

@@ -34,7 +34,7 @@
                 <a-input v-model="data.name" />
               </a-form-model-item>
               <a-form-model-item label="作业类型" prop="type">
-                <a-select v-model="data.type" placeholder="请选择角色">
+                <a-select v-model="data.type" placeholder="请选择作业类型" disabled>
                   <a-select-option v-for="(item, index) in helper.jobTypeList" :key="index" :value="item.value">
                     {{ item.desc }}
                   </a-select-option>
@@ -54,7 +54,7 @@
               </a-form-model-item>
               <!-- 执行文件还没有 -->
               <a-form-model-item label="执行文件" prop="configJarName">
-                <a-select v-model="data.config.jarName" placeholder="请选择文件">
+                <a-select v-model="data.flinkConfig.jarName" placeholder="请选择文件">
                   <a-select-option v-for="(item, index) in helper.jobJarList" :key="index" :value="item">
                     {{ item }}
                   </a-select-option>
@@ -66,15 +66,15 @@
                 </a-upload>
               </a-form-model-item>
               <a-form-model-item label="MainClass" prop="configMainClass">
-                <a-input v-model="data.config.mainClass" />
+                <a-input v-model="data.flinkConfig.mainClass" />
               </a-form-model-item>
               <a-form-model-item label="程序参数" prop="configArgs">
-                <a-textarea v-model="data.config.args" />
+                <a-textarea v-model="data.flinkConfig.args" />
               </a-form-model-item>
 
               <H2>运行参数</H2>
               <a-form-model-item label="作业并行度" prop="configParallelism">
-                <a-input-number v-model="data.config.parallelism" :min="1" />
+                <a-input-number v-model="data.flinkConfig.parallelism" :min="1" />
               </a-form-model-item>
 
               <a-form-model-item :wrapper-col="{ span: wrapperCol.span, offset: labelCol.span }">
@@ -150,7 +150,7 @@ export default {
         lastStatus: null,
         statusDesc: "",
         clientVersion: "",
-        config: {
+        flinkConfig: {
           jarName: "",
           mainClass: "",
           args: "",
@@ -317,7 +317,9 @@ export default {
     handleTabChange(activeKey) {
       if (activeKey !== "instList") {
         // 实例列表清除定时器
-        this.$refs.refInstList.clearDataListTimer();
+        if (this.$refs.refInstList) {
+          this.$refs.refInstList.clearDataListTimer();
+        }
       }
     },
     initAddUsageModel() {

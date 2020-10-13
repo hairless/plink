@@ -1,5 +1,5 @@
-<template>
-  <div style="height: 100%">
+编辑<template>
+  <div>
     <!-- Page Header -->
     <div>
       <a-page-header style="padding: 5px 5px 0 5px" :title="usageModelHelper.title" :sub-title="usageModelHelper.subTitle" @back="() => $router.go(-1)">
@@ -10,8 +10,8 @@
           <a-button type="primary" size="small" v-show="usageModelHelper.showStartButton" style="margin-right: 5px" @click="onStart" :disabled="!data.authMap.start">启动</a-button>
           <a-button type="danger" size="small" v-show="usageModelHelper.showStopButton" style="margin-right: 5px" @click="onStop" :disabled="!data.authMap.stop">停止</a-button>
           <a-button type="primary" size="small" v-show="usageModelHelper.showEditButton" style="margin-right: 5px" @click="onEdit" :disabled="!data.authMap.edit">编辑</a-button>
+          <a-button type="primary" size="small" v-show="usageModelHelper.showUpdateButton" style="margin-right: 5px" @click="onUpdate">更新</a-button>
           <a-button type="primary" size="small" v-show="usageModelHelper.showDetailButton" style="margin-right: 5px" @click="onDetail">详情</a-button>
-          <a-button type="primary" size="small" v-show="usageModelHelper.showSaveButton" style="margin-right: 5px" @click="onSave">保存</a-button>
           <a-button type="danger" size="small" v-show="usageModelHelper.showDeleteButton" style="margin-right: 5px" @click="onDelete" :disabled="!data.authMap.delete">删除</a-button>
           <a-button type="primary" size="small" @click="onGoBack">返回</a-button>
         </template>
@@ -19,54 +19,97 @@
     </div>
 
     <!-- Page Content -->
-    <div>
-      <a-row>
-        <!-- SQL 编辑器 -->
-        <a-col span="16" class="sql-editor-container">
-          <div style="background-color: #f7f7f7; padding: 5px">
-            <a-row :gutter="16">
-              <a-col span="12"><a-button type="primary" size="small">查看执行计划</a-button></a-col>
-              <a-col span="12" align="right">
-                <!--<a-button type="primary" size="small">格式化</a-button>-->
-                <a-button type="primary" size="small" style="margin-left: 5px" @click="onDebug">调试</a-button>
-              </a-col>
-            </a-row>
+    <a-tabs default-active-key="1" @change="handleTabChange">
+      <a-tab-pane key="job">
+        <span slot="tab">
+          <a-icon type="file-text" />
+          作业信息
+        </span>
+
+        <!-- 作业信息 -->
+        <a-spin :spinning="usageModelHelper.isLoading" size="large">
+          <div style="margin-top: 20px">
+            <h2>基本配置</h2>
+            <a-form-model ref="ruleForm" :model="data" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
+              <a-form-model-item label="作业名称" prop="name">
+                <a-input v-model="data.name" />
+              </a-form-model-item>
+              <a-form-model-item label="作业类型" prop="type">
+                <a-select v-model="data.type" placeholder="请选择作业类型" disabled>
+                  <a-select-option v-for="(item, index) in helper.jobTypeList" :key="index" :value="item.value">
+                    {{ item.desc }}
+                  </a-select-option>
+                </a-select>
+              </a-form-model-item>
+              <a-form-model-item label="作业描述">
+                <a-textarea v-model="data.description" />
+              </a-form-model-item>
+
+              <H2>作业配置</H2>
+              <a-form-model-item label="主节点内存" prop="flinkConfigJobManagerMemory">
+                <a-input v-model="data.flinkConfig.jobManagerMemory" />
+              </a-form-model-item>
+              <a-form-model-item label="执行节点内存" prop="flinkConfigTaskManagerMemory">
+                <a-input v-model="data.flinkConfig.taskManagerMemory" />
+              </a-form-model-item>
+              <a-form-model-item label="Slot 数/节点" prop="flinkConfigTaskManagerSlots">
+                <a-input-number v-model="data.flinkConfig.taskManagerSlots" :min="1" />
+              </a-form-model-item>
+              <a-form-model-item label="作业并行度" prop="flinkConfigParallelism">
+                <a-input-number v-model="data.flinkConfig.parallelism" :min="1" />
+              </a-form-model-item>
+              <a-form-model-item label="Flink 参数" prop="flinkConfigConfigs">
+                <a-textarea v-model="data.flinkConfig.configs" />
+              </a-form-model-item>
+
+              <a-form-model-item :wrapper-col="{ span: wrapperCol.span, offset: labelCol.span }">
+                <a-button type="primary" @click="onAdd" v-show="usageModelHelper.showAddButton">
+                  新建
+                </a-button>
+                <a-button type="primary" @click="onUpdate" v-show="usageModelHelper.showUpdateButton">
+                  更新
+                </a-button>
+                <a-button style="margin-left: 10px;" @click="onRest" v-show="usageModelHelper.showRest">
+                  清空
+                </a-button>
+              </a-form-model-item>
+            </a-form-model>
           </div>
-          <SqlCMEditor height="700" theme="eclipse" />
-        </a-col>
+        </a-spin>
+      </a-tab-pane>
 
-        <!-- 参数配置 -->
-        <a-col span="8" class="job-detail">
-          <a-tabs type="card" default-active-key="1">
-            <a-tab-pane key="1">
-              <span slot="tab">
-                <a-icon type="file-text" />
-                作业信息
-              </span>
-            </a-tab-pane>
+      <a-tab-pane key="sql">
+        <span slot="tab">
+          <a-icon type="database" />
+          Flink SQL
+        </span>
 
-            <a-tab-pane key="2">
-              <span slot="tab">
-                <a-icon type="file-text" />
-                高级配置
-              </span>
-            </a-tab-pane>
-          </a-tabs>
-        </a-col>
-      </a-row>
-    </div>
+        <SqlCMEditor v-model="data.extraConfig.sql" height="700" />
+      </a-tab-pane>
+
+      <a-tab-pane key="instList">
+        <span slot="tab">
+          <a-icon type="database" />
+          实例列表
+        </span>
+
+        <InstList ref="refInstList" :job-id="dataId" :is-auto-flush="true" />
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 
 <script>
 import * as jobApi from "@/api/job";
 import * as helperApi from "@/api/helper";
+import InstList from "@/views/inst/list";
 import SqlCMEditor from "@/components/SqlCMEditor";
 export default {
   components: {
+    InstList,
     SqlCMEditor
   },
-  name: "JobSqlEdit",
+  name: "JobSqlAddEditDetail",
   props: {
     // 使用模式
     usageModel: {
@@ -103,11 +146,15 @@ export default {
         lastStatus: null,
         statusDesc: "",
         clientVersion: "",
-        config: {
-          jarName: "",
-          mainClass: "",
-          args: "",
-          parallelism: 1
+        flinkConfig: {
+          jobManagerMemory: "1G",
+          taskManagerMemory: "2G",
+          taskManagerSlots: "",
+          parallelism: 1,
+          configs: ""
+        },
+        extraConfig: {
+          sql: ""
         },
         authMap: {
           edit: false,
@@ -118,13 +165,15 @@ export default {
         }
       },
       rules: {
-        name: [{ required: true, message: "请输入作业名！", trigger: "blur" }]
+        name: [{ required: true, message: "请输入作业名！", trigger: "blur" }],
+        type: [{ required: true, message: "请选择作业类型！", trigger: "blur" }]
 
         // 下拉框的校验规则，对面里面还有子对象的规则，未直接生效，后续看看怎么弄
-        // type: [{ required: true, message: "请选择类型！", trigger: "blur" }],
-        // clientVersion: [{ required: true, message: "请选择客户端版本！", trigger: "blur" }],
-        // configJarName: [{ required: true, message: "请选择执行文件！", trigger: "blur" }],
-        // configMainClass: [{ required: true, message: "请输入 Java Main Class！", trigger: "blur" }]
+        /*
+        flinkConfigJobManagerMemory: [{ required: true, message: "请输入主节点内存！", trigger: "blur" }],
+        flinkConfigTaskManagerMemory: [{ required: true, message: "请输入执行节点内存！", trigger: "blur" }],
+        flinkConfigTaskManagerSlots: [{ required: true, message: "请输入执行节点核数！", trigger: "blur" }]
+        */
       },
       usageModelHelper: {
         showPassword: false,
@@ -134,7 +183,6 @@ export default {
         showUpdateButton: false,
         showEditButton: false,
         showDetailButton: false,
-        showSaveButton: true,
         showDeleteButton: false,
         showRest: true,
         isLoading: false,
@@ -175,10 +223,25 @@ export default {
     onUpdate() {
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
-          jobApi.updateJob(this.data).then(() => {
+          let data = {
+            id: this.data.id,
+            name: this.data.name,
+            type: this.data.type,
+            description: this.data.description,
+            flinkConfig: {
+              jobManagerMemory: this.data.flinkConfig.jobManagerMemory,
+              taskManagerMemory: this.data.flinkConfig.taskManagerMemory,
+              taskManagerSlots: this.data.flinkConfig.taskManagerSlots,
+              parallelism: this.data.flinkConfig.parallelism,
+              configs: this.data.flinkConfig.configs
+            },
+            extraConfig: this.data.extraConfig
+          };
+          jobApi.updateJob(data).then(() => {
             this.$router.push({
               path: "/job/jobDetail",
               query: {
+                type: this.data.type,
                 jobId: this.data.id
               }
             });
@@ -196,6 +259,7 @@ export default {
       this.$router.push({
         path: "/job/jobEdit",
         query: {
+          type: this.data.type,
           jobId: this.data.id
         }
       });
@@ -204,12 +268,10 @@ export default {
       this.$router.push({
         path: "/job/jobDetail",
         query: {
+          type: this.data.type,
           jobId: this.data.id
         }
       });
-    },
-    onSave() {
-      // save ...
     },
     onDelete() {
       jobApi.deleteJob(this.data.id).then(() => {
@@ -274,7 +336,9 @@ export default {
     handleTabChange(activeKey) {
       if (activeKey !== "instList") {
         // 实例列表清除定时器
-        this.$refs.refInstList.clearDataListTimer();
+        if (this.$refs.refInstList) {
+          this.$refs.refInstList.clearDataListTimer();
+        }
       }
     },
     initAddUsageModel() {
@@ -290,7 +354,7 @@ export default {
       this.usageModelHelper.showUpdateButton = true;
       this.usageModelHelper.showPassword = true;
       this.usageModelHelper.showPassword = true;
-      this.usageModelHelper.showDetailButton = false;
+      this.usageModelHelper.showDetailButton = true;
       this.usageModelHelper.showStartButton = false;
       this.usageModelHelper.showStopButton = false;
       this.usageModelHelper.title = "编辑作业";
@@ -314,6 +378,13 @@ export default {
       jobApi.getJob(this.dataId).then(resp => {
         this.usageModelHelper.isLoading = false;
         this.data = resp.data;
+
+        // test
+        if (!this.data["extraConfig"].sql) {
+          this.data["extraConfig"] = {
+            sql: ""
+          };
+        }
 
         // 最终状态清除定时器
         if ([3, 4, 5, 6].includes(this.data.lastStatus)) {
@@ -365,12 +436,4 @@ export default {
 };
 </script>
 
-<style lang="stylus" rel="stylesheet/stylus" scoped>
-.sql-editor-container
-  border: solid 1px #dcdcdc
-  min-height: 700px
-
-.job-detail
-  border: solid 1px #dcdcdc
-  min-height: 736px
-</style>
+<style scoped></style>
