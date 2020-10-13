@@ -1,6 +1,6 @@
 package com.github.hairless.plink.service.impl;
 
-import com.github.hairless.plink.common.Assist.FlinkShellSubmitAssist;
+import com.github.hairless.plink.common.assist.FlinkShellSubmitAssist;
 import com.github.hairless.plink.common.builder.StandaloneCommandBuilder;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;

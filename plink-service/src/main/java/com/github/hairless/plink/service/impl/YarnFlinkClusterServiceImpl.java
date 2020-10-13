@@ -1,6 +1,6 @@
 package com.github.hairless.plink.service.impl;
 
-import com.github.hairless.plink.common.Assist.FlinkShellSubmitAssist;
+import com.github.hairless.plink.common.assist.FlinkShellSubmitAssist;
 import com.github.hairless.plink.common.builder.YarnCommandBuilder;
 import com.github.hairless.plink.common.util.HadoopConfigUtil;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
