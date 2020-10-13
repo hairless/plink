@@ -67,7 +67,7 @@ public class JobInstanceTransform implements Transform<JobInstanceDTO, JobInstan
             } else {
                 jobInstanceDTO.setFlinkConfig(new FlinkConfig());
             }
-            if (jobInstanceDTO.getExtraConfig() != null) {
+            if (jobInstanceDTO.getExtraConfigJson() != null) {
                 jobInstanceDTO.setExtraConfig(JSON.parseObject(jobInstanceDTO.getExtraConfigJson()));
             } else {
                 jobInstanceDTO.setExtraConfig(new JSONObject());

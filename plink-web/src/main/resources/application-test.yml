@@ -52,5 +52,6 @@ kerberos:
   keytab:
   principal:
 
+#'yarn' or 'standalone'
 cluster:
   mode: yarn
