@@ -1,6 +1,6 @@
 package com.github.hairless.plink.service.impl;
 
-import com.github.hairless.plink.common.Assist.FlinkShellSubmitAssist;
+import com.github.hairless.plink.common.assist.FlinkShellSubmitAssist;
 import com.github.hairless.plink.common.builder.StandaloneCommandBuilder;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
@@ -46,8 +46,8 @@ public class StandaloneFlinkClusterServiceImpl implements FlinkClusterService {
     }
 
     @Override
-    public void stopJob(JobInstanceDTO jobInstanceDTO) throws Exception {
-        flinkRestRpcService.stopJob(jobInstanceDTO.getAppId());
+    public void stopJob(String appId) throws Exception {
+        flinkRestRpcService.stopJob(appId);
     }
 
     @Override

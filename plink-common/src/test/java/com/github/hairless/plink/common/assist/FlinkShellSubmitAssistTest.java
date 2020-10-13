@@ -1,4 +1,4 @@
-package com.github.hairless.plink.common.Assist;
+package com.github.hairless.plink.common.assist;
 
 import com.github.hairless.plink.common.util.SystemUtil;
 import org.junit.Test;

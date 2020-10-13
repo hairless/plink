@@ -1,11 +1,11 @@
 package com.github.hairless.plink.schedule.task;
 
+import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.service.FlinkClusterService;
 import com.github.hairless.plink.service.JobInstanceService;
 import com.github.hairless.plink.service.factory.FlinkClusterServiceFactory;
-import com.github.hairless.plink.service.transform.JobInstanceTransform;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -21,20 +21,18 @@ import java.util.Date;
 @Component
 public class InstanceStatusSyncTask {
     @Autowired
-    private JobInstanceTransform jobInstanceTransform;
-    @Autowired
     private FlinkClusterServiceFactory flinkClusterServiceFactory;
     @Autowired
     private JobInstanceService jobInstanceService;
 
     @Async("commonThreadExecutor")
-    public void asyncInstanceStatusSyncTask(JobInstance jobInstance) {
+    public void asyncInstanceStatusSyncTask(JobInstanceDTO jobInstanceDTO) {
         JobInstance jobInstanceStopped;
         JobInstanceStatusEnum jobInstanceStatusEnum;
         try {
             //提交平台实例（flink job）到flink集群
             FlinkClusterService defaultFlinkClusterService = flinkClusterServiceFactory.getDefaultFlinkClusterService();
-            jobInstanceStatusEnum = defaultFlinkClusterService.jobStatus(jobInstanceTransform.transform(jobInstance));
+            jobInstanceStatusEnum = defaultFlinkClusterService.jobStatus(jobInstanceDTO);
             switch (jobInstanceStatusEnum) {
                 case RUN_FAILED:
                 case SUCCESS: {
@@ -47,11 +45,11 @@ public class InstanceStatusSyncTask {
                     return;
                 }
             }
-            jobInstanceStopped.setId(jobInstance.getId());
-            jobInstanceStopped.setJobId(jobInstance.getJobId());
+            jobInstanceStopped.setId(jobInstanceDTO.getId());
+            jobInstanceStopped.setJobId(jobInstanceDTO.getJobId());
             jobInstanceService.updateJobAndInstanceStatus(jobInstanceStopped);
         } catch (Exception e) {
-            log.warn("asyncSubmitJob error jobInstance={}", jobInstance, e);
+            log.warn("asyncSubmitJob error jobInstance={}", jobInstanceDTO, e);
         }
     }
 }
