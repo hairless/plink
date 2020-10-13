@@ -7,6 +7,7 @@ import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.schedule.task.SubmitJobTask;
 import com.github.hairless.plink.service.transform.JobInstanceTransform;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -33,13 +34,15 @@ public class SubmitJobSchedule {
 
     @Scheduled(fixedDelay = 5 * 1000, initialDelay = 10 * 1000)
     public void submitJobSchedule() throws Exception {
-        log.info("submitJobSchedule start");
         JobInstance condition = new JobInstance();
         condition.setStatus(JobInstanceStatusEnum.WAITING_START.getValue());
         List<JobInstance> jobInstances = jobInstanceMapper.select(condition);
         Collection<JobInstanceDTO> jobInstanceDTOS = jobInstanceTransform.transform(jobInstances);
-        for (JobInstanceDTO jobInstanceDTO : jobInstanceDTOS) {
-            submitJobTask.asyncSubmitJobTask(jobInstanceDTO);
+        if (CollectionUtils.isNotEmpty(jobInstanceDTOS)) {
+            log.info("submitJobSchedule start");
+            for (JobInstanceDTO jobInstanceDTO : jobInstanceDTOS) {
+                submitJobTask.asyncSubmitJobTask(jobInstanceDTO);
+            }
         }
     }
 }

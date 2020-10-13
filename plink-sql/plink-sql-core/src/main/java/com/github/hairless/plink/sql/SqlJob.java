@@ -8,7 +8,6 @@ import org.apache.calcite.sql.SqlNodeList;
 import org.apache.calcite.sql.SqlSetOption;
 import org.apache.calcite.sql.parser.SqlParser;
 import org.apache.flink.api.common.JobExecutionResult;
-import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -29,7 +28,7 @@ public class SqlJob {
 
     public JobExecutionResult start() throws Exception {
         log.info("sql job {} staring...", sqlConfig.getJobName());
-        StreamExecutionEnvironment env = new LocalStreamEnvironment();
+        StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         EnvironmentSettings settings = EnvironmentSettings.newInstance()
                 .useBlinkPlanner().inStreamingMode().build();
         TableEnvironmentImpl tEnv = (TableEnvironmentImpl) StreamTableEnvironment.create(env, settings);

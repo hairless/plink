@@ -42,7 +42,7 @@ public class FlinkShellSubmitAssist {
         log.info("jobInstance {} logging to file {}", jobInstanceDTO.getId(), logFile);
         int exitCode = syncExecShellCommand(command);
         if (exitCode != 0) {
-            throw new PlinkMessageException("submit job failed!");
+            throw new PlinkMessageException("submit job failed! exitCode is " + exitCode);
         }
         String log = FileUtil.readFileToString(logFile);
         Matcher matcher = compile.matcher(log);
