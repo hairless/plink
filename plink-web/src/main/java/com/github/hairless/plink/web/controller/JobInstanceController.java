@@ -7,8 +7,11 @@ import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.service.JobInstanceService;
 import com.github.pagehelper.PageInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * JobInstance
@@ -29,5 +32,16 @@ public class JobInstanceController {
     public Result<PageInfo<JobInstanceDTO>> queryJobInstances(JobInstanceDTO jobInstanceDTO, PageReq pageReq) {
         PageInfo<JobInstanceDTO> jobInstanceDTOPageInfo = jobInstanceService.queryJobInstances(jobInstanceDTO, pageReq);
         return new Result<>(ResultCode.SUCCESS, jobInstanceDTOPageInfo);
+    }
+
+    /**
+     * 查询实例启动日志
+     *
+     * @param jobInstanceId 作业实例id
+     */
+    @RequestMapping("/startLog/{jobInstanceId}")
+    public Result<String> queryJob(@PathVariable(value = "jobInstanceId") @NotNull Long jobInstanceId) {
+        String startLog = jobInstanceService.startLog(jobInstanceId);
+        return new Result<>(ResultCode.SUCCESS, ResultCode.SUCCESS.getDesc(), startLog);
     }
 }

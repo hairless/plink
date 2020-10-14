@@ -11,7 +11,6 @@ import com.github.hairless.plink.service.factory.FlinkClusterServiceFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -25,10 +24,6 @@ import java.util.Date;
 @Component
 public class SubmitJobTask {
 
-    @Value("${logging.instance.dir}")
-    private String instanceLogDir;
-    @Value("${logging.instance.pattern}")
-    private String instanceLogPattern;
     @Autowired
     private FlinkClusterServiceFactory flinkClusterServiceFactory;
     @Autowired
@@ -36,7 +31,7 @@ public class SubmitJobTask {
 
     @Async("commonThreadExecutor")
     public void asyncSubmitJobTask(JobInstanceDTO jobInstanceDTO) {
-        String logFile = String.format(instanceLogDir + instanceLogPattern, jobInstanceDTO.getJobId(), jobInstanceDTO.getId());
+        String logFile = jobInstanceService.getStartLogFilePath(jobInstanceDTO);
         LoggerUtil.registerThreadFileAppender(String.valueOf(jobInstanceDTO.getId()), logFile);
 
         log.info("prepare starting job instance, jobId={}, instanceId={}", jobInstanceDTO.getJobId(), jobInstanceDTO.getId());
