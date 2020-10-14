@@ -1,6 +1,7 @@
 package com.github.hairless.plink.sql.connector.collection;
 
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.github.hairless.plink.sql.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.serialization.SerializationSchema;
@@ -63,7 +64,8 @@ public class CollectionTableFactory implements DynamicTableSourceFactory, Dynami
         FactoryUtil.TableFactoryHelper helper = FactoryUtil.createTableFactoryHelper(this, context);
         ReadableConfig tableOptions = helper.getOptions();
         String dataString = tableOptions.get(DATA);
-        List<String> dataList = JSON.parseArray(dataString, String.class);
+        List<String> dataList = JsonUtil.parseObject(dataString, new TypeReference<List<String>>() {
+        });
         DataType producedDataType = context.getCatalogTable().getSchema().toPhysicalRowDataType();
         DecodingFormat<DeserializationSchema<RowData>> decodingFormat = helper.discoverDecodingFormat(
                 DeserializationFormatFactory.class, DEFAULT_FORMAT);

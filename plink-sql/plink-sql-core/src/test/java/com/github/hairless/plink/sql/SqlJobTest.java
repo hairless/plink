@@ -1,8 +1,8 @@
 package com.github.hairless.plink.sql;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.github.hairless.plink.sql.model.SqlConfig;
+import com.github.hairless.plink.sql.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
@@ -19,16 +19,17 @@ public class SqlJobTest {
     public static String sql;
 
     static {
-        List<JSONObject> sourceData = Stream.of(
-                new JSONObject().fluentPut("a", 1).fluentPut("b", "1000").fluentPut("c", 2),
-                new JSONObject().fluentPut("a", 2).fluentPut("b", "1000").fluentPut("c", 3),
-                new JSONObject().fluentPut("a", 3).fluentPut("b", "2000").fluentPut("c", 4),
-                new JSONObject().fluentPut("a", 4).fluentPut("b", "2000").fluentPut("c", 5),
-                new JSONObject().fluentPut("a", 5).fluentPut("b", "3000").fluentPut("c", 6)
-        ).collect(Collectors.toList());
+        List<String> sourceData = Stream.of(
+                JsonNodeFactory.instance.objectNode().put("a", 1).put("b", "1000").put("c", 2),
+                JsonNodeFactory.instance.objectNode().put("a", 2).put("b", "6000").put("c", 2),
+                JsonNodeFactory.instance.objectNode().put("a", 3).put("b", "2000").put("c", 4),
+                JsonNodeFactory.instance.objectNode().put("a", 4).put("b", "1000").put("c", 2),
+                JsonNodeFactory.instance.objectNode().put("a", 5).put("b", "5000").put("c", 3),
+                JsonNodeFactory.instance.objectNode().put("a", 6).put("b", "3000").put("c", 2)
+        ).map(JsonUtil::toJSONString).collect(Collectors.toList());
 
         String sourceDDL =
-                "set a=b;create table t1( a int,b string, c int) with ( 'connector' = 'collection','data'='" + JSON.toJSONString(sourceData) + "');";
+                "set a=b;create table t1( a int,b string, c int) with ( 'connector' = 'collection','data'='" + JsonUtil.toJSONString(sourceData) + "');";
         String sinkDDL =
                 "create table t2(a int comment '测试',b string,c int) with ( 'connector' = 'print');";
         String viewSql =
@@ -56,17 +57,17 @@ public class SqlJobTest {
 
     @Test
     public void sqlJobWatermarkTest() {
-        List<JSONObject> sourceData = Stream.of(
-                new JSONObject().fluentPut("data_time", "2020-01-01 12:00:01"),
-                new JSONObject().fluentPut("data_time", "2020-01-01 12:00:02"),
-                new JSONObject().fluentPut("data_time", "2020-01-01 12:00:03"),
-                new JSONObject().fluentPut("data_time", "2020-01-01 12:01:01")
-        ).collect(Collectors.toList());
+        List<String> sourceData = Stream.of(
+                JsonNodeFactory.instance.objectNode().put("data_time", "2020-01-01 12:00:01"),
+                JsonNodeFactory.instance.objectNode().put("data_time", "2020-01-01 12:00:02"),
+                JsonNodeFactory.instance.objectNode().put("data_time", "2020-01-01 12:00:03"),
+                JsonNodeFactory.instance.objectNode().put("data_time", "2020-01-01 12:01:01")
+        ).map(JsonUtil::toJSONString).collect(Collectors.toList());
         String sql = "create table t1( " +
                 "data_time STRING, " +
                 "row1_time AS to_timestamp(data_time)," +
                 "WATERMARK FOR row1_time AS row1_time - INTERVAL '5' SECOND " +
-                ") with ( 'connector' = 'collection','data'='" + JSON.toJSONString(sourceData) + "');" +
+                ") with ( 'connector' = 'collection','data'='" + JsonUtil.toJSONString(sourceData) + "');" +
                 "create table t2(stime TIMESTAMP(3),cnt bigint) with ( 'connector' = 'print');" +
                 "insert into t2 select TUMBLE_START(row1_time, INTERVAL '1' MINUTE) as stime,count(1) cnt from t1 group by TUMBLE(row1_time, INTERVAL '1' MINUTE);;";
 

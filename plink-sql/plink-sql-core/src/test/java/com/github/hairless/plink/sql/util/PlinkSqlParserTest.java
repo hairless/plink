@@ -1,6 +1,5 @@
 package com.github.hairless.plink.sql.util;
 
-import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.sql.SqlJobTest;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseDagNode;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseInfo;
@@ -22,8 +21,8 @@ public class PlinkSqlParserTest {
         log.info(SqlJobTest.sql);
         PlinkSqlParser plinkSqlParser = PlinkSqlParser.create(SqlJobTest.sql);
         SqlParseInfo sqlParseInfo = plinkSqlParser.getSqlParseInfo();
-        log.info("sqlParseInfo:{}", JSON.toJSONString(sqlParseInfo));
+        log.info("sqlParseInfo:{}", JsonUtil.toJSONString(sqlParseInfo));
         List<SqlParseDagNode> dag = plinkSqlParser.getDag();
-        log.info("dag:{}", JSON.toJSONString(dag));
+        log.info("dag:{}", JsonUtil.toJSONString(dag));
     }
 }

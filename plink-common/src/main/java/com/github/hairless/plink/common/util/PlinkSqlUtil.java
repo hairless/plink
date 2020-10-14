@@ -1,6 +1,5 @@
 package com.github.hairless.plink.common.util;
 
-import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.sql.model.SqlDebugConfig;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseInfo;
@@ -124,7 +123,7 @@ public class PlinkSqlUtil {
             Thread.currentThread().setContextClassLoader(sqlBaseClassLoader);
             Class<?> plinkSqlParserClass = sqlBaseClassLoader.loadClass(PLINK_SQL_DEBUG_DRIVER_CLASS_NAME);
             Class<?> SqlDebugConfigClass = sqlBaseClassLoader.loadClass(SqlDebugConfig.class.getName());
-            Object internal = JSON.parseObject(JSON.toJSONString(sqlDebugConfig), SqlDebugConfigClass);
+            Object internal = JsonUtil.parseObject(JsonUtil.toJSONString(sqlDebugConfig), SqlDebugConfigClass);
             Object debugRes = plinkSqlParserClass.getMethod("debug", SqlDebugConfigClass).invoke(null, internal);
             return (Map<String, List<String>>) debugRes;
         } catch (InvocationTargetException e) {
