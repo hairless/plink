@@ -1,6 +1,5 @@
 package com.github.hairless.plink.sql;
 
-import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.sql.connector.collection.CollectionDataWarehouse;
 import com.github.hairless.plink.sql.connector.collection.CollectionTableFactory;
 import com.github.hairless.plink.sql.connector.collection.CollectionTableSink;
@@ -8,6 +7,7 @@ import com.github.hairless.plink.sql.model.SqlConfig;
 import com.github.hairless.plink.sql.model.SqlDebugConfig;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseNode;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseNodeActionEnum;
+import com.github.hairless.plink.sql.util.JsonUtil;
 import com.github.hairless.plink.sql.util.PlinkSqlParser;
 import com.github.hairless.plink.sql.util.SkipAnsiCheckSqlDialect;
 import com.github.hairless.plink.sql.util.SqlBuilder;
@@ -87,7 +87,7 @@ public class SqlDebugDriver {
         List<SqlNode> newTableOptions = new ArrayList<>();
         newTableOptions.addAll(tableOptions.stream().filter(node -> ((SqlTableOption) node).getKeyString().startsWith(FactoryUtil.FORMAT.key())).collect(Collectors.toList()));
         newTableOptions.add(newSqlTableOption(FactoryUtil.CONNECTOR.key(), CollectionTableFactory.COLLECTION));
-        newTableOptions.add(newSqlTableOption(CollectionTableFactory.DATA.key(), JSON.toJSONString(sourceConfig.getData())));
+        newTableOptions.add(newSqlTableOption(CollectionTableFactory.DATA.key(), JsonUtil.toJSONString(sourceConfig.getData())));
         tableOptions.clear();
         tableOptions.addAll(newTableOptions);
         return ((SqlNode) sourceTable.getCalciteSqlNode()).toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql() + ";";

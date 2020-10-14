@@ -1,7 +1,7 @@
 package com.github.hairless.plink.service.transform;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.github.hairless.plink.common.util.JsonUtil;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.dto.JobDTO;
@@ -66,14 +66,14 @@ public class JobInstanceTransform implements Transform<JobInstanceDTO, JobInstan
             JobInstanceDTO jobInstanceDTO = new JobInstanceDTO();
             BeanUtils.copyProperties(jobInstance, jobInstanceDTO);
             if (jobInstanceDTO.getFlinkConfigJson() != null) {
-                jobInstanceDTO.setFlinkConfig(JSON.parseObject(jobInstanceDTO.getFlinkConfigJson(), FlinkConfig.class));
+                jobInstanceDTO.setFlinkConfig(JsonUtil.parseObject(jobInstanceDTO.getFlinkConfigJson(), FlinkConfig.class));
             } else {
                 jobInstanceDTO.setFlinkConfig(new FlinkConfig());
             }
             if (jobInstanceDTO.getExtraConfigJson() != null) {
-                jobInstanceDTO.setExtraConfig(JSON.parseObject(jobInstanceDTO.getExtraConfigJson()));
+                jobInstanceDTO.setExtraConfig(JsonUtil.parseObject(jobInstanceDTO.getExtraConfigJson()));
             } else {
-                jobInstanceDTO.setExtraConfig(new JSONObject());
+                jobInstanceDTO.setExtraConfig(JsonNodeFactory.instance.objectNode());
             }
             //setLastStatusDesc
             JobInstanceStatusEnum statusEnum = JobInstanceStatusEnum.getEnum(jobInstance.getStatus());
@@ -110,10 +110,10 @@ public class JobInstanceTransform implements Transform<JobInstanceDTO, JobInstan
                 return null;
             }
             if (dto.getFlinkConfig() != null) {
-                dto.setFlinkConfigJson(JSON.toJSONString(dto.getFlinkConfig()));
+                dto.setFlinkConfigJson(JsonUtil.toJSONString(dto.getFlinkConfig()));
             }
             if (dto.getExtraConfig() != null) {
-                dto.setExtraConfigJson(JSON.toJSONString(dto.getExtraConfig()));
+                dto.setExtraConfigJson(JsonUtil.toJSONString(dto.getExtraConfig()));
             }
             return dto;
         }).collect(Collectors.toList());

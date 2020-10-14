@@ -1,15 +1,13 @@
 package com.github.hairless.plink.sql;
 
-import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.sql.model.SqlConfig;
+import com.github.hairless.plink.sql.util.JsonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.stream.Collectors;
 
@@ -27,21 +25,20 @@ public class SqlJobFactory {
         //options.addOption("n", "name", true, "job name");
     }
 
-    public static SqlJob create(String[] args) throws ParseException, FileNotFoundException {
-        SqlConfig sqlConfig;
+    public static SqlJob create(String[] args) throws Exception {
+        String configJson;
         CommandLine commandLine = new DefaultParser().parse(options, args);
         if (commandLine.hasOption("f")) {
             String file = commandLine.getOptionValue("file");
             log.info("load config from file {}", file);
             BufferedReader bufferedReader = new BufferedReader(new FileReader(file));
-            String configJson = bufferedReader.lines().collect(Collectors.joining());
-            sqlConfig = JSON.parseObject(configJson, SqlConfig.class);
+            configJson = bufferedReader.lines().collect(Collectors.joining());
         } else if (commandLine.hasOption("c")) {
-            String configJson = commandLine.getOptionValue("config");
-            sqlConfig = JSON.parseObject(configJson, SqlConfig.class);
+            configJson = commandLine.getOptionValue("config");
         } else {
             throw new RuntimeException("please set -f or -c for sqlConfig");
         }
+        SqlConfig sqlConfig = JsonUtil.parseObject(configJson, SqlConfig.class);
         return new SqlJob(sqlConfig);
     }
 }

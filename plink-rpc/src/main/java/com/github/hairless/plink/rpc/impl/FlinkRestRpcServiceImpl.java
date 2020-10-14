@@ -1,7 +1,7 @@
 package com.github.hairless.plink.rpc.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.github.hairless.plink.common.util.FlinkConfigUtil;
+import com.github.hairless.plink.common.util.JsonUtil;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.rpc.FlinkRestRpcService;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
             httpGet = new HttpGet(String.format(FlinkConfigUtil.getRestAddress() + JOBS_JOBId, jobId));
             CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
             String resJson = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-            return JSON.parseObject(resJson).getString("state");
+            return JsonUtil.parseObject(resJson).get("state").textValue();
         } catch (Exception e) {
             throw new PlinkRuntimeException("queryJobStatus error", e);
         } finally {
@@ -53,7 +53,7 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
             httpPatch = new HttpPatch(String.format(FlinkConfigUtil.getRestAddress() + JOBS_JOBId, jobId));
             CloseableHttpResponse httpResponse = httpClient.execute(httpPatch);
             String resJson = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-            String errors = JSON.parseObject(resJson).getString("errors");
+            String errors = JsonUtil.parseObject(resJson).get("errors").textValue();
             if (errors != null) {
                 throw new PlinkRuntimeException("stopJob error:" + errors);
             }

@@ -1,6 +1,6 @@
 package com.github.hairless.plink.common.builder;
 
-import com.alibaba.fastjson.JSON;
+import com.github.hairless.plink.common.util.JsonUtil;
 import com.github.hairless.plink.common.util.PlinkSqlUtil;
 import com.github.hairless.plink.common.util.PlinkUtil;
 import com.github.hairless.plink.model.common.FlinkConfig;
@@ -27,10 +27,10 @@ public class FlinkSqlSubmitOptionsBuilder implements FlinkSubmitOptionsBuilder {
         flinkConfig.setMainClass(PlinkSqlUtil.PLINK_SQL_JOB_DRIVER_CLASS_NAME);
         SqlConfig sqlConfig = new SqlConfig();
         sqlConfig.setJobName(jobName);
-        sqlConfig.setSql(jobInstanceDTO.getExtraConfig().getString("sql"));
+        sqlConfig.setSql(jobInstanceDTO.getExtraConfig().get("sql").textValue());
         List<String> args = new ArrayList<>();
         args.add("\"-c\"");
-        args.add('"' + StringEscapeUtils.escapeJava(JSON.toJSONString(sqlConfig)) + '"');
+        args.add('"' + StringEscapeUtils.escapeJava(JsonUtil.toJSONString(sqlConfig)) + '"');
         flinkConfig.setArgs(String.join(" ", args));
         flinkSubmitOptions.setFlinkConfig(flinkConfig);
         return flinkSubmitOptions;
