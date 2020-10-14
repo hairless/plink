@@ -13,4 +13,8 @@ public interface JobInstanceService {
     PageInfo<JobInstanceDTO> queryJobInstances(JobInstanceDTO jobInstanceDTO, PageReq pageReq);
 
     void updateJobAndInstanceStatus(JobInstance jobInstance);
+
+    String startLog(Long jobInstanceId);
+
+    String getStartLogFilePath(JobInstanceDTO jobInstanceDTO);
 }

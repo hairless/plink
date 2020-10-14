@@ -31,6 +31,9 @@ public class JobTransform implements Transform<JobDTO, Job> {
 
     @Override
     public JobDTO transform(Job job) {
+        if (job == null) {
+            return null;
+        }
         return transform(Collections.singletonList(job)).stream().findFirst().orElse(null);
     }
 
@@ -101,6 +104,9 @@ public class JobTransform implements Transform<JobDTO, Job> {
 
     @Override
     public Job inverseTransform(JobDTO dto) {
+        if (dto == null) {
+            return null;
+        }
         return inverseTransform(Collections.singletonList(dto)).stream().findFirst().orElse(null);
 
     }
