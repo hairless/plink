@@ -23,8 +23,8 @@ import java.util.stream.Stream;
 public class FlinkConfigUtil {
     private static final Map<String, Object> cache = new ConcurrentHashMap<>();
 
-    private static final String CONF_SUFFIX = "/conf";
-    private static final String LIB_SUFFIX = "/lib";
+    public static final String CONF_SUFFIX = "/conf";
+    public static final String LIB_SUFFIX = "/lib";
 
     private static final String VERSION_CLASS = "org.apache.flink.runtime.util.EnvironmentInformation";
     private static final String VERSION_METHODS = "getVersion";
