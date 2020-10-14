@@ -1,9 +1,11 @@
 package com.github.hairless.plink.service.impl;
 
+import com.github.hairless.plink.common.util.FileUtil;
 import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.exception.PlinkMessageException;
+import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.model.pojo.Job;
 import com.github.hairless.plink.model.pojo.JobInstance;
 import com.github.hairless.plink.model.req.PageReq;
@@ -13,9 +15,12 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -25,6 +30,11 @@ import java.util.List;
 @Slf4j
 @Service
 public class JobInstanceServiceImpl implements JobInstanceService {
+    @Value("${logging.instance.dir}")
+    private String instanceLogDir;
+    @Value("${logging.instance.pattern}")
+    private String instanceLogPattern;
+
     @Autowired
     private JobMapper jobMapper;
     @Autowired
@@ -64,5 +74,27 @@ public class JobInstanceServiceImpl implements JobInstanceService {
         if (jobRowCnt == 0) {
             throw new PlinkMessageException("update job status fail");
         }
+    }
+
+    @Override
+    public String startLog(Long jobInstanceId) {
+        JobInstance jobInstance = jobInstanceMapper.selectByPrimaryKey(jobInstanceId);
+        if (jobInstance == null) {
+            return null;
+        }
+        JobInstanceDTO jobInstanceDTO = jobInstanceTransform.transform(jobInstance);
+        String startLogFilePath = getStartLogFilePath(jobInstanceDTO);
+        try {
+            return FileUtil.readFileToString(startLogFilePath);
+        } catch (FileNotFoundException e) {
+            return null;
+        } catch (IOException e) {
+            throw new PlinkRuntimeException("read instance start log error", e);
+        }
+    }
+
+    @Override
+    public String getStartLogFilePath(JobInstanceDTO jobInstanceDTO) {
+        return String.format(instanceLogDir + instanceLogPattern, jobInstanceDTO.getJobId(), jobInstanceDTO.getId());
     }
 }

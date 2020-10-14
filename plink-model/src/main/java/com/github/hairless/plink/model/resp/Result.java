@@ -38,6 +38,13 @@ public class Result<T> implements Serializable {
         this.data = data;
     }
 
+    public Result(ResultCode resultCode, String msg, T data) {
+        this.success = resultCode.getSuccess();
+        this.code = resultCode.getCode();
+        this.msg = msg;
+        this.data = data;
+    }
+
     public Result(ResultCode resultCode, String msg) {
         this.success = resultCode.getSuccess();
         this.code = resultCode.getCode();
