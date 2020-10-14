@@ -1,6 +1,5 @@
 package com.github.hairless.plink.web.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.github.hairless.plink.TestBootStrapApp;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
@@ -19,9 +18,9 @@ public class JobControllerTest extends BaseControllerTest {
 
     //@Test
     public void addJob() throws Exception {
-        JSONObject param = new JSONObject();
-        param.put("name", "test_add_job");
-        param.put("type", "1");
+//        JSONObject param = new JSONObject();
+//        param.put("name", "test_add_job");
+//        param.put("type", "1");
         //postTest("/mng/job/addJob", param);
     }
 
@@ -35,9 +34,9 @@ public class JobControllerTest extends BaseControllerTest {
 
     //@Test
     public void updateJob() throws Exception {
-        JSONObject param = new JSONObject();
-        param.put("name", "test_update_job");
-        param.put("type", "1");
+//        JSONObject param = new JSONObject();
+//        param.put("name", "test_update_job");
+//        param.put("type", "1");
         //postTest("/mng/job/updateJob", param);
     }
 

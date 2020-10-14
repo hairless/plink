@@ -1,7 +1,6 @@
 package com.github.hairless.plink.web.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.github.hairless.plink.common.util.JsonUtil;
 import com.github.hairless.plink.model.resp.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,7 @@ public class BaseControllerTest {
         String respBody = mvcResult.getResponse().getContentAsString();
         log.info("response: {}", respBody);
         assert mvcResult.getResponse().getStatus() == 200;
-        assert JSON.parseObject(respBody, Result.class).getSuccess();
+        assert JsonUtil.parseObject(respBody, Result.class).getSuccess();
     }
 
     protected String post(String url, Object param) throws Exception {
@@ -49,7 +48,7 @@ public class BaseControllerTest {
     protected MvcResult postMvcResult(String url, Object param) throws Exception {
         return mockMvc.perform(MockMvcRequestBuilders.post(url).
                 characterEncoding("UTF-8").contentType(MediaType.APPLICATION_JSON).
-                content(JSONObject.toJSONString(param))).andDo(document("post")).andReturn();
+                content(JsonUtil.toJSONString(param))).andDo(document("post")).andReturn();
     }
 
     protected void postTest(String url, Object param) throws Exception {
@@ -58,6 +57,6 @@ public class BaseControllerTest {
         String respBody = mvcResult.getResponse().getContentAsString();
         log.info("response: {}", respBody);
         assert mvcResult.getResponse().getStatus() == 200;
-        assert JSON.parseObject(respBody, Result.class).getSuccess();
+        assert JsonUtil.parseObject(respBody, Result.class).getSuccess();
     }
 }
