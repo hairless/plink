@@ -190,17 +190,6 @@
                 <version>1.2.62</version>
             </dependency>
             <dependency>
-                <groupId>com.arronlong</groupId>
-                <artifactId>httpclientutil</artifactId>
-                <version>1.0.4</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>log4j</artifactId>
-                        <groupId>log4j</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>3.9</version>
@@ -209,6 +198,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-text</artifactId>
                 <version>1.4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.5.10</version>
             </dependency>
 
             <!-- log -->

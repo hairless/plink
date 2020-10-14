@@ -28,6 +28,7 @@ public class SqlJob {
 
     public JobExecutionResult start() throws Exception {
         log.info("sql job {} staring...", sqlConfig.getJobName());
+        StreamExecutionEnvironment.setDefaultLocalParallelism(1);
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         EnvironmentSettings settings = EnvironmentSettings.newInstance()
                 .useBlinkPlanner().inStreamingMode().build();

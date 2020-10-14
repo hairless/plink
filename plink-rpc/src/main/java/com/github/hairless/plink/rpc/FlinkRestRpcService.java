@@ -9,12 +9,6 @@ import lombok.Setter;
  */
 public interface FlinkRestRpcService {
 
-    String uploadJar(String localJarPath);
-
-    void deleteJar(String jarId);
-
-    String runJar(String jarId, RunConfig runConfig);
-
     String queryJobStatus(String jobId);
 
     void stopJob(String jobId);
