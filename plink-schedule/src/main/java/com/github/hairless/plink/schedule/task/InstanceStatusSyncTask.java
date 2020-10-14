@@ -49,7 +49,7 @@ public class InstanceStatusSyncTask {
             jobInstanceStopped.setJobId(jobInstanceDTO.getJobId());
             jobInstanceService.updateJobAndInstanceStatus(jobInstanceStopped);
         } catch (Exception e) {
-            log.warn("asyncSubmitJob error jobInstance={}", jobInstanceDTO, e);
+            log.warn("asyncSubmitJob error jobInstanceId={}", jobInstanceDTO.getId(), e);
         }
     }
 }
