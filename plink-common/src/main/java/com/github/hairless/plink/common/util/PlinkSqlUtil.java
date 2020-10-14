@@ -56,6 +56,15 @@ public class PlinkSqlUtil {
                     sqlClassPathUrlList.add(sqlShapeJar.toURI().toURL());
                 }
             }
+
+            //flink dependency jars
+            File libDir = new File(FlinkConfigUtil.getFlinkHome() + FlinkConfigUtil.LIB_SUFFIX);
+            File[] flinkDepJars = libDir.listFiles();
+            if (flinkDepJars != null) {
+                for (File flinkDepJar : flinkDepJars) {
+                    sqlClassPathUrlList.add(flinkDepJar.toURI().toURL());
+                }
+            }
             //获取扩展类加载器
             ClassLoader extClassLoader = ClassLoader.getSystemClassLoader().getParent();
             //将扩展类加载器设置为sql类加载器的父加载器，防止sql shape引入第3方依赖冲突

@@ -17,7 +17,8 @@
     <modules>
         <module>plink-sql-model</module>
         <module>plink-sql-core</module>
-        <module>plink-sql-dependency</module>
+        <module>plink-sql-shape-dependency</module>
+        <module>plink-sql-flink-dependency</module>
     </modules>
 
     <dependencyManagement>
@@ -35,7 +36,13 @@
             </dependency>
             <dependency>
                 <groupId>com.github.hairless</groupId>
-                <artifactId>plink-sql-dependency</artifactId>
+                <artifactId>plink-sql-flink-dependency</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>com.github.hairless</groupId>
+                <artifactId>plink-sql-shape-dependency</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
             </dependency>
