@@ -1,10 +1,10 @@
 <template>
   <div>
     <template v-if="type === 1">
-      <JobCustomAddEditDetail :usage-model="'detail'" :data-id="jobId" />
+      <JobCustomAddEditDetail :usage-mode="'detail'" :data-id="jobId" />
     </template>
     <template v-else-if="type === 3">
-      <JobSqlAddEditDetail :usage-model="'detail'" :data-id="jobId" />
+      <JobSqlAddEditDetail :usage-mode="'detail'" :data-id="jobId" />
     </template>
     <template v-else>
       等待实现中 。。。

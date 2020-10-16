@@ -8,3 +8,10 @@ export function getInstPageList(filter) {
     params: filter
   });
 }
+
+export function getInstLog(id) {
+  return request({
+    url: "/api/mng/jobInstance/startLog/" + id,
+    method: "get"
+  });
+}

@@ -2,17 +2,17 @@
   <div>
     <!-- Page Header -->
     <div>
-      <a-page-header style="padding: 5px 5px 0 5px" :title="usageModelHelper.title" :sub-title="usageModelHelper.subTitle" @back="() => $router.go(-1)">
+      <a-page-header style="padding: 5px 5px 0 5px" :title="usageModeHelper.title" :sub-title="usageModeHelper.subTitle" @back="() => $router.go(-1)">
         <template slot="tags">
           <a-tag :style="{ color: [3, 4, -1].includes(data.lastStatus) ? 'red' : 'green' }" v-show="data.lastStatusDesc">{{ data.lastStatusDesc }}</a-tag>
         </template>
         <template slot="extra">
-          <a-button type="primary" size="small" v-show="usageModelHelper.showStartButton" style="margin-right: 5px" @click="onStart" :disabled="!data.authMap.start">启动</a-button>
-          <a-button type="danger" size="small" v-show="usageModelHelper.showStopButton" style="margin-right: 5px" @click="onStop" :disabled="!data.authMap.stop">停止</a-button>
-          <a-button type="primary" size="small" v-show="usageModelHelper.showEditButton" style="margin-right: 5px" @click="onEdit" :disabled="!data.authMap.edit">编辑</a-button>
-          <a-button type="primary" size="small" v-show="usageModelHelper.showUpdateButton" style="margin-right: 5px" @click="onUpdate">更新</a-button>
-          <a-button type="primary" size="small" v-show="usageModelHelper.showDetailButton" style="margin-right: 5px" @click="onDetail">详情</a-button>
-          <a-button type="danger" size="small" v-show="usageModelHelper.showDeleteButton" style="margin-right: 5px" @click="onDelete" :disabled="!data.authMap.delete">删除</a-button>
+          <a-button type="primary" size="small" v-show="usageModeHelper.showStartButton" style="margin-right: 5px" @click="onStart" :disabled="!data.authMap.start">启动</a-button>
+          <a-button type="danger" size="small" v-show="usageModeHelper.showStopButton" style="margin-right: 5px" @click="onStop" :disabled="!data.authMap.stop">停止</a-button>
+          <a-button type="primary" size="small" v-show="usageModeHelper.showEditButton" style="margin-right: 5px" @click="onEdit" :disabled="!data.authMap.edit">编辑</a-button>
+          <a-button type="primary" size="small" v-show="usageModeHelper.showUpdateButton" style="margin-right: 5px" @click="onUpdate">更新</a-button>
+          <a-button type="primary" size="small" v-show="usageModeHelper.showDetailButton" style="margin-right: 5px" @click="onDetail">详情</a-button>
+          <a-button type="danger" size="small" v-show="usageModeHelper.showDeleteButton" style="margin-right: 5px" @click="onDelete" :disabled="!data.authMap.delete">删除</a-button>
           <a-button type="primary" size="small" @click="onGoBack">返回</a-button>
         </template>
       </a-page-header>
@@ -27,19 +27,21 @@
         </span>
 
         <!-- 作业信息 -->
-        <a-spin :spinning="usageModelHelper.isLoading" size="large">
+        <a-spin :spinning="usageModeHelper.isLoading" size="large">
           <div style="margin-top: 20px">
             <h2>基本配置</h2>
             <a-form-model ref="ruleForm" :model="data" :rules="rules" :label-col="labelCol" :wrapper-col="wrapperCol">
               <a-form-model-item label="作业名称" prop="name">
-                <a-input v-model="data.name" />
+                <a-input v-model="data.name" v-if="['add', 'edit'].includes(usageMode)" />
+                <span v-else-if="['detail'].includes(usageMode)">{{ data.name }}</span>
               </a-form-model-item>
               <a-form-model-item label="作业类型" prop="type">
-                <a-select v-model="data.type" placeholder="请选择作业类型" disabled>
+                <a-select v-model="data.type" placeholder="请选择作业类型" disabled v-if="['add', 'edit'].includes(usageMode)">
                   <a-select-option v-for="(item, index) in helper.jobTypeList" :key="index" :value="item.value">
                     {{ item.desc }}
                   </a-select-option>
                 </a-select>
+                <span v-else-if="['detail'].includes(usageMode)">{{ data.typeDesc }}</span>
               </a-form-model-item>
               <a-form-model-item label="作业描述">
                 <a-textarea v-model="data.description" />
@@ -47,29 +49,33 @@
 
               <H2>作业配置</H2>
               <a-form-model-item label="主节点内存" prop="flinkConfigJobManagerMemory">
-                <a-input v-model="data.flinkConfig.jobManagerMemory" />
+                <a-input v-model="data.flinkConfig.jobManagerMemory" v-if="['add', 'edit'].includes(usageMode)" />
+                <span v-else-if="['detail'].includes(usageMode)">{{ data.flinkConfig.jobManagerMemory }}</span>
               </a-form-model-item>
               <a-form-model-item label="执行节点内存" prop="flinkConfigTaskManagerMemory">
-                <a-input v-model="data.flinkConfig.taskManagerMemory" />
+                <a-input v-model="data.flinkConfig.taskManagerMemory" v-if="['add', 'edit'].includes(usageMode)" />
+                <span v-else-if="['detail'].includes(usageMode)">{{ data.flinkConfig.taskManagerMemory }}</span>
               </a-form-model-item>
               <a-form-model-item label="Slot 数/节点" prop="flinkConfigTaskManagerSlots">
-                <a-input-number v-model="data.flinkConfig.taskManagerSlots" :min="1" />
+                <a-input-number v-model="data.flinkConfig.taskManagerSlots" :min="1" v-if="['add', 'edit'].includes(usageMode)" />
+                <span v-else-if="['detail'].includes(usageMode)">{{ data.flinkConfig.taskManagerSlots }}</span>
               </a-form-model-item>
               <a-form-model-item label="作业并行度" prop="flinkConfigParallelism">
-                <a-input-number v-model="data.flinkConfig.parallelism" :min="1" />
+                <a-input-number v-model="data.flinkConfig.parallelism" :min="1" v-if="['add', 'edit'].includes(usageMode)" />
+                <span v-else-if="['detail'].includes(usageMode)">{{ data.flinkConfig.parallelism }}</span>
               </a-form-model-item>
               <a-form-model-item label="Flink 参数" prop="flinkConfigConfigs">
                 <a-textarea v-model="data.flinkConfig.configs" />
               </a-form-model-item>
 
               <a-form-model-item :wrapper-col="{ span: wrapperCol.span, offset: labelCol.span }">
-                <a-button type="primary" @click="onAdd" v-show="usageModelHelper.showAddButton">
+                <a-button type="primary" @click="onAdd" v-show="usageModeHelper.showAddButton">
                   新建
                 </a-button>
-                <a-button type="primary" @click="onUpdate" v-show="usageModelHelper.showUpdateButton">
+                <a-button type="primary" @click="onUpdate" v-show="usageModeHelper.showUpdateButton">
                   更新
                 </a-button>
-                <a-button style="margin-left: 10px;" @click="onRest" v-show="usageModelHelper.showRest">
+                <a-button style="margin-left: 10px;" @click="onRest" v-show="usageModeHelper.showRest">
                   清空
                 </a-button>
               </a-form-model-item>
@@ -84,10 +90,10 @@
           Flink SQL
         </span>
 
-        <SqlCMEditor v-model="data.extraConfig.sql" height="700" />
+        <SqlCMEditor v-model="data.extraConfig.sql" height="700" :read-only="usageModeHelper.editorReadOnly" />
       </a-tab-pane>
 
-      <a-tab-pane key="instList">
+      <a-tab-pane key="instList" v-if="['detail'].includes(usageMode)">
         <span slot="tab">
           <a-icon type="database" />
           实例列表
@@ -112,7 +118,7 @@ export default {
   name: "JobSqlAddEditDetail",
   props: {
     // 使用模式
-    usageModel: {
+    usageMode: {
       default: "" // add | edit | update
     },
     dataId: {
@@ -128,9 +134,9 @@ export default {
     data: {
       deep: true,
       handler() {
-        if (this.usageModel === "edit" || this.usageModel === "detail") {
-          this.usageModelHelper.title = this.data.name;
-          this.usageModelHelper.subTitle = this.data.description;
+        if (this.usageMode === "edit" || this.usageMode === "detail") {
+          this.usageModeHelper.title = this.data.name;
+          this.usageModeHelper.subTitle = this.data.description;
         }
       }
     }
@@ -175,7 +181,7 @@ export default {
         flinkConfigTaskManagerSlots: [{ required: true, message: "请输入执行节点核数！", trigger: "blur" }]
         */
       },
-      usageModelHelper: {
+      usageModeHelper: {
         showPassword: false,
         showAddButton: false,
         showStartButton: false,
@@ -186,6 +192,7 @@ export default {
         showDeleteButton: false,
         showRest: true,
         isLoading: false,
+        editorReadOnly: true,
         title: "",
         subTitle: ""
       },
@@ -342,41 +349,41 @@ export default {
       }
     },
     initAddUsageModel() {
-      this.usageModelHelper.showAddButton = true;
-      this.usageModelHelper.showUpdateButton = false;
-      this.usageModelHelper.showPassword = true;
-      this.usageModelHelper.title = "新建作业";
-      this.usageModelHelper.subTitle = "请仔细核对作业信息哟！";
+      this.usageModeHelper.showAddButton = true;
+      this.usageModeHelper.showUpdateButton = false;
+      this.usageModeHelper.showPassword = true;
+      this.usageModeHelper.title = "新建作业";
+      this.usageModeHelper.subTitle = "请仔细核对作业信息哟！";
     },
     initEditUsageModel() {
-      this.usageModelHelper.isLoading = true;
-      this.usageModelHelper.showAddButton = false;
-      this.usageModelHelper.showUpdateButton = true;
-      this.usageModelHelper.showPassword = true;
-      this.usageModelHelper.showPassword = true;
-      this.usageModelHelper.showDetailButton = true;
-      this.usageModelHelper.showStartButton = false;
-      this.usageModelHelper.showStopButton = false;
-      this.usageModelHelper.title = "编辑作业";
-      this.usageModelHelper.subTitle = "请仔细核对作业信息哟！";
+      this.usageModeHelper.isLoading = true;
+      this.usageModeHelper.showAddButton = false;
+      this.usageModeHelper.showUpdateButton = true;
+      this.usageModeHelper.showPassword = true;
+      this.usageModeHelper.showPassword = true;
+      this.usageModeHelper.showDetailButton = true;
+      this.usageModeHelper.showStartButton = false;
+      this.usageModeHelper.showStopButton = false;
+      (this.usageModeHelper.editorReadOnly = false), (this.usageModeHelper.title = "编辑作业");
+      this.usageModeHelper.subTitle = "请仔细核对作业信息哟！";
     },
     initDetailUsageModel() {
-      this.usageModelHelper.showAddButton = false;
-      this.usageModelHelper.showUpdateButton = false;
-      this.usageModelHelper.showPassword = false;
-      this.usageModelHelper.showRest = false;
-      this.usageModelHelper.showEditButton = true;
-      this.usageModelHelper.showDeleteButton = true;
-      this.usageModelHelper.showStartButton = true;
-      this.usageModelHelper.showStopButton = true;
-      this.usageModelHelper.title = "作业详情";
-      this.usageModelHelper.subTitle = "请仔细核对作业信息哟！";
+      this.usageModeHelper.showAddButton = false;
+      this.usageModeHelper.showUpdateButton = false;
+      this.usageModeHelper.showPassword = false;
+      this.usageModeHelper.showRest = false;
+      this.usageModeHelper.showEditButton = true;
+      this.usageModeHelper.showDeleteButton = true;
+      this.usageModeHelper.showStartButton = true;
+      this.usageModeHelper.showStopButton = true;
+      (this.usageModeHelper.editorReadOnly = true), (this.usageModeHelper.title = "作业详情");
+      this.usageModeHelper.subTitle = "请仔细核对作业信息哟！";
     },
     getData() {
-      this.usageModelHelper.isLoading = true;
+      this.usageModeHelper.isLoading = true;
       // 根据 ID 获取数据详情
       jobApi.getJob(this.dataId).then(resp => {
-        this.usageModelHelper.isLoading = false;
+        this.usageModeHelper.isLoading = false;
         this.data = resp.data;
 
         // test
@@ -408,7 +415,7 @@ export default {
     },
     initUsageModel() {
       // 使用模式
-      switch (this.usageModel) {
+      switch (this.usageMode) {
         case "add":
           this.initAddUsageModel();
           break;
