@@ -19,7 +19,7 @@
     </div>
 
     <!-- Page Content -->
-    <a-tabs default-active-key="1" @change="handleTabChange">
+    <a-tabs v-model="helper.activeKey" @change="handleTabChange">
       <a-tab-pane key="job">
         <span slot="tab">
           <a-icon type="file-text" />
@@ -201,7 +201,8 @@ export default {
       helper: {
         jobTypeList: [],
         jobJarList: [],
-        jobClientVersionList: []
+        jobClientVersionList: [],
+        activeKey: "job"
       },
       dataTimer: null
     };
@@ -296,6 +297,11 @@ export default {
           title: "启动作业成功！"
         });
         this.handleFlush(true);
+
+        if (this.helper.activeKey === "instList") {
+          // 子组件刷新数据
+          this.$refs.refInstList.getDataList();
+        }
       });
     },
     onStop() {
@@ -345,6 +351,10 @@ export default {
         // 实例列表清除定时器
         if (this.$refs.refInstList) {
           this.$refs.refInstList.clearDataListTimer();
+        }
+      } else {
+        if (this.$refs.refInstList) {
+          this.$refs.refInstList.getDataList();
         }
       }
     },
