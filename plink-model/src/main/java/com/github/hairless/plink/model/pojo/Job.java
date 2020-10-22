@@ -1,5 +1,6 @@
 package com.github.hairless.plink.model.pojo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.hairless.plink.model.enums.JobClientVersionEnum;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.enums.JobTypeEnum;
@@ -69,10 +70,12 @@ public class Job extends BaseModel {
      * 最新实例启动时间
      * {@link JobInstance#startTime}
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastStartTime;
     /**
      * 最新实例停止时间
      * {@link JobInstance#stopTime}
      */
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastStopTime;
 }
