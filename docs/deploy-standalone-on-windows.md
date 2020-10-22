@@ -46,8 +46,8 @@ Plink 进行独立单机部署，可以在 Windows 上进行部署，以下是�
 
 ## 安装 Apache Flink
 
-* 版本: flink-1.9.3-bin-scala_2.11（建议: 这里建议使用 1.9.x 版本，因为 1.10+ 版本在 windows 系统上不能开箱即用）
-* 下载: <https://mirror.bit.edu.cn/apache/flink/flink-1.9.3/flink-1.9.3-bin-scala_2.11.tgz>
+* 版本: flink-1.11.2-bin-scala_2.11（建议: 这里建议使用 1.11.x 版本，因为 1.10+ 版本在 windows 系统上不能开箱即用）
+* 下载: <https://mirror.bit.edu.cn/apache/flink/flink-1.11.2/flink-1.11.2-bin-scala_2.11.tgz>
 * 解压到合适的目录，假设该目录为 FLINK_HOME
 * 环境变量配置 FLINK_HOME（必须，Plink 会用到该环境变量）
 * Flink 配置: 无需更改
@@ -99,4 +99,4 @@ bin/run.bat stop
 ```
 
 ## 示例
-1. [运行 Word Count 作业](manual/manual-run-word-count.md): 在 Plink 上提交 Flink 自带的 flink-1.9.1\examples\streaming\WordCount.jar，然运行。
+1. [运行 Word Count 作业](manual/manual-run-word-count.md): 在 Plink 上提交 Flink 自带的 flink-1.11.2\examples\streaming\WordCount.jar，然运行。
