@@ -1,6 +1,5 @@
 package com.github.hairless.plink.model.pojo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.hairless.plink.model.enums.JobClientVersionEnum;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.enums.JobTypeEnum;

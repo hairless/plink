@@ -1,6 +1,5 @@
 package com.github.hairless.plink.model.pojo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
