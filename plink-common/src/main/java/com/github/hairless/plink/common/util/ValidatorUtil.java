@@ -13,7 +13,7 @@ import java.util.Set;
  * @date: 2020/1/19
  */
 public class ValidatorUtil {
-    private static Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     public static void validate(Object obj) {
         Set<ConstraintViolation<Object>> set = validator.validate(obj, Default.class);

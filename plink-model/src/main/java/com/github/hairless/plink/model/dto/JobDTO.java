@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.validation.Valid;
-
 /**
  * @author: silence
  * @date: 2020/1/17
@@ -27,7 +25,6 @@ public class JobDTO extends Job {
 
     private String lastUiAddress;
 
-    @Valid
     private FlinkConfig flinkConfig;
 
     private JsonNode extraConfig;
