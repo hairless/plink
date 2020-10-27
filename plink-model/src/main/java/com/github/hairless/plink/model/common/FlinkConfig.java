@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import java.util.List;
+import java.util.Map;
 
 /**
  * @author: silence
@@ -50,5 +50,5 @@ public class FlinkConfig implements Serializable {
     /**
      * 其他flink配置
      */
-    private List<String> configs;
+    private Map<String, String> configs;
 }

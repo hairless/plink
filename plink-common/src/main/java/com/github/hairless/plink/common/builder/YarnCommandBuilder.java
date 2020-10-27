@@ -62,7 +62,10 @@ public class YarnCommandBuilder implements FlinkShellCommandBuilder {
             builder.append(format(parallelism, flinkConfig.getParallelism()));
         }
         if (flinkConfig.getConfigs() != null) {
-            builder.append(flinkConfig.getConfigs().stream().map(c -> format(confItem, c)).collect(Collectors.joining()));
+            builder.append(flinkConfig.getConfigs().entrySet().stream()
+                    .map(e -> e.getKey() + "=" + e.getValue())
+                    .map(c -> format(confItem, c))
+                    .collect(Collectors.joining()));
         }
         if (StringUtils.isNotBlank(flinkSubmitOptions.getLibPath())) {
             builder.append(format(yarnShip, flinkSubmitOptions.getLibPath()));

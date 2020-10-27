@@ -57,3 +57,8 @@ kerberos:
 #'yarn' or 'standalone'
 cluster:
   mode: yarn
+
+flink:
+  defaultConfs:
+    execution.checkpointing.interval: 60000
+    execution.checkpointing.timeout: 120000
