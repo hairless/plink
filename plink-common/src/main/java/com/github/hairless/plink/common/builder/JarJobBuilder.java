@@ -8,6 +8,8 @@ import com.github.hairless.plink.model.dto.JobDTO;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import org.apache.flink.util.Preconditions;
 
+import java.util.Map;
+
 /**
  * @author: silence
  * @date: 2020/10/13
@@ -26,7 +28,14 @@ public class JarJobBuilder implements JobBuilder {
         FlinkSubmitOptions flinkSubmitOptions = new FlinkSubmitOptions();
         flinkSubmitOptions.setJobName("PLINK_JAR_" + jobInstanceDTO.getJob().getName());
         flinkSubmitOptions.setMainJarPath(UploadUtil.getJobJarsPath(jobInstanceDTO.getJobId(), jobInstanceDTO.getFlinkConfig().getJarName()));
-        flinkSubmitOptions.setFlinkConfig(jobInstanceDTO.getFlinkConfig());
+        FlinkConfig flinkConfig = jobInstanceDTO.getFlinkConfig();
+        Map<String, String> configs = flinkConfig.getConfigs();
+        configs.forEach((k, v) -> {
+            if (!configs.containsKey(k)) {
+                configs.put(k, v);
+            }
+        });
+        flinkSubmitOptions.setFlinkConfig(flinkConfig);
         return flinkSubmitOptions;
     }
 }

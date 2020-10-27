@@ -39,7 +39,10 @@ public class StandaloneCommandBuilder implements FlinkShellCommandBuilder {
             builder.append(format(parallelism, flinkConfig.getParallelism()));
         }
         if (flinkConfig.getConfigs() != null) {
-            builder.append(flinkConfig.getConfigs().stream().map(c -> format(confItem, c)).collect(Collectors.joining()));
+            builder.append(flinkConfig.getConfigs().entrySet().stream()
+                    .map(e -> e.getKey() + "=" + e.getValue())
+                    .map(c -> format(confItem, c))
+                    .collect(Collectors.joining()));
         }
         if (StringUtils.isNotBlank(flinkConfig.getMainClass())) {
             builder.append(format(mainClass, flinkConfig.getMainClass()));
