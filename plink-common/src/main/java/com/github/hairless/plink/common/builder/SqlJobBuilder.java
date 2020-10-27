@@ -16,6 +16,7 @@ import org.apache.flink.util.Preconditions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: silence
@@ -51,6 +52,12 @@ public class SqlJobBuilder implements JobBuilder {
         args.add("\"-c\"");
         args.add('"' + StringEscapeUtils.escapeJava(JsonUtil.toJSONString(sqlConfig)) + '"');
         flinkConfig.setArgs(String.join(" ", args));
+        Map<String, String> configs = flinkConfig.getConfigs();
+        configs.forEach((k, v) -> {
+            if (!configs.containsKey(k)) {
+                configs.put(k, v);
+            }
+        });
         flinkSubmitOptions.setFlinkConfig(flinkConfig);
         return flinkSubmitOptions;
     }
