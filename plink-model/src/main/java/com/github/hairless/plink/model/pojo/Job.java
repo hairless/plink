@@ -51,6 +51,10 @@ public class Job extends BaseModel {
      */
     private String extraConfigJson;
     /**
+     * 是否进行重试
+     */
+    private Boolean isRetry;
+    /**
      * 最新实例ID
      */
     private Long lastInstanceId;

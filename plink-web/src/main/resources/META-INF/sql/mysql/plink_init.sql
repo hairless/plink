@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `job`
     `client_version`    VARCHAR(20)        NOT NULL DEFAULT '' COMMENT '客户端版本',
     `flink_config_json` MEDIUMTEXT         NULL COMMENT '作业flink参数配置',
     `extra_config_json` MEDIUMTEXT         NULL COMMENT '作业额外配置',
+    `isRetry`           BOOLEAN            NOT NULL DEFAULT FALSE COMMENT '是否重试',
     `last_instance_id`  BIGINT             NULL COMMENT '最新实例的ID',
     `last_status`       TINYINT(4)         NULL COMMENT '最新实例的状态',
     `last_app_id`       VARCHAR(100)       NULL COMMENT '最新实例的app_id',

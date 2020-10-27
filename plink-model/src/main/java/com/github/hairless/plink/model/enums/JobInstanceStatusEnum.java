@@ -24,12 +24,12 @@ public enum JobInstanceStatusEnum {
 
     private Integer value;
     private String desc;
-    private boolean FinalState;
+    private boolean finalState;
 
     JobInstanceStatusEnum(Integer value, String desc, boolean finalState) {
         this.value = value;
         this.desc = desc;
-        FinalState = finalState;
+        this.finalState = finalState;
     }
 
     public static JobInstanceStatusEnum getEnum(Integer value) {
