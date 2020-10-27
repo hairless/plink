@@ -23,7 +23,7 @@ else
     profile="--spring.profiles.active=prod"
 fi
 
-JARFILE=$(find . -name "$SERVER_ROOT_PATH/lib/plink-web-*.jar" -print)
+JARFILE=$(find "$SERVER_ROOT_PATH/lib/" -name "plink-web-*.jar" -print)
 
 case "$1" in
 
