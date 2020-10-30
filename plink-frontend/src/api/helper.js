@@ -21,3 +21,10 @@ export function getJobClientVersionList() {
     method: "get"
   });
 }
+
+export function getDefaultFlinkConfs() {
+  return request({
+    url: "/api/mng/util/defaultFlinkConfs",
+    method: "get"
+  });
+}

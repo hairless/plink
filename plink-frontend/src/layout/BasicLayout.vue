@@ -9,8 +9,7 @@
           :style="{
             background: '#ffffff',
             padding: '10px',
-            margin: 0,
-            minHeight: screenHeight + 'px'
+            margin: 0
           }"
         >
           <router-view />
@@ -30,7 +29,6 @@ export default {
   data() {
     return {
       collapsed: false,
-      screenHeight: document.body.clientHeight - 64 - 10 - 21 - 10 - 10 - 1
     };
   },
   components: {
@@ -43,6 +41,5 @@ export default {
 
 <style scoped>
 #components-layout-demo-top-side-2 {
-  height: 100%;
 }
 </style>

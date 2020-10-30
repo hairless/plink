@@ -64,8 +64,18 @@
                 <a-input-number v-model="data.flinkConfig.parallelism" :min="1" v-if="['add', 'edit'].includes(usageMode)" />
                 <span v-else-if="['detail'].includes(usageMode)">{{ data.flinkConfig.parallelism }}</span>
               </a-form-model-item>
+              <a-form-model-item label="是否重试" prop="isRetry">
+                <a-switch checked-children="开" un-checked-children="关" v-model="data.flinkConfig.isRetry" />
+              </a-form-model-item>
               <a-form-model-item label="Flink 参数" prop="flinkConfigConfigs">
-                <a-textarea v-model="data.flinkConfig.configs" />
+                <a-textarea
+                  v-model="data.flinkConfig.configsStr"
+                  :autoSize="{ minRows: 7 }"
+                  placeholder="flink.conf.key1=value1
+flink.conf.key2=value2
+flink.conf.key3=value3"
+                />
+                <div v-for="(value, key) in helper.defaultFlinkConfs" :key="key">{{ key + "=" + value }}</div>
               </a-form-model-item>
 
               <a-form-model-item :wrapper-col="{ span: wrapperCol.span, offset: labelCol.span }">
@@ -157,6 +167,8 @@ export default {
           taskManagerMemory: "2G",
           taskManagerSlots: "",
           parallelism: 1,
+          isRetry: false,
+          configsStr: "",
           configs: ""
         },
         extraConfig: {
@@ -202,7 +214,8 @@ export default {
         jobTypeList: [],
         jobJarList: [],
         jobClientVersionList: [],
-        activeKey: "job"
+        activeKey: "job",
+        defaultFlinkConfs: {}
       },
       dataTimer: null
     };
@@ -231,6 +244,17 @@ export default {
     onUpdate() {
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
+          let configsStr = this.data.flinkConfig.configsStr;
+          let configKVs = configsStr ? configsStr.split(/[\n]+/) : [];
+          let configKVMap = {};
+          if (configKVs.length > 0) {
+            configKVs.forEach(item => {
+              let kv = item.split("=");
+              let k = kv[0];
+              let v = kv[1];
+              configKVMap[k] = v;
+            });
+          }
           let data = {
             id: this.data.id,
             name: this.data.name,
@@ -241,7 +265,8 @@ export default {
               taskManagerMemory: this.data.flinkConfig.taskManagerMemory,
               taskManagerSlots: this.data.flinkConfig.taskManagerSlots,
               parallelism: this.data.flinkConfig.parallelism,
-              configs: this.data.flinkConfig.configs
+              isRetry: this.data.flinkConfig.isRetry,
+              configs: configKVMap
             },
             extraConfig: this.data.extraConfig
           };
@@ -403,6 +428,20 @@ export default {
           };
         }
 
+        // str to map
+        let configsStr = "";
+        if (this.data.flinkConfig.configs) {
+          let count = 0;
+          Object.entries(this.data.flinkConfig.configs).forEach(item => {
+            if (count > 0) {
+              configsStr += "\n";
+            }
+            configsStr += `${item[0]}=${item[1]}`;
+            count += 1;
+          });
+        }
+        this.data.flinkConfig.configsStr = configsStr;
+
         // 最终状态清除定时器
         if ([3, 4, 5, 6].includes(this.data.lastStatus)) {
           this.clearDataTimer();
@@ -420,6 +459,9 @@ export default {
       });
       helperApi.getJobClientVersionList().then(resp => {
         this.helper.jobClientVersionList = resp.data;
+      });
+      helperApi.getDefaultFlinkConfs().then(resp => {
+        this.helper.defaultFlinkConfs = resp.data;
       });
       this.getJobUploadJarList();
     },
