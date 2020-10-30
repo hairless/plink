@@ -99,7 +99,6 @@ public class PlinkSqlUtil {
             Object origRes = plinkSqlParserClass.getMethod("getSqlParseInfo").invoke(plinkSqlParser);
             BeanUtils.copyProperties(newRes, origRes);
             return newRes;
-
         } catch (InvocationTargetException e) {
             throw new PlinkRuntimeException("sql parse error", e.getTargetException());
         } catch (Exception e) {

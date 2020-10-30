@@ -31,6 +31,8 @@ public interface JobService {
 
     void startJob(Long jobId);
 
+    void startJob(JobDTO jobDTO);
+
     void startJobs(List<Long> idList);
 
     void stopJob(Long jobId);

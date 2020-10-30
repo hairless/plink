@@ -1,11 +1,14 @@
 package com.github.hairless.plink.service.impl;
 
+import com.github.hairless.plink.common.builder.JobBuilder;
+import com.github.hairless.plink.common.factory.JobBuilderFactory;
 import com.github.hairless.plink.common.util.UploadUtil;
 import com.github.hairless.plink.common.util.ValidatorUtil;
 import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.dto.JobDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
+import com.github.hairless.plink.model.enums.JobTypeEnum;
 import com.github.hairless.plink.model.exception.PlinkMessageException;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.model.pojo.Job;
@@ -98,6 +101,9 @@ public class JobServiceImpl implements JobService {
         if (jobDTO.getId() == null) {
             throw new PlinkMessageException("jobId is null");
         }
+        JobTypeEnum jobTypeEnum = JobTypeEnum.getEnum(jobDTO.getType());
+        JobBuilder jobBuilder = JobBuilderFactory.create(jobTypeEnum);
+        jobBuilder.validate(jobDTO);
         Job job = jobTransform.inverseTransform(jobDTO);
         int rowCnt = jobMapper.updateByPrimaryKeySelective(job);
         if (rowCnt == 0) {
@@ -173,7 +179,16 @@ public class JobServiceImpl implements JobService {
             throw new PlinkMessageException("jobId is not exist");
         }
         JobDTO jobDTO = jobTransform.transform(job);
+        startJob(jobDTO);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void startJob(JobDTO jobDTO) {
         ValidatorUtil.validate(jobDTO);
+        JobTypeEnum jobTypeEnum = JobTypeEnum.getEnum(jobDTO.getType());
+        JobBuilder jobBuilder = JobBuilderFactory.create(jobTypeEnum);
+        jobBuilder.validate(jobDTO);
         if (jobDTO.getLastStatus() != null) {
             JobInstanceStatusEnum jobInstanceStatusEnum = JobInstanceStatusEnum.getEnum(jobDTO.getLastStatus());
             if (jobInstanceStatusEnum != null && !jobInstanceStatusEnum.isFinalState()) {
@@ -181,17 +196,17 @@ public class JobServiceImpl implements JobService {
             }
         }
         JobInstance jobInstance = new JobInstance();
-        jobInstance.setJobId(job.getId());
-        jobInstance.setFlinkConfigJson(job.getFlinkConfigJson());
-        jobInstance.setExtraConfigJson(job.getExtraConfigJson());
+        jobInstance.setJobId(jobDTO.getId());
+        jobInstance.setFlinkConfigJson(jobDTO.getFlinkConfigJson());
+        jobInstance.setExtraConfigJson(jobDTO.getExtraConfigJson());
         jobInstance.setStatus(JobInstanceStatusEnum.WAITING_START.getValue());
         int rowCnt = jobInstanceMapper.insertSelective(jobInstance);
         if (rowCnt == 0) {
             throw new PlinkMessageException("insert job instance fail");
         }
         Job newJob = new Job();
+        newJob.setId(jobDTO.getId());
         newJob.setLastInstanceId(jobInstance.getId());
-        newJob.setId(jobId);
         newJob.setLastStatus(JobInstanceStatusEnum.WAITING_START.getValue());
         int jobUpdateRowCnt = jobMapper.updateByPrimaryKeySelective(newJob);
         if (jobUpdateRowCnt == 0) {

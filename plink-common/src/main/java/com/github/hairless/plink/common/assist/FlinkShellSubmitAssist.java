@@ -1,8 +1,8 @@
 package com.github.hairless.plink.common.assist;
 
 import com.github.hairless.plink.common.builder.FlinkShellCommandBuilder;
-import com.github.hairless.plink.common.builder.FlinkSubmitOptionsBuilder;
-import com.github.hairless.plink.common.factory.FlinkSubmitOptionsBuilderFactory;
+import com.github.hairless.plink.common.builder.JobBuilder;
+import com.github.hairless.plink.common.factory.JobBuilderFactory;
 import com.github.hairless.plink.common.util.FileUtil;
 import com.github.hairless.plink.model.common.FlinkSubmitOptions;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
@@ -34,8 +34,8 @@ public class FlinkShellSubmitAssist {
 
     public String submitJob(JobInstanceDTO jobInstanceDTO, String logFile) throws Exception {
         JobTypeEnum jobTypeEnum = JobTypeEnum.getEnum(jobInstanceDTO.getJob().getType());
-        FlinkSubmitOptionsBuilder flinkSubmitOptionsBuilder = FlinkSubmitOptionsBuilderFactory.create(jobTypeEnum);
-        FlinkSubmitOptions flinkSubmitOptions = flinkSubmitOptionsBuilder.builder(jobInstanceDTO);
+        JobBuilder jobBuilder = JobBuilderFactory.create(jobTypeEnum);
+        FlinkSubmitOptions flinkSubmitOptions = jobBuilder.buildFlinkSubmitOption(jobInstanceDTO);
         String runCommand = flinkShellCommandBuilder.buildRunCommand(flinkSubmitOptions);
         String command = format("{0} >> {1} 2>&1", runCommand, logFile);
         log.debug("command:{}", command);
