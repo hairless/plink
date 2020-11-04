@@ -1,2 +1,0 @@
-(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d2093fb"],{a7f5:function(n,t,e){"use strict";e.r(t),e.d(t,"getInstPageList",(function(){return o})),e.d(t,"getInstLog",(function(){return r}));var u=e("b775");function o(n){return Object(u["default"])({url:"/mng/jobInstance/queryJobInstances",method:"get",params:n})}function r(n){return Object(u["default"])({url:"/mng/jobInstance/startLog/"+n,method:"get"})}}}]);
-//# sourceMappingURL=chunk-2d2093fb.bed3fb41.js.map

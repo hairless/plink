@@ -14,9 +14,8 @@ const chainWebpack = config => {
 const node_env = process.env.NODE_ENV;
 
 module.exports = {
-  publicPath: node_env === "prod" ? "/" : "/", // 全都用 /
-  outputDir: "dist",
-  assetsDir: "static",
+  publicPath: node_env === "prod" ? "/" : "/",
+  outputDir: "../plink-web/src/main/resources/static",
   devServer: {
     port: port,
     open: true,
