@@ -243,7 +243,6 @@ export default {
         // 获取实例列表中最新的实例，不是最终状态就开启周期刷新，否则关闭
         let lastInst = this.dataList[0];
         if (lastInst) {
-          console.log("inst status: " + lastInst.id);
           // 3:启动失败，4:运行失败，5:已停止，6:运行成功
           if ([3, 4, 5, 6].includes(lastInst.status)) {
             // 关闭刷新

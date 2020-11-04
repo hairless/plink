@@ -3,7 +3,7 @@ import request from "@/utils/request";
 /************** 实例相关 ********************/
 export function getInstPageList(filter) {
   return request({
-    url: "/api/mng/jobInstance/queryJobInstances",
+    url: "/mng/jobInstance/queryJobInstances",
     method: "get",
     params: filter
   });
@@ -11,7 +11,7 @@ export function getInstPageList(filter) {
 
 export function getInstLog(id) {
   return request({
-    url: "/api/mng/jobInstance/startLog/" + id,
+    url: "/mng/jobInstance/startLog/" + id,
     method: "get"
   });
 }

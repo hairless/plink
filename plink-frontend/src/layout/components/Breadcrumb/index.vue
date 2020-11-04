@@ -24,11 +24,15 @@ export default {
   },
   watch: {
     $route: function() {
-      this.matchedRoutes = this.$route.matched;
+      this.matchedRoutes = this.$route.matched.filter(item => {
+        return item.path !== "/page";
+      });
     }
   },
   created() {
-    this.matchedRoutes = this.$route.matched;
+    this.matchedRoutes = this.$route.matched.filter(item => {
+      return item.path !== "/page";
+    });
   }
 };
 </script>

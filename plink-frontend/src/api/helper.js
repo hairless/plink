@@ -3,28 +3,28 @@ import request from "@/utils/request";
 /************** Helper 相关 ********************/
 export function getInstStatusList() {
   return request({
-    url: "/api/mng/enum/jobInstanceStatus",
+    url: "/mng/enum/jobInstanceStatus",
     method: "get"
   });
 }
 
 export function getJobTypeList() {
   return request({
-    url: "/api/mng/enum/jobType",
+    url: "/mng/enum/jobType",
     method: "get"
   });
 }
 
 export function getJobClientVersionList() {
   return request({
-    url: "/api/mng/enum/jobClientVersion",
+    url: "/mng/enum/jobClientVersion",
     method: "get"
   });
 }
 
 export function getDefaultFlinkConfs() {
   return request({
-    url: "/api/mng/util/defaultFlinkConfs",
+    url: "/mng/util/defaultFlinkConfs",
     method: "get"
   });
 }

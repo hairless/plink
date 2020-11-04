@@ -25,7 +25,7 @@ module.exports = {
       errors: true
     },
     proxy: {
-      "/api/user": {
+      "/user": {
         target: process.env.PROXY_USER_API_URL,
         changeOrigin: true,
         pathRewrite: {
@@ -33,11 +33,11 @@ module.exports = {
         }
       },
       /* Job Inst Enum ... */
-      "/api/mng": {
+      "/mng": {
         target: process.env.PROXY_JOB_API_URL,
         changeOrigin: true,
         pathRewrite: {
-          "^/api/mng": "/"
+          "^/mng": "/"
         }
       }
     }

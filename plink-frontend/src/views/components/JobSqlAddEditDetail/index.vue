@@ -226,7 +226,7 @@ export default {
         if (valid) {
           jobApi.addJob(this.data).then(resp => {
             this.$router.push({
-              path: "/job/jobDetail",
+              path: "/page/job/jobDetail",
               query: {
                 jobId: resp.data.id
               }
@@ -272,7 +272,7 @@ export default {
           };
           jobApi.updateJob(data).then(() => {
             this.$router.push({
-              path: "/job/jobDetail",
+              path: "/page/job/jobDetail",
               query: {
                 type: this.data.type,
                 jobId: this.data.id
@@ -290,7 +290,7 @@ export default {
     },
     onEdit() {
       this.$router.push({
-        path: "/job/jobEdit",
+        path: "/page/job/jobEdit",
         query: {
           type: this.data.type,
           jobId: this.data.id
@@ -299,7 +299,7 @@ export default {
     },
     onDetail() {
       this.$router.push({
-        path: "/job/jobDetail",
+        path: "/page/job/jobDetail",
         query: {
           type: this.data.type,
           jobId: this.data.id
@@ -312,7 +312,7 @@ export default {
           title: "删除作业成功！"
         });
         this.$router.push({
-          path: "/job/jobList"
+          path: "/page/job/jobList"
         });
       });
     },
