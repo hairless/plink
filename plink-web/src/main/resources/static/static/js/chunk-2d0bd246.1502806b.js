@@ -1,0 +1,2 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d0bd246"],{"2b77":function(t,e,n){"use strict";n.r(e);var u=function(){var t=this,e=t.$createElement,n=t._self._c||e;return n("div",[(1===t.type||t.type,[t._v(" 等待实现中 。。。 ")])],2)},o=[],r={name:"JobAdd",data:function(){return{type:-1}},methods:{parseRoute:function(){this.type=this.$route.query.type}},created:function(){this.parseRoute()}},s=r,a=n("2877"),c=Object(a["a"])(s,u,o,!1,null,null,null);e["default"]=c.exports}}]);
+//# sourceMappingURL=chunk-2d0bd246.1502806b.js.map
