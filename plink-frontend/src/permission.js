@@ -5,7 +5,7 @@ import { getToken } from "@/utils/auth"; // get token from cookie
 
 import { LoadingBar, Notice } from "view-design";
 
-const whiteList = ["/login", "/auth-redirect"]; // no redirect whitelist
+const whiteList = ["/page/login", "/page/auth-redirect"]; // no redirect whitelist
 
 router.beforeEach(async (to, from, next) => {
   // start progress bar
@@ -17,7 +17,7 @@ router.beforeEach(async (to, from, next) => {
   const hasToken = getToken();
 
   if (hasToken) {
-    if (to.path === "/login") {
+    if (to.path === "/page/login") {
       next({ path: "/" });
       LoadingBar.finish();
     } else {
@@ -49,7 +49,7 @@ router.beforeEach(async (to, from, next) => {
           Notice.error({
             title: error || "Has Error"
           });
-          next(`/login?redirect=${to.path}`);
+          next(`/page/login?redirect=${to.path}`);
           LoadingBar.finish();
         }
       }
@@ -61,7 +61,7 @@ router.beforeEach(async (to, from, next) => {
       next();
     } else {
       // other pages that do not have permission to access are redirected to the login page.
-      next(`/login?redirect=${to.path}`);
+      next(`/page/login?redirect=${to.path}`);
       LoadingBar.finish();
     }
   }
