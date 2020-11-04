@@ -1,12 +1,12 @@
 import request from "@/utils/request";
 
 // 上传 Jar 的 URL
-export const UPLOAD_JAR_URL = "/api/mng/job/{jobId}/uploadJar";
+export const UPLOAD_JAR_URL = "/mng/job/{jobId}/uploadJar";
 
 /************** 作业相关 ********************/
 export function getJobPageList(filter) {
   return request({
-    url: "/api/mng/job/queryJobs",
+    url: "/mng/job/queryJobs",
     method: "get",
     params: filter
   });
@@ -14,7 +14,7 @@ export function getJobPageList(filter) {
 
 /*export function getJobList(filter) {
   return request({
-    url: "/api/mng/job/getJobList",
+    url: "/mng/job/getJobList",
     method: "get",
     params: filter
   });
@@ -22,7 +22,7 @@ export function getJobPageList(filter) {
 
 export function addJob(data) {
   return request({
-    url: "/api/mng/job/addJob",
+    url: "/mng/job/addJob",
     method: "post",
     data: data
   });
@@ -30,14 +30,14 @@ export function addJob(data) {
 
 export function getJob(jobId) {
   return request({
-    url: "/api/mng/job/queryJob/" + jobId,
+    url: "/mng/job/queryJob/" + jobId,
     method: "get"
   });
 }
 
 export function updateJob(data) {
   return request({
-    url: "/api/mng/job/updateJob",
+    url: "/mng/job/updateJob",
     method: "post",
     data: data
   });
@@ -45,14 +45,14 @@ export function updateJob(data) {
 
 export function deleteJob(jobId) {
   return request({
-    url: "/api/mng/job/deleteJob/" + jobId,
+    url: "/mng/job/deleteJob/" + jobId,
     method: "post"
   });
 }
 
 export function deleteJobList(idList) {
   return request({
-    url: "/api/mng/job/deleteJobs",
+    url: "/mng/job/deleteJobs",
     method: "post",
     data: idList
   });
@@ -60,21 +60,21 @@ export function deleteJobList(idList) {
 
 export function getJobJarList(jobId) {
   return request({
-    url: "/api/mng/job/{jobId}/jarList".replace("{jobId}", jobId),
+    url: "/mng/job/{jobId}/jarList".replace("{jobId}", jobId),
     method: "get"
   });
 }
 
 export function startJob(jobId) {
   return request({
-    url: "/api/mng/job/startJob/{jobId}".replace("{jobId}", jobId),
+    url: "/mng/job/startJob/{jobId}".replace("{jobId}", jobId),
     method: "get"
   });
 }
 
 export function startJobList(idList) {
   return request({
-    url: "/api/mng/job/startJobs",
+    url: "/mng/job/startJobs",
     method: "post",
     data: idList
   });
@@ -82,14 +82,14 @@ export function startJobList(idList) {
 
 export function restartJob(jobId) {
   return request({
-    url: "/api/mng/job/reStartJob/{jobId}".replace("{jobId}", jobId),
+    url: "/mng/job/reStartJob/{jobId}".replace("{jobId}", jobId),
     method: "get"
   });
 }
 
 export function restartJobList(idList) {
   return request({
-    url: "/api/mng/job/reStartJobs",
+    url: "/mng/job/reStartJobs",
     method: "post",
     data: idList
   });
@@ -97,14 +97,14 @@ export function restartJobList(idList) {
 
 export function stopJob(jobId) {
   return request({
-    url: "/api/mng/job/stopJob/{jobId}".replace("{jobId}", jobId),
+    url: "/mng/job/stopJob/{jobId}".replace("{jobId}", jobId),
     method: "get"
   });
 }
 
 export function stopJobList(idList) {
   return request({
-    url: "/api/mng/job/stopJobs",
+    url: "/mng/job/stopJobs",
     method: "post",
     data: idList
   });

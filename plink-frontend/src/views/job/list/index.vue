@@ -56,15 +56,15 @@
         }"
       >
         <span slot="name" slot-scope="current, row">
-          <router-link :to="{ path: '/job/jobDetail', query: { jobId: row.id } }">{{ current }}</router-link>
+          <router-link :to="{ path: '/page/job/jobDetail', query: { type: row.type, jobId: row.id } }">{{ current }}</router-link>
         </span>
         <span slot="lastStatusDesc" slot-scope="current, row">
           <span :style="{ color: [3, 4, -1].includes(row.lastStatus) ? 'red' : 'green' }">{{ current }}</span>
         </span>
         <span slot="action" slot-scope="row">
-          <router-link :to="{ name: 'JobDetail', query: { jobId: row.id } }">详情</router-link>
+          <router-link :to="{ path: '/page/job/JobDetail', query: { type: row.type, jobId: row.id } }">详情</router-link>
           <a-divider type="vertical" />
-          <router-link :to="{ name: 'JobEdit', query: { jobId: row.id } }" @click="onEdit(row)">编辑</router-link>
+          <router-link :to="{ path: '/page/job/JobEdit', query: { type: row.type, jobId: row.id } }" @click="onEdit(row)">编辑</router-link>
         </span>
       </a-table>
     </div>
@@ -108,8 +108,8 @@
             <a-input v-model="jobAddModal.data.name" />
           </a-form-model-item>
           <a-form-model-item label="作业类型" prop="type">
-            <a-select :default-value="jobAddModal.data.type" placeholder="请选择角色">
-              <a-select-option v-for="(item, index) in helper.jobTypeList" :key="index" :value="item.value">
+            <a-select v-model="jobAddModal.data.type">
+              <a-select-option v-for="(item, index) in helper.jobTypeList" :key="index" :value="item.value" :disabled="!item.enable">
                 {{ item.desc }}
               </a-select-option>
             </a-select>
@@ -238,8 +238,9 @@ export default {
         if (valid) {
           jobApi.addJob(this.jobAddModal.data).then(resp => {
             this.$router.push({
-              path: "/job/jobEdit",
+              path: "/page/job/jobEdit",
               query: {
+                type: resp.data.type,
                 jobId: resp.data.id
               }
             });
@@ -255,7 +256,7 @@ export default {
     },
     onEdit(row) {
       this.$router.push({
-        path: "/job/jobEdit",
+        path: "/page/job/jobEdit",
         query: {
           jobId: row.id
         }

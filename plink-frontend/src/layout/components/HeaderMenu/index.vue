@@ -19,7 +19,14 @@ export default {
   methods: {
     transformRouteList() {
       let routeList = this.$store.getters.routeList;
+      let pageRouteList = null;
       routeList = utils.deepCopy(routeList);
+      routeList.forEach(item => {
+        if (item.path === "/page") {
+          pageRouteList = item.children;
+        }
+      });
+      routeList = pageRouteList;
       if (routeList && routeList.length > 0) {
         this.routeHeaderList = routeList.filter(route => {
           route["children"] = null;
