@@ -13,10 +13,10 @@ export const constantRoutes = [
   {
     path: "/",
     name: "Home",
-    redirect: "/user/profile"
+    redirect: "/page/job/jobList"
   },
   {
-    path: "/about",
+    path: "/page/about",
     name: "About",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
@@ -24,7 +24,7 @@ export const constantRoutes = [
     component: () => import(/* webpackChunkName: "about" */ "../views/About.vue")
   },
   {
-    path: "/login",
+    path: "/page/login",
     name: "Login",
     component: () => import("@/views/user/login/"),
     meta: {
@@ -36,7 +36,7 @@ export const constantRoutes = [
   },
   /* 用户 */
   {
-    path: "/user",
+    path: "/page/user",
     name: "User",
     redirect: "/user/profile",
     component: BasicLayout,

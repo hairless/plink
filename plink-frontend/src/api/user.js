@@ -70,140 +70,162 @@ export function getUserRouteList() {
         {
           id: 1,
           moduleId: 1,
-          moduleName: "作业管理",
+          moduleName: "辅助路由",
           parentId: -1,
-          name: "Job",
-          path: "/job",
-          component: "layout/BasicLayout.vue",
+          name: "Page",
+          path: "/page",
+          component: "layout/BlankLayout.vue",
           meta: {
-            showOnTop: 1,
+            showOnTop: 0,
             showOnLeft: 0,
             icon: "project",
-            title: "作业管理",
-            url: "/job"
+            title: "辅助路由",
+            url: "/page"
           },
           level: 1,
           sequence: -1,
           remark: "",
-          redirect: "/job/jobList",
+          redirect: "/page/job/jobList",
           children: [
             {
-              id: 111,
-              moduleId: 1,
-              moduleName: "作业管理",
-              parentId: 1,
-              name: "JobList",
-              path: "jobList",
-              component: "views/job/list/index.vue",
-              meta: {
-                showOnTop: 0,
-                showOnLeft: 1,
-                icon: "project",
-                title: "作业列表",
-                url: "/job/jobList"
-              },
-              level: 1,
-              sequence: -1,
-              remark: ""
-            },
-            {
-              id: 112,
-              moduleId: 1,
-              moduleName: "作业管理",
-              parentId: 1,
-              name: "JobAdd",
-              path: "jobAdd",
-              component: "views/job/add/index.vue",
-              meta: {
-                showOnTop: 0,
-                showOnLeft: 0,
-                icon: "project",
-                title: "作业添加",
-                url: "/job/jobAdd"
-              },
-              level: 1,
-              sequence: -1,
-              remark: ""
-            },
-            {
-              id: 113,
+              id: 1,
               moduleId: 1,
               moduleName: "作业管理",
               parentId: -1,
-              name: "JobEdit",
-              path: "jobEdit",
-              component: "views/job/edit/index.vue",
+              name: "Job",
+              path: "job",
+              component: "layout/BasicLayout.vue",
               meta: {
-                showOnTop: 0,
+                showOnTop: 1,
                 showOnLeft: 0,
                 icon: "project",
-                title: "作业编辑",
-                url: "/job/jobEdit"
+                title: "作业管理",
+                url: "/page/job"
               },
               level: 1,
               sequence: -1,
-              remark: ""
-            },
-            {
-              id: 114,
-              moduleId: 1,
-              moduleName: "作业管理",
-              parentId: -1,
-              name: "JobDetail",
-              path: "jobDetail",
-              component: "views/job/detail/index.vue",
-              meta: {
-                showOnTop: 0,
-                showOnLeft: 0,
-                icon: "project",
-                title: "作业详情",
-                url: "/job/jobDetail"
-              },
-              level: 1,
-              sequence: -1,
-              remark: ""
-            },
-            {
-              id: 121,
-              moduleId: 1,
-              moduleName: "作业管理",
-              parentId: 1,
-              name: "InstList",
-              path: "instList",
-              component: "views/inst/list/index.vue",
-              meta: {
-                showOnTop: 0,
-                showOnLeft: 1,
-                icon: "project",
-                title: "实例列表",
-                url: "/job/instList"
-              },
-              level: 1,
-              sequence: -1,
-              remark: ""
-            },
-            {
-              id: 122,
-              moduleId: 1,
-              moduleName: "作业管理",
-              parentId: -1,
-              name: "InstDetail",
-              path: "InstDetail",
-              component: "layout/BlankLayout.vue",
-              meta: {
-                showOnTop: 0,
-                showOnLeft: 0,
-                icon: "project",
-                title: "实例详情",
-                url: "/job/instList"
-              },
-              level: 1,
-              sequence: -1,
-              remark: ""
+              remark: "",
+              redirect: "/page/job/jobList",
+              children: [
+                {
+                  id: 111,
+                  moduleId: 1,
+                  moduleName: "作业管理",
+                  parentId: 1,
+                  name: "JobList",
+                  path: "jobList",
+                  component: "views/job/list/index.vue",
+                  meta: {
+                    showOnTop: 0,
+                    showOnLeft: 1,
+                    icon: "project",
+                    title: "作业列表",
+                    url: "/page/job/jobList"
+                  },
+                  level: 1,
+                  sequence: -1,
+                  remark: ""
+                },
+                {
+                  id: 112,
+                  moduleId: 1,
+                  moduleName: "作业管理",
+                  parentId: 1,
+                  name: "JobAdd",
+                  path: "jobAdd",
+                  component: "views/job/add/index.vue",
+                  meta: {
+                    showOnTop: 0,
+                    showOnLeft: 0,
+                    icon: "project",
+                    title: "作业添加",
+                    url: "/page/job/jobAdd"
+                  },
+                  level: 1,
+                  sequence: -1,
+                  remark: ""
+                },
+                {
+                  id: 113,
+                  moduleId: 1,
+                  moduleName: "作业管理",
+                  parentId: -1,
+                  name: "JobEdit",
+                  path: "jobEdit",
+                  component: "views/job/edit/index.vue",
+                  meta: {
+                    showOnTop: 0,
+                    showOnLeft: 0,
+                    icon: "project",
+                    title: "作业编辑",
+                    url: "/page/job/jobEdit"
+                  },
+                  level: 1,
+                  sequence: -1,
+                  remark: ""
+                },
+                {
+                  id: 114,
+                  moduleId: 1,
+                  moduleName: "作业管理",
+                  parentId: -1,
+                  name: "JobDetail",
+                  path: "jobDetail",
+                  component: "views/job/detail/index.vue",
+                  meta: {
+                    showOnTop: 0,
+                    showOnLeft: 0,
+                    icon: "project",
+                    title: "作业详情",
+                    url: "/page/job/jobDetail"
+                  },
+                  level: 1,
+                  sequence: -1,
+                  remark: ""
+                },
+                {
+                  id: 121,
+                  moduleId: 1,
+                  moduleName: "作业管理",
+                  parentId: 1,
+                  name: "InstList",
+                  path: "instList",
+                  component: "views/inst/list/index.vue",
+                  meta: {
+                    showOnTop: 0,
+                    showOnLeft: 1,
+                    icon: "project",
+                    title: "实例列表",
+                    url: "/page/job/instList"
+                  },
+                  level: 1,
+                  sequence: -1,
+                  remark: ""
+                },
+                {
+                  id: 122,
+                  moduleId: 1,
+                  moduleName: "作业管理",
+                  parentId: -1,
+                  name: "InstDetail",
+                  path: "InstDetail",
+                  component: "layout/BlankLayout.vue",
+                  meta: {
+                    showOnTop: 0,
+                    showOnLeft: 0,
+                    icon: "project",
+                    title: "实例详情",
+                    url: "/page/job/instList"
+                  },
+                  level: 1,
+                  sequence: -1,
+                  remark: ""
+                }
+              ]
             }
           ]
         },
-        {
+        /*{
           id: 2,
           moduleId: 1,
           moduleName: "Flink SQL",
@@ -222,26 +244,26 @@ export function getUserRouteList() {
           sequence: -1,
           remark: "",
           redirect: "/job/jobList"
-        },
+        },*/
         {
           id: 3,
           moduleId: 1,
           moduleName: "用户管理",
           parentId: -1,
           name: "User",
-          path: "/user",
+          path: "user",
           component: "layout/BlankLayout.vue",
           meta: {
             showOnTop: 1,
             showOnLeft: 1,
             icon: "project",
             title: "用户管理",
-            url: "/user"
+            url: "/page/user"
           },
           level: 1,
           sequence: -1,
           remark: "",
-          redirect: "/user/userList"
+          redirect: "/page/user/userList"
         }
       ]
     });

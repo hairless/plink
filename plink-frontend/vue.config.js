@@ -14,9 +14,8 @@ const chainWebpack = config => {
 const node_env = process.env.NODE_ENV;
 
 module.exports = {
-  publicPath: node_env === "prod" ? "/" : "/", // 全都用 /
-  outputDir: "dist",
-  assetsDir: "static",
+  publicPath: node_env === "prod" ? "/" : "/",
+  outputDir: "../plink-web/src/main/resources/static",
   devServer: {
     port: port,
     open: true,
@@ -25,7 +24,7 @@ module.exports = {
       errors: true
     },
     proxy: {
-      "/api/user": {
+      "/user": {
         target: process.env.PROXY_USER_API_URL,
         changeOrigin: true,
         pathRewrite: {
@@ -33,11 +32,11 @@ module.exports = {
         }
       },
       /* Job Inst Enum ... */
-      "/api/mng": {
+      "/mng": {
         target: process.env.PROXY_JOB_API_URL,
         changeOrigin: true,
         pathRewrite: {
-          "^/api/mng": "/"
+          "^/mng": "/"
         }
       }
     }

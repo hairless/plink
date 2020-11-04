@@ -30,6 +30,7 @@ hs_err_pid*
 *.ipr
 /upload*
 
+# NPM
+package-lock.json
 
-plink-frontend-bak
 /module/

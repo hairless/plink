@@ -3,7 +3,7 @@
     <!-- Data Filter -->
     <div style="margin-bottom: 10px; padding: 5px; background-image: linear-gradient(100deg, rgba(60, 213, 255, 0.5), rgba(60, 213, 255, 0.3));">
       <a-row :gutter="16">
-        <a-col class="gutter-row" :span="20" style="padding-left: 20px">
+        <a-col class="gutter-row" :span="14" style="padding-left: 20px">
           <div class="gutter-box">
             <span
               >ID :
@@ -31,8 +31,11 @@
             </span>
           </div>
         </a-col>
-        <a-col class="gutter-row" :span="4" align="right">
+        <a-col class="gutter-row" :span="10" align="right">
           <div class="gutter-box">
+            <a-tooltip title="周期刷新">
+              <a-switch checked-children="开" un-checked-children="关" v-model="helper.isAutoFlush" @change="handleDataListFlush" />
+            </a-tooltip>
             <a-button type="primary" size="small" class="filter-tool" @click="onQuery">查询</a-button>
             <a-button type="primary" size="small" class="filter-tool" @click="onGoBack">返回</a-button>
           </div>
@@ -56,7 +59,9 @@
           <span :style="{ color: [3, 4, -1].includes(row.status) ? 'red' : 'green' }">{{ current }}</span>
         </span>
         <span slot="action" slot-scope="row">
-          <router-link :to="{ name: 'InstDetail', query: { jobId: row.id } }">详情</router-link>
+          <a @click="onLog(row)">日志</a>
+          <a-divider type="vertical" />
+          <router-link :to="{ path: 'inst/instDetail', query: { instId: row.id } }" disabled>详情</router-link>
         </span>
       </a-table>
     </div>
@@ -69,7 +74,7 @@
           <a-col class="gutter-row" :span="12">
             <div class="gutter-box">
               <span style="font-size: 16px">周期刷新 : </span>
-              <a-switch checked-children="开" un-checked-children="关" v-model="helper.isAutoFlush" @change="handleFlush" />
+              <a-switch checked-children="开" un-checked-children="关" v-model="helper.isAutoFlush" @change="handleDataListFlush" />
             </div>
           </a-col>
           <a-col class="gutter-row" :span="12" align="right">
@@ -89,13 +94,23 @@
         </a-row>
       </row>
     </div>
+
+    <!-- 实例日志的对话框 -->
+    <a-modal v-model="instLog.isVisible" title="实例日志" @ok="handleInstLogModalOk" @cancel="handleInstLogModalCancel" :width="helper.clientWidth * 0.8">
+      <!--      <a-textarea v-model="instLog.data" autoSize="auto" />-->
+      <SqlCMEditor v-model="instLog.data" :read-only="true" :auto-scroll-to-bottom-on-changes="true" />
+    </a-modal>
   </div>
 </template>
 <script>
 import * as instApi from "@/api/inst";
 import * as helperApi from "@/api/helper";
 import * as utils from "@/utils/utils";
+import SqlCMEditor from "@/components/SqlCMEditor";
 export default {
+  components: {
+    SqlCMEditor
+  },
   name: "InstList",
   props: {
     jobId: {
@@ -161,18 +176,24 @@ export default {
           align: "center",
           fixed: "right",
           scopedSlots: { customRender: "statusDesc" }
-        } /*,
+        },
         {
           title: "操作",
           width: 130,
           align: "center",
           fixed: "right",
           scopedSlots: { customRender: "action" }
-        }*/
+        }
       ],
       dataList: [],
       dataTableSelectedRowKeys: [],
       isLoading: false,
+
+      instLog: {
+        isVisible: false,
+        data: "",
+        timer: null
+      },
 
       // Bottom Tool
       page: {
@@ -184,7 +205,8 @@ export default {
       helper: {
         jobTypeList: [],
         instStatusList: [],
-        isAutoFlush: this.isAutoFlush
+        isAutoFlush: this.isAutoFlush,
+        clientWidth: document.documentElement.clientWidth
       }
     };
   },
@@ -217,10 +239,31 @@ export default {
         this.isLoading = false;
         this.dataList = resp.data.list;
         this.page.total = resp.data.total;
+
+        // 获取实例列表中最新的实例，不是最终状态就开启周期刷新，否则关闭
+        let lastInst = this.dataList[0];
+        if (lastInst) {
+          // 3:启动失败，4:运行失败，5:已停止，6:运行成功
+          if ([3, 4, 5, 6].includes(lastInst.status)) {
+            // 关闭刷新
+            this.handleDataListFlush(false);
+          } else {
+            // 开启刷新
+            this.helper.isAutoFlush = true;
+            this.handleDataListFlush(true);
+          }
+        }
       });
     },
+    handleInstLogModalOk() {
+      this.instLog.isVisible = false;
+      this.clearInstLogTimer();
+    },
+    handleInstLogModalCancel() {
+      this.clearInstLogTimer();
+    },
     /* 定时器自动刷新 */
-    handleFlush(checked) {
+    handleDataListFlush(checked) {
       if (checked) {
         if (!this.dataListTimer) {
           this.dataListTimer = this.getDataListTimer();
@@ -239,6 +282,29 @@ export default {
       this.dataListTimer = null;
       this.helper.isAutoFlush = false;
     },
+    handleInstLogFlush(checked, row) {
+      if (checked) {
+        if (!this.instLog.timer) {
+          this.instLog.timer = this.getInstLogTimer(row);
+        }
+      } else {
+        this.clearInstLogTimer();
+      }
+    },
+    getInstLogTimer(row) {
+      return setInterval(() => {
+        this.getInstLog(row);
+      }, 1000);
+    },
+    clearInstLogTimer() {
+      clearInterval(this.instLog.timer);
+      this.instLog.timer = null;
+    },
+    getInstLog(row) {
+      instApi.getInstLog(row.id).then(resp => {
+        this.instLog.data = resp.data;
+      });
+    },
     /* Helper */
     initHelper() {
       helperApi.getJobTypeList().then(resp => {
@@ -248,19 +314,21 @@ export default {
         this.helper.instStatusList = resp.data;
       });
     },
-    initTimer() {
-      if (this.helper.isAutoFlush) {
-        this.handleFlush(true);
-      }
+    onLog(row) {
+      this.instLog.data = "";
+      this.instLog.isVisible = true;
+
+      // 周期刷新
+      this.handleInstLogFlush(true, row);
     }
   },
   beforeDestroy() {
     this.clearDataListTimer();
+    this.clearInstLogTimer();
   },
   created() {
     this.initHelper();
     this.getDataList();
-    this.initTimer();
   }
 };
 </script>
