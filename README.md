@@ -29,9 +29,8 @@ Platform for [Apache Flink](https://flink.apache.org)
 
 ## 项目部署
 1. [部署文档](docs/deploy-standalone.md)  
-    1.1. [在 Windows 上部署 Plink](docs/deploy-standalone-on-windows.md)  
-    1.2. [在 Linux 上部署 Plink](docs/deploy-standalone-on-linux.md)  
-    1.3. [使用 Docker 部署 Plink](docs/deploy-standalone-on-docker.md)
+    1.1. [在 Linux 上部署 Plink](docs/deploy-standalone-on-linux.md)  
+    1.2. [使用 Docker 部署 Plink](docs/deploy-standalone-on-docker.md)
 
 ## 使用手册
 1. [使用手册](docs/manual/manual-home.md)  
@@ -40,9 +39,8 @@ Platform for [Apache Flink](https://flink.apache.org)
 ## 项目文档
 1. [Plink 技术栈](docs/technicalNote.md)
 2. [部署文档](docs/deploy-standalone.md)  
-    2.1. [在 Windows 上部署 Plink](docs/deploy-standalone-on-windows.md)  
-    2.2. [在 Linux 上部署 Plink](docs/deploy-standalone-on-linux.md)  
-    2.3. [使用 Docker 部署 Plink](docs/deploy-standalone-on-docker.md)
+    2.1. [在 Linux 上部署 Plink](docs/deploy-standalone-on-linux.md)  
+    2.2. [使用 Docker 部署 Plink](docs/deploy-standalone-on-docker.md)
 3. [使用手册](docs/manual/manual-home.md)  
     3.1. [运行 Word Count 作业](docs/manual/manual-run-word-count.md)
 
