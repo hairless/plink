@@ -1,6 +1,7 @@
 package com.github.hairless.plink.common.builder;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.hairless.plink.common.conf.FlinkAutoConfig;
 import com.github.hairless.plink.common.util.JsonUtil;
 import com.github.hairless.plink.common.util.PlinkSqlUtil;
 import com.github.hairless.plink.common.util.PlinkUtil;
@@ -15,6 +16,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.flink.util.Preconditions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,8 +54,9 @@ public class SqlJobBuilder implements JobBuilder {
         args.add("\"-c\"");
         args.add('"' + StringEscapeUtils.escapeJava(JsonUtil.toJSONString(sqlConfig)) + '"');
         flinkConfig.setArgs(String.join(" ", args));
-        Map<String, String> configs = flinkConfig.getConfigs();
-        configs.forEach((k, v) -> {
+        Map<String, String> defaultConfs = FlinkAutoConfig.defaultConfs;
+        Map<String, String> configs = flinkConfig.getConfigs() == null ? new HashMap<>() : flinkConfig.getConfigs();
+        defaultConfs.forEach((k, v) -> {
             if (!configs.containsKey(k)) {
                 configs.put(k, v);
             }
