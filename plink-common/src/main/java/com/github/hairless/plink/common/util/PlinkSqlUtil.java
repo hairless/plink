@@ -27,7 +27,6 @@ public class PlinkSqlUtil {
     public static final String PLINK_SQL_PARSER_CLASS_NAME = "com.github.hairless.plink.sql.util.PlinkSqlParser";
 
     public static final String SQL_JAR_FILE = "/module/sql/plink-sql.jar";
-    public static final String SQL_SHAPE_DIR_PATH = "/module/sql/shape/";
 
     private static volatile ClassLoader sqlBaseClassLoader;
 
@@ -42,19 +41,6 @@ public class PlinkSqlUtil {
                         ",you can try 'mvn package' in plink-sql module");
             }
             sqlClassPathUrlList.add(sqlCoreJarFile.toURI().toURL());
-
-            //plink sql shape jars
-            File sqlShapeDir = new File(plinkHome + SQL_SHAPE_DIR_PATH);
-            if (!sqlShapeDir.exists()) {
-                throw new PlinkRuntimeException("sql shape dir not exist,path=" + sqlShapeDir.getAbsolutePath() +
-                        ",you can try 'mvn package' in plink-sql module");
-            }
-            File[] sqlShapeJars = sqlShapeDir.listFiles();
-            if (sqlShapeJars != null) {
-                for (File sqlShapeJar : sqlShapeJars) {
-                    sqlClassPathUrlList.add(sqlShapeJar.toURI().toURL());
-                }
-            }
 
             //flink dependency jars
             File libDir = new File(FlinkConfigUtil.getFlinkHome() + FlinkConfigUtil.LIB_SUFFIX);

@@ -33,14 +33,8 @@
 
         <!-- config -->
         <fileSet>
-            <directory>../plink-web/target/classes</directory>
+            <directory>../config</directory>
             <outputDirectory>/config</outputDirectory>
-            <fileMode>0755</fileMode>
-            <includes>
-                <include>application.yml</include>
-                <include>application-local.yml</include>
-                <include>application-test.yml</include>
-            </includes>
         </fileSet>
 
         <!-- module -->
