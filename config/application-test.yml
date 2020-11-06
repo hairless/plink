@@ -3,7 +3,7 @@ server:
 
 logging:
   dir: log
-  config: classpath:config/logback.xml
+  config: config/logback.xml
   instance:
     dir: log/intance_log
     pattern: /job_id_%s/instance_id_%s.log
