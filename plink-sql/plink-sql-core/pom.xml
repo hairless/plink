@@ -92,7 +92,6 @@
                         </goals>
                         <configuration>
                             <finalName>${sql.jar.name}</finalName>
-                            <minimizeJar>true</minimizeJar>
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
@@ -101,6 +100,8 @@
                                         <program-class>com.github.hairless.plink.sql.SqlJobDriver</program-class>
                                     </manifestEntries>
                                 </transformer>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
                         </configuration>
                     </execution>
@@ -116,12 +117,11 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy todir="../../module/sql" overwrite="true" >
+                                <copy todir="../../module/sql" overwrite="true">
                                     <fileset dir="${project.build.directory}" erroronmissingdir="false">
                                         <include name="${sql.jar.name}.jar"/>
                                     </fileset>
                                 </copy>
-
                             </tasks>
                         </configuration>
                     </execution>
