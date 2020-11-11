@@ -54,8 +54,7 @@ public class FlinkShellSubmitAssist {
 
     public static int syncExecShellCommand(String command) throws IOException, InterruptedException {
         ProcessBuilder processBuilder = new ProcessBuilder();
-        String replaceCommand = command.replace("`", "\\`");
-        processBuilder.command("/bin/sh", "-c", replaceCommand);
+        processBuilder.command("/bin/sh", "-c", command);
         Process process = processBuilder.start();
         return process.waitFor();
     }
