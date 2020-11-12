@@ -5,7 +5,7 @@ logging:
   dir: log
   config: config/logback.xml
   instance:
-    dir: log/intance_log
+    dir: log/instance_log
     pattern: /job_id_%s/instance_id_%s.log
 
 spring:
