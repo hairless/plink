@@ -32,7 +32,7 @@ public class YarnCommandBuilder implements FlinkShellCommandBuilder {
     private static final String taskManagerMemory = "-ytm {0} ";
     private static final String taskManagerSlots = "-ys {0} ";
     private static final String parallelism = "-p {0} ";
-    private static final String confItem = "-yd {0} ";
+    private static final String confItem = "-yD \"{0}\" ";
     private static final String yarnShip = "-yt {0} ";
     private static final String mainClass = "-c {0} ";
     private static final String mainJarPath = "{0} ";
