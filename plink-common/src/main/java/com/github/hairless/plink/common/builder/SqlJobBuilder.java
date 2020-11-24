@@ -49,11 +49,11 @@ public class SqlJobBuilder implements JobBuilder {
         flinkConfig.setMainClass(PlinkSqlUtil.PLINK_SQL_JOB_DRIVER_CLASS_NAME);
         SqlConfig sqlConfig = new SqlConfig();
         sqlConfig.setJobName(jobName);
-        sqlConfig.setSql(jobInstanceDTO.getExtraConfig().get("sql").textValue().replace("`", "\\`"));
+        sqlConfig.setSql(jobInstanceDTO.getExtraConfig().get("sql").textValue());
         List<String> args = new ArrayList<>();
         args.add("\"-c\"");
         args.add('"' + StringEscapeUtils.escapeJava(JsonUtil.toJSONString(sqlConfig)) + '"');
-        flinkConfig.setArgs(String.join(" ", args));
+        flinkConfig.setArgs(String.join(" ", args).replace("`", "\\`"));
         Map<String, String> defaultConfs = FlinkAutoConfig.defaultConfs;
         Map<String, String> configs = flinkConfig.getConfigs() == null ? new HashMap<>() : flinkConfig.getConfigs();
         defaultConfs.forEach((k, v) -> {
