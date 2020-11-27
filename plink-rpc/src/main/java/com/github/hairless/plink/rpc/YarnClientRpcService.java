@@ -11,4 +11,6 @@ public interface YarnClientRpcService {
     void killApplication(String appId) throws PlinkException;
 
     YarnApplicationState getYarnApplicationState(String appId) throws PlinkException;
+
+    String getResourceManagerAddress() throws PlinkException;
 }

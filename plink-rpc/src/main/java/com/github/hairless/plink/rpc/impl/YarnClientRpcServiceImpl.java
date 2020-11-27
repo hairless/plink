@@ -13,6 +13,7 @@ import org.apache.hadoop.yarn.api.records.ApplicationReport;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.apache.hadoop.yarn.client.api.YarnClient;
 import org.apache.hadoop.yarn.util.ConverterUtils;
+import org.apache.hadoop.yarn.webapp.util.WebAppUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,8 @@ public class YarnClientRpcServiceImpl implements YarnClientRpcService {
 
     private YarnClient reusableYarnClient;
 
+    private String resourceManagerAddressCache;
+
     @Override
     public void killApplication(String appId) throws PlinkException {
         try {
@@ -45,6 +48,14 @@ public class YarnClientRpcServiceImpl implements YarnClientRpcService {
     @Override
     public YarnApplicationState getYarnApplicationState(String appId) throws PlinkException {
         return getYarnApplicationState(HadoopConfigUtil.getHadoopHome(), appId);
+    }
+
+    @Override
+    public String getResourceManagerAddress() throws PlinkException {
+        if (resourceManagerAddressCache == null) {
+            resourceManagerAddressCache = WebAppUtils.getResolvedRemoteRMWebAppURLWithScheme(HadoopConfigUtil.getConfiguration());
+        }
+        return resourceManagerAddressCache;
     }
 
     public YarnApplicationState getYarnApplicationState(String hadoopHome, String appId) {
