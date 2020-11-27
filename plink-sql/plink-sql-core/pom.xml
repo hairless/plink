@@ -13,13 +13,7 @@
     <artifactId>plink-sql-core</artifactId>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
         <sql.jar.name>plink-sql</sql.jar.name>
-        <java.version>1.8</java.version>
-        <scala.binary.version>2.11</scala.binary.version>
-        <flink.version>1.11.1</flink.version>
     </properties>
 
     <dependencies>
@@ -38,14 +32,10 @@
 
         <!--内置的flink connector-->
         <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-jdbc_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
+            <groupId>com.github.hairless</groupId>
+            <artifactId>plink-sql-connectors</artifactId>
+            <type>pom</type>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
