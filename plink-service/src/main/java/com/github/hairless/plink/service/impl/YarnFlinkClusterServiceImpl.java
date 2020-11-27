@@ -2,14 +2,12 @@ package com.github.hairless.plink.service.impl;
 
 import com.github.hairless.plink.common.assist.FlinkShellSubmitAssist;
 import com.github.hairless.plink.common.builder.YarnCommandBuilder;
-import com.github.hairless.plink.common.util.HadoopConfigUtil;
 import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.rpc.YarnClientRpcService;
 import com.github.hairless.plink.service.FlinkClusterService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
-import org.apache.hadoop.yarn.webapp.util.WebAppUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,7 +66,7 @@ public class YarnFlinkClusterServiceImpl implements FlinkClusterService {
         if (StringUtils.isBlank(jobInstanceDTO.getAppId())) {
             return null;
         }
-        String resourceManagerAddress = WebAppUtils.getResolvedRemoteRMWebAppURLWithScheme(HadoopConfigUtil.getConfiguration());
+        String resourceManagerAddress = yarnClientRpcService.getResourceManagerAddress();
         JobInstanceStatusEnum jobInstanceStatusEnum = JobInstanceStatusEnum.getEnum(jobInstanceDTO.getStatus());
         switch (jobInstanceStatusEnum) {
             case RUNNING:
