@@ -19,10 +19,7 @@ import org.apache.flink.table.api.internal.TableEnvironmentImpl;
 import org.apache.flink.table.operations.CatalogSinkModifyOperation;
 import org.apache.flink.table.operations.ddl.CreateViewOperation;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -149,9 +146,19 @@ public class PlinkSqlParser {
                 node.setCalciteSqlNode(sqlNode);
                 node.setComment(viewName);
                 nodeMap.put(node.getName(), node);
-                List<String> selectTableList = lookupSelectTable(sqlCreateView.getQuery());
-                List<SqlParseLink> viewLinkList = selectTable2Link(selectTableList, viewName);
+
+                //获取上游查询的表组织成关系
+                Map<String, Set<SqlParseNodeActionEnum>> selectTableMap = lookupSelectTable(sqlCreateView.getQuery());
+                List<SqlParseLink> viewLinkList = selectTable2Link(selectTableMap.keySet(), viewName);
                 linkList.addAll(viewLinkList);
+
+                //设置tableNode的action
+                selectTableMap.forEach((tableName, actionSet) -> {
+                    SqlParseNode sourNode = nodeMap.get(tableName);
+                    if (SqlParseNodeTypeEnum.TABLE.equals(sourNode.getType())) {
+                        sourNode.getActions().addAll(actionSet);
+                    }
+                });
             } else if (sqlNode instanceof SqlInsert) {
                 SqlInsert sqlInsert = (SqlInsert) sqlNode;
                 String sinkTableName = sqlInsert.getTargetTable().toString();
@@ -177,10 +184,22 @@ public class PlinkSqlParser {
                 node.setColumnList(sqlParseColumnList);
                 node.setCalciteSqlNode(sqlNode);
                 nodeMap.put(node.getName(), node);
-                List<String> selectTableList = lookupSelectTable(sqlInsert.getSource());
-                List<SqlParseLink> sinkLinkList = selectTable2Link(selectTableList, insertName);
+
+                //获取上游查询的表组织成关系
+                Map<String, Set<SqlParseNodeActionEnum>> selectTableMap = lookupSelectTable(sqlInsert.getSource());
+                List<SqlParseLink> sinkLinkList = selectTable2Link(selectTableMap.keySet(), insertName);
                 linkList.addAll(sinkLinkList);
                 linkList.add(new SqlParseLink(insertName, sinkTableName));
+
+                //设置tableNode的action
+                selectTableMap.forEach((tableName, actionSet) -> {
+                    SqlParseNode sourceNode = nodeMap.get(tableName);
+                    if (SqlParseNodeTypeEnum.TABLE.equals(sourceNode.getType())) {
+                        sourceNode.getActions().addAll(actionSet);
+                    }
+                });
+                SqlParseNode sinkNode = nodeMap.get(sinkTableName);
+                sinkNode.getActions().add(SqlParseNodeActionEnum.SINK);
             } else if (sqlNode instanceof SqlSetOption) {
                 String name = ((SqlSetOption) sqlNode).getName().getSimple();
                 String value = ((SqlSetOption) sqlNode).getValue().toString();
@@ -191,22 +210,12 @@ public class PlinkSqlParser {
             }
             tEnv.sqlUpdate(splitSql);
         }
-        linkList.forEach(link -> {
-            SqlParseNode sourNode = nodeMap.get(link.getSourceName());
-            if (SqlParseNodeTypeEnum.TABLE.equals(sourNode.getType())) {
-                sourNode.getActions().add(SqlParseNodeActionEnum.SOURCE);
-            }
-            SqlParseNode targetNode = nodeMap.get(link.getTargetName());
-            if (SqlParseNodeTypeEnum.TABLE.equals(targetNode.getType())) {
-                targetNode.getActions().add(SqlParseNodeActionEnum.SINK);
-            }
-        });
         //校验
         tEnv.explain(true);
         return new PlinkSqlParser(nodeMap, linkList);
     }
 
-    private static List<SqlParseLink> selectTable2Link(List<String> selectTableList, String target) {
+    private static List<SqlParseLink> selectTable2Link(Set<String> selectTableList, String target) {
         return selectTableList.stream().map(selectTable -> {
             SqlParseLink link = new SqlParseLink();
             link.setSourceName(selectTable);
@@ -215,32 +224,47 @@ public class PlinkSqlParser {
         }).collect(Collectors.toList());
     }
 
-    private static List<String> lookupSelectTable(SqlNode sqlNode) {
-        List<String> list = new ArrayList<>();
+    private static Map<String, Set<SqlParseNodeActionEnum>> lookupSelectTable(SqlNode sqlNode, SqlParseNodeActionEnum action, Map<String, Set<SqlParseNodeActionEnum>> tableMap) {
         if (sqlNode instanceof SqlSelect) {
             SqlNode from = ((SqlSelect) sqlNode).getFrom();
-            list.addAll(lookupSelectTable(from));
+            lookupSelectTable(from, action, tableMap);
         } else if (sqlNode instanceof SqlJoin) {
             SqlJoin sqlJoin = (SqlJoin) sqlNode;
-            list.addAll(lookupSelectTable(sqlJoin.getLeft()));
-            list.addAll(lookupSelectTable(sqlJoin.getRight()));
+            lookupSelectTable(sqlJoin.getLeft(), action, tableMap);
+            lookupSelectTable(sqlJoin.getRight(), action, tableMap);
+        } else if (sqlNode instanceof SqlSnapshot) {
+            SqlSnapshot sqlSnapshot = (SqlSnapshot) sqlNode;
+            lookupSelectTable(sqlSnapshot.getTableRef(), SqlParseNodeActionEnum.DIM, tableMap);
         } else if (sqlNode instanceof SqlBasicCall) {
             SqlBasicCall sqlBasicCall = (SqlBasicCall) sqlNode;
             SqlOperator operator = sqlBasicCall.getOperator();
             if (SqlKind.AS.equals(operator.getKind())) {
-                list.addAll(lookupSelectTable(sqlBasicCall.getOperands()[0]));
+                lookupSelectTable(sqlBasicCall.getOperands()[0], action, tableMap);
             } else if (SqlKind.UNION.equals(operator.getKind())) {
                 for (SqlNode operandSqlNode : sqlBasicCall.getOperands()) {
-                    list.addAll(lookupSelectTable(operandSqlNode));
+                    lookupSelectTable(operandSqlNode, action, tableMap);
                 }
             } else {
                 throw new RuntimeException("operator " + operator.getKind() + " not support");
             }
         } else if (sqlNode instanceof SqlIdentifier) {
-            list.add(((SqlIdentifier) sqlNode).getSimple());
+            String tableName = ((SqlIdentifier) sqlNode).getSimple();
+            if (tableMap.containsKey(tableName)) {
+                tableMap.get(tableName).add(action);
+            } else {
+                Set<SqlParseNodeActionEnum> actionSet = new HashSet<>();
+                actionSet.add(action);
+                tableMap.put(tableName, actionSet);
+            }
         } else {
             throw new RuntimeException("operator " + sqlNode.getClass() + " not support");
         }
-        return list;
+        return tableMap;
+    }
+
+    private static Map<String, Set<SqlParseNodeActionEnum>> lookupSelectTable(SqlNode sqlNode) {
+        Map<String, Set<SqlParseNodeActionEnum>> tableMap = new HashMap<>();
+        lookupSelectTable(sqlNode, SqlParseNodeActionEnum.SOURCE, tableMap);
+        return tableMap;
     }
 }
