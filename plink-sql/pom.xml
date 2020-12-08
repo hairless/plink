@@ -28,7 +28,6 @@
         <module>plink-sql-core</module>
         <module>plink-sql-flink-dependency</module>
         <module>plink-sql-connectors</module>
-        <module>plink-sql-connectors/flink-connector-jdbc</module>
     </modules>
 
     <dependencyManagement>
