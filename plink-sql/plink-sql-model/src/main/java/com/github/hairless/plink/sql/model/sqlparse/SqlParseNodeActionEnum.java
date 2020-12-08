@@ -6,5 +6,6 @@ package com.github.hairless.plink.sql.model.sqlparse;
  */
 public enum SqlParseNodeActionEnum {
     SOURCE,
-    SINK;
+    DIM,
+    SINK
 }
