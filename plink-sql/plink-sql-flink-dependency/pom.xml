@@ -13,15 +13,6 @@
     <artifactId>plink-sql-flink-dependency</artifactId>
     <packaging>pom</packaging>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-
-        <java.version>1.8</java.version>
-        <scala.binary.version>2.11</scala.binary.version>
-        <flink.version>1.11.1</flink.version>
-    </properties>
-
     <dependencies>
 
         <!--flink dependencies-->

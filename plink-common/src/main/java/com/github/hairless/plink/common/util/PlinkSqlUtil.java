@@ -26,33 +26,40 @@ public class PlinkSqlUtil {
     public static final String PLINK_SQL_DEBUG_DRIVER_CLASS_NAME = "com.github.hairless.plink.sql.SqlDebugDriver";
     public static final String PLINK_SQL_PARSER_CLASS_NAME = "com.github.hairless.plink.sql.util.PlinkSqlParser";
 
-    public static final String SQL_JAR_FILE = "/module/sql/plink-sql.jar";
+    public static final String SQL_BASE_DIR = PlinkUtil.getPlinkHome() + "/module/sql";
+    public static final String SQL_JAR_FILE = SQL_BASE_DIR + "/plink-sql.jar";
+    public static final String SQL_CONNECTORS_DIR_PATH = SQL_BASE_DIR + "/connectors";
+    public static final String SQL_FORMATS_DIR_PATH = SQL_BASE_DIR + "/formats";
+    public static final String SQL_UDF_DIR_PATH = SQL_BASE_DIR + "/udf";
 
     private static volatile ClassLoader sqlBaseClassLoader;
 
     private static synchronized void initSqlBaseClassLoader() throws Exception {
         if (sqlBaseClassLoader == null) {
-            String plinkHome = PlinkUtil.getPlinkHome();
             List<URL> sqlClassPathUrlList = new ArrayList<>();
             //plink sql core jar
-            File sqlCoreJarFile = new File(plinkHome + SQL_JAR_FILE);
+            File sqlCoreJarFile = new File(SQL_JAR_FILE);
             if (!sqlCoreJarFile.exists()) {
                 throw new PlinkRuntimeException("sql core jar file not exist!,path=" + sqlCoreJarFile.getAbsolutePath() +
                         ",you can try 'mvn package' in plink-sql module");
             }
             sqlClassPathUrlList.add(sqlCoreJarFile.toURI().toURL());
 
+            //plink sql connector jars
+            sqlClassPathUrlList.addAll(FileUtil.listFileURLs(SQL_CONNECTORS_DIR_PATH));
+
+            //plink sql format jars
+            sqlClassPathUrlList.addAll(FileUtil.listFileURLs(SQL_FORMATS_DIR_PATH));
+
+            //plink sql udf jars
+            sqlClassPathUrlList.addAll(FileUtil.listFileURLs(SQL_UDF_DIR_PATH));
+
             //flink dependency jars
-            File libDir = new File(FlinkConfigUtil.getFlinkHome() + FlinkConfigUtil.LIB_SUFFIX);
-            File[] flinkDepJars = libDir.listFiles();
-            if (flinkDepJars != null) {
-                for (File flinkDepJar : flinkDepJars) {
-                    sqlClassPathUrlList.add(flinkDepJar.toURI().toURL());
-                }
-            }
+            sqlClassPathUrlList.addAll(FileUtil.listFileURLs(FlinkConfigUtil.getFlinkHome() + FlinkConfigUtil.LIB_SUFFIX));
+
             //获取扩展类加载器
             ClassLoader extClassLoader = ClassLoader.getSystemClassLoader().getParent();
-            //将扩展类加载器设置为sql类加载器的父加载器，防止sql shape引入第3方依赖冲突
+            //将扩展类加载器设置为sql类加载器的父加载器，防止sql 插件引入第3方依赖冲突
             sqlBaseClassLoader = new URLClassLoader(sqlClassPathUrlList.toArray(new URL[0]), extClassLoader);
         }
     }
