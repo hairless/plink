@@ -253,14 +253,14 @@ export default {
         this.cm.display.input.focus();
       }
     },
-    markText(line, ch) {
-      var startMark = CodeMirror.Pos(line, ch - 2 > 0 ? ch - 2 : 0);
-      var endMark = CodeMirror.Pos(line, ch + 2);
+    markText(startLineNum, startColumnNum, endLineNum, endColumnNum) {
+      let startMark = CodeMirror.Pos(startLineNum, startColumnNum);
+      let endMark = CodeMirror.Pos(endLineNum, endColumnNum);
       this.cm.markText(startMark, endMark, { className: "ErrorHighlight" });
       let elem = document.createElement("span");
       elem.innerHTML = "×";
       elem.className = "ErrorMarker";
-      this.cm.setGutterMarker(line, "ErrorMarker", elem);
+      this.cm.setGutterMarker(startLineNum, "ErrorMarker", elem);
     },
     clearMarker() {
       this.cm.clearGutter("ErrorMarker");

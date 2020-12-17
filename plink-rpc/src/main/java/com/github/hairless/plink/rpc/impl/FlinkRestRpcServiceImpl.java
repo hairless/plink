@@ -35,8 +35,12 @@ public class FlinkRestRpcServiceImpl implements FlinkRestRpcService {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             httpGet = new HttpGet(String.format(FlinkConfigUtil.getRestAddress() + JOBS_JOBId, jobId));
             CloseableHttpResponse httpResponse = httpClient.execute(httpGet);
-            String resJson = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-            return JsonUtil.parseObject(resJson).get("state").textValue();
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                String resJson = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
+                return JsonUtil.parseObject(resJson).get("state").textValue();
+            } else {
+                throw new PlinkRuntimeException("queryJobStatus error " + httpResponse.getStatusLine().toString());
+            }
         } catch (Exception e) {
             throw new PlinkRuntimeException("queryJobStatus error", e);
         } finally {

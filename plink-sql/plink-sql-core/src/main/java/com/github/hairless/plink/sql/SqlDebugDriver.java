@@ -5,6 +5,7 @@ import com.github.hairless.plink.sql.connector.collection.CollectionTableFactory
 import com.github.hairless.plink.sql.connector.collection.CollectionTableSink;
 import com.github.hairless.plink.sql.model.SqlConfig;
 import com.github.hairless.plink.sql.model.SqlDebugConfig;
+import com.github.hairless.plink.sql.model.exception.PlinkSqlParseException;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseNode;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseNodeActionEnum;
 import com.github.hairless.plink.sql.util.JsonUtil;
@@ -51,7 +52,7 @@ public class SqlDebugDriver {
         }
     }
 
-    private static String handleDebugSql(final String identifier, String sql, SqlDebugConfig sqlDebugConfig) throws SqlParseException {
+    private static String handleDebugSql(final String identifier, String sql, SqlDebugConfig sqlDebugConfig) throws PlinkSqlParseException {
         PlinkSqlParser plinkSqlParser = PlinkSqlParser.create(sql);
         StringBuilder sqlBuilder = new StringBuilder();
         List<SqlParseNode> sourceTableList = plinkSqlParser.getTableList(SqlParseNodeActionEnum.SOURCE);
