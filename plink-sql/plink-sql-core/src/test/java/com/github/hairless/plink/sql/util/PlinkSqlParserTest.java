@@ -1,10 +1,10 @@
 package com.github.hairless.plink.sql.util;
 
 import com.github.hairless.plink.sql.SqlJobTest;
+import com.github.hairless.plink.sql.model.exception.PlinkSqlParseException;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseDagNode;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.calcite.sql.parser.SqlParseException;
 import org.junit.Test;
 
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.List;
 public class PlinkSqlParserTest {
 
     @Test
-    public void parse() throws SqlParseException {
+    public void parse() throws PlinkSqlParseException {
         log.info(SqlJobTest.sql);
         PlinkSqlParser plinkSqlParser = PlinkSqlParser.create(SqlJobTest.sql);
         SqlParseInfo sqlParseInfo = plinkSqlParser.getSqlParseInfo();

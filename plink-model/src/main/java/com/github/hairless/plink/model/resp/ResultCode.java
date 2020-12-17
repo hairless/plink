@@ -8,16 +8,16 @@ import lombok.Getter;
  */
 @Getter
 public enum ResultCode {
-    SUCCESS("10001", true, "success"),
-    FAILURE("10002", false, "failure"),
-    EXCEPTION("10003", false, "exception");
+    SUCCESS(10001, true, "success"),
+    FAILURE(10002, false, "failure"),
+    EXCEPTION(10003, false, "exception"),
+    EXCEPTION_DATA(10004, true, "exception with data");
 
-    private String code;
+    private Integer code;
     private Boolean success;
     private String desc;
 
-    ResultCode(String code, Boolean success, String desc) {
-
+    ResultCode(Integer code, Boolean success, String desc) {
         this.code = code;
         this.success = success;
         this.desc = desc;
