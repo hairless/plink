@@ -19,7 +19,7 @@ import java.io.StringWriter;
 public class Result<T> implements Serializable {
     private static final long serialVersionUID = 1L;
     private Boolean success;
-    private String code;
+    private Integer code;
     private String msg;
     private T data;
     private String exceptionMessage;

@@ -39,7 +39,8 @@ service.interceptors.response.use(
 
     // if the custom code is not 10000, it is judged as an error.
     switch (resp.code) {
-      case "10001":
+      case 10001:
+      case 10004:
         return resp;
       case 40001:
         // 登录失败
@@ -61,7 +62,7 @@ service.interceptors.response.use(
           desc: resp.msg || "Error",
           duration: 5
         });
-        return Promise.reject(new Error(resp.msg || "Error"));
+        return Promise.reject(resp);
     }
   },
   error => {

@@ -1,5 +1,7 @@
 package com.github.hairless.plink.common.util;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.hairless.plink.model.exception.PlinkDataException;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.sql.model.SqlDebugConfig;
 import com.github.hairless.plink.sql.model.sqlparse.SqlParseInfo;
@@ -93,6 +95,11 @@ public class PlinkSqlUtil {
             BeanUtils.copyProperties(newRes, origRes);
             return newRes;
         } catch (InvocationTargetException e) {
+            Throwable targetException = e.getTargetException();
+            if (targetException.getClass().getSimpleName().equals("PlinkSqlParseException")) {
+                JsonNode jsonNode = JsonUtil.parseObject(JsonUtil.toJSONString(targetException));
+                throw new PlinkDataException(jsonNode.get("message").textValue(), jsonNode.get("pos"));
+            }
             throw new PlinkRuntimeException("sql parse error", e.getTargetException());
         } catch (Exception e) {
             throw new PlinkRuntimeException("sql parse error", e);

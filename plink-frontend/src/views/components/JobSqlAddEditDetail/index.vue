@@ -100,7 +100,25 @@ flink.conf.key3=value3"
           Flink SQL
         </span>
 
-        <SqlCMEditor v-model="data.extraConfig.sql" height="700" :read-only="usageModeHelper.editorReadOnly" />
+        <a-row class="head">
+          <a-alert v-if="alertMessage!==''" type="error" closable @close="alertMessage=''"
+                   style="margin-bottom: 5px;white-space:pre-wrap">
+            <div slot="message">
+              {{alertMessage}}
+              <a v-if="alertException" @click="showAlertException=!showAlertException">查看异常信息</a>
+              <span v-if="showAlertException" style="white-space:pre-wrap"><br>{{alertException}}</span>
+            </div>
+          </a-alert>
+            <a-button-group style="float: right">
+              <a-button type="primary" icon="medicine-box" @click="sqlParse">SQL校验</a-button>
+              <a-button type="primary" icon="medicine-box" @click="sqlFormat">格式化</a-button>
+            </a-button-group>
+        </a-row>
+        <a-row>
+          <SqlCMEditor ref="sqlEditor" v-model="data.extraConfig.sql" height="650" :read-only="usageModeHelper.editorReadOnly" />
+        </a-row>
+
+
       </a-tab-pane>
 
       <a-tab-pane key="instList" v-if="['detail'].includes(usageMode)">
@@ -117,6 +135,7 @@ flink.conf.key3=value3"
 
 <script>
 import * as jobApi from "@/api/job";
+import * as sqlApi from "@/api/sql";
 import * as helperApi from "@/api/helper";
 import InstList from "@/views/inst/list";
 import SqlCMEditor from "@/components/SqlCMEditor";
@@ -153,6 +172,9 @@ export default {
   },
   data() {
     return {
+      alertMessage: "",
+      showAlertException: false,
+      alertException: "",
       labelCol: { span: 4 },
       wrapperCol: { span: 16 },
       data: {
@@ -221,6 +243,34 @@ export default {
     };
   },
   methods: {
+    showAlert(msg, exception) {
+      this.alertMessage = msg;
+      this.showAlertException = false;
+      if (exception) {
+        this.alertException = exception;
+      } else {
+        this.alertException = null;
+      }
+    },
+    sqlFormat(){
+      this.$refs.sqlEditor.formatSql();
+    },
+    sqlParse(){
+      this.$refs.sqlEditor.clearMarker();
+      sqlApi.sqlParse(this.data.extraConfig.sql).then(res => {
+        if(res.code===10004){
+          this.$refs.sqlEditor.markText(res.data.lineNumber-1,res.data.columnNumber-1,res.data.endLineNumber-1,res.data.endColumnNumber);
+          this.showAlert(res.msg);
+        }else {
+          this.$Notice.success({
+            title: "SQL校验成功！"
+          });
+        }
+      }).catch(res => {
+        console.log(res)
+        this.showAlert(res.msg,res.exceptionStackTrace);
+      });
+    },
     onAdd() {
       this.$refs.ruleForm.validate(valid => {
         if (valid) {
@@ -495,4 +545,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+  .head {
+    background: rgba(242, 241, 244, 0.95);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04)
+  }
+</style>

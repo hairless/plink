@@ -240,7 +240,7 @@ export default {
     },
     onEdit() {
       this.$router.push({
-        path: "/job/jobEdit",
+        path: "/page/job/jobEdit",
         query: {
           jobId: this.data.id
         }
@@ -248,7 +248,7 @@ export default {
     },
     onDetail() {
       this.$router.push({
-        path: "/job/jobDetail",
+        path: "/page/job/jobDetail",
         query: {
           jobId: this.data.id
         }
@@ -260,7 +260,7 @@ export default {
           title: "删除作业成功！"
         });
         this.$router.push({
-          path: "/job/jobList"
+          path: "/page/job/jobList"
         });
       });
     },
