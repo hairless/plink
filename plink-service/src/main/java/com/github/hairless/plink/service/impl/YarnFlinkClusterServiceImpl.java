@@ -9,6 +9,7 @@ import com.github.hairless.plink.service.FlinkClusterService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -19,12 +20,17 @@ import org.springframework.stereotype.Service;
 public class YarnFlinkClusterServiceImpl implements FlinkClusterService {
     @Autowired
     private YarnClientRpcService yarnClientRpcService;
+    @Value("${cluster.queue}")
+    private String defaultQueue;
 
     private final FlinkShellSubmitAssist flinkShellSubmitAssist =
             new FlinkShellSubmitAssist(YarnCommandBuilder.INSTANCE, "Submitting application master (application_[0-9_]+)");
 
     @Override
     public String submitJob(JobInstanceDTO jobInstanceDTO, String logFile) throws Exception {
+        if (StringUtils.isNotBlank(defaultQueue)) {
+            jobInstanceDTO.getFlinkConfig().setQueue(defaultQueue);
+        }
         return flinkShellSubmitAssist.submitJob(jobInstanceDTO, logFile);
     }
 
