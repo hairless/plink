@@ -57,6 +57,7 @@ kerberos:
 #'yarn' or 'standalone'
 cluster:
   mode: yarn
+  queue:
 
 flink:
   defaultConfs:

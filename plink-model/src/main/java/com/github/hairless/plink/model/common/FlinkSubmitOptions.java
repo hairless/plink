@@ -15,7 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 public class FlinkSubmitOptions {
     private String jobName;
-    private String queue;
     private String savePointPath;
     private List<String> localClasspath;
     private List<String> shapefiles;

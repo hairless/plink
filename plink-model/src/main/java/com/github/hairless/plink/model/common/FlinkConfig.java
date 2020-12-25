@@ -51,4 +51,8 @@ public class FlinkConfig implements Serializable {
      * 其他flink配置
      */
     private Map<String, String> configs;
+    /**
+     * 任务提交队列
+     */
+    private String queue;
 }

@@ -47,8 +47,8 @@ public class YarnCommandBuilder implements FlinkShellCommandBuilder {
         if (StringUtils.isNotBlank(flinkSubmitOptions.getJobName())) {
             builder.append(format(jobName, flinkSubmitOptions.getJobName()));
         }
-        if (StringUtils.isNotBlank(flinkSubmitOptions.getQueue())) {
-            builder.append(format(queue, flinkSubmitOptions.getQueue()));
+        if (StringUtils.isNotBlank(flinkConfig.getQueue())) {
+            builder.append(format(queue, flinkConfig.getQueue()));
         }
         if (StringUtils.isNotBlank(flinkConfig.getJobManagerMemory())) {
             builder.append(format(jobManagerMemory, flinkConfig.getJobManagerMemory()));
