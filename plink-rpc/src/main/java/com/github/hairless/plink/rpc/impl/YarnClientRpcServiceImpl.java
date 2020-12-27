@@ -47,7 +47,7 @@ public class YarnClientRpcServiceImpl implements YarnClientRpcService {
 
     @Override
     public YarnApplicationState getYarnApplicationState(String appId) throws PlinkException {
-        return getYarnApplicationState(HadoopConfigUtil.getHadoopHome(), appId);
+        return getYarnApplicationState(HadoopConfigUtil.getHadoopConfDir(), appId);
     }
 
     @Override
