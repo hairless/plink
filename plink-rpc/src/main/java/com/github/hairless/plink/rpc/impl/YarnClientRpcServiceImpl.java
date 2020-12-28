@@ -46,20 +46,7 @@ public class YarnClientRpcServiceImpl implements YarnClientRpcService {
     }
 
     @Override
-    public YarnApplicationState getYarnApplicationState(String appId) throws PlinkException {
-        return getYarnApplicationState(HadoopConfigUtil.getHadoopHome(), appId);
-    }
-
-    @Override
-    public String getResourceManagerAddress() throws PlinkException {
-        if (resourceManagerAddressCache == null) {
-            resourceManagerAddressCache = WebAppUtils.getResolvedRemoteRMWebAppURLWithScheme(HadoopConfigUtil.getConfiguration());
-        }
-        return resourceManagerAddressCache;
-    }
-
-    public YarnApplicationState getYarnApplicationState(String hadoopHome, String appId) {
-        Preconditions.checkArgument(StringUtils.isNotBlank(hadoopHome), "hadoopHome is empty");
+    public YarnApplicationState getYarnApplicationState(String appId) {
         Preconditions.checkArgument(StringUtils.isNotBlank(appId), "appId is empty");
         try {
             YarnClient yarnClient = getReusableYarnClient();
@@ -67,14 +54,22 @@ public class YarnClientRpcServiceImpl implements YarnClientRpcService {
             Preconditions.checkNotNull(report, "getYarnApplicationReport is null");
             return report.getYarnApplicationState();
         } catch (Exception e) {
-            log.error("getYarnApplicationState fail...hadoopHome={},appId={}", hadoopHome, appId, e);
+            log.error("getYarnApplicationState fail...,appId={}", appId, e);
         }
         return null;
     }
 
+    @Override
+    public String getResourceManagerAddress() throws PlinkException {
+        if (resourceManagerAddressCache == null) {
+            resourceManagerAddressCache = WebAppUtils.getResolvedRemoteRMWebAppURLWithScheme(HadoopConfigUtil.getConfigurationFromEnv());
+        }
+        return resourceManagerAddressCache;
+    }
+
     private YarnClient getYarnClient() throws PlinkException, IOException {
         YarnClient yarnClient = YarnClient.createYarnClient();
-        Configuration config = HadoopConfigUtil.getConfiguration();
+        Configuration config = HadoopConfigUtil.getConfigurationFromEnv();
         if (StringUtils.isNotBlank(kerberosKeytab) && StringUtils.isNotBlank(kerberosPrincipal)) {
             UserGroupInformation.setConfiguration(config);
             UserGroupInformation.loginUserFromKeytab(kerberosPrincipal, kerberosKeytab);
