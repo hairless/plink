@@ -19,41 +19,59 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date: 2020/9/04
  */
 public class HadoopConfigUtil {
-    private static final String CONF_SUFFIX = "/etc/hadoop";
+    public static final String HADOOP_HOME = "HADOOP_HOME";
+    public static final String HADOOP_CONF_DIR = "HADOOP_CONF_DIR";
+    public static final String CONF_SUFFIX = "/etc/hadoop";
     private static final Map<String, Configuration> configurationMap = new ConcurrentHashMap<>();
 
 
     public static String getHadoopHome() throws PlinkException {
-        String hadoopHome = System.getenv("HADOOP_HOME");
-        if (StringUtils.isBlank(hadoopHome)) {
-            throw new PlinkException("HADOOP_HOME is not set!");
-        }
-        return hadoopHome;
+        return FileUtil.getPathFromEnv(HADOOP_HOME);
     }
 
-    private static synchronized void loadConfiguration(String hadoopHome) {
-        if (!configurationMap.containsKey(hadoopHome)) {
-            Preconditions.checkArgument(StringUtils.isNotBlank(hadoopHome), "hadoopHome is empty");
-            Collection<File> files = FileUtils.listFiles(new File(hadoopHome, CONF_SUFFIX), new String[]{"xml"}, false);
+    public static String getHadoopConfDir(String hadoopHome) throws PlinkException {
+        return FileUtil.resolvePath(hadoopHome, CONF_SUFFIX);
+    }
+
+    public static String getHadoopConfDir() throws PlinkException {
+        try {
+            return FileUtil.getPathFromEnv(HADOOP_CONF_DIR);
+        } catch (PlinkException e) {
+            return getHadoopConfDir(getHadoopHome());
+        }
+    }
+
+    private static synchronized void loadConfiguration(String hadoopConfDir) throws PlinkException {
+        if (!configurationMap.containsKey(hadoopConfDir)) {
+            Preconditions.checkArgument(StringUtils.isNotBlank(hadoopConfDir), "hadoopConfDir is empty");
+            File hadoopConfDirFile = new File(hadoopConfDir);
+            if (!hadoopConfDirFile.exists()) {
+                throw new PlinkException(hadoopConfDir + " is not exist!");
+            }
+            Collection<File> files = FileUtils.listFiles(hadoopConfDirFile, new String[]{"xml"}, false);
             Configuration conf = new Configuration();
             if (CollectionUtils.isNotEmpty(files)) {
                 for (File file : files) {
                     conf.addResource(new Path(file.getAbsolutePath()));
                 }
             }
-            configurationMap.put(hadoopHome, conf);
+            configurationMap.put(hadoopConfDir, conf);
         }
     }
 
-    public static synchronized Configuration getConfiguration() throws PlinkException {
-        return getConfiguration(getHadoopHome());
+    public static synchronized Configuration getConfigurationFromEnv() throws PlinkException {
+        return getConfigurationFromHadoopConfDir(getHadoopConfDir());
     }
 
-    public static synchronized Configuration getConfiguration(String hadoopHome) throws PlinkException {
-        if (!configurationMap.containsKey(hadoopHome)) {
-            loadConfiguration(hadoopHome);
+    public static synchronized Configuration getConfigurationFromHadoopHome(String hadoopHome) throws PlinkException {
+        return getConfigurationFromHadoopConfDir(getHadoopConfDir(hadoopHome));
+    }
+
+    public static synchronized Configuration getConfigurationFromHadoopConfDir(String hadoopConfDir) throws PlinkException {
+        if (!configurationMap.containsKey(hadoopConfDir)) {
+            loadConfiguration(hadoopConfDir);
         }
-        return configurationMap.get(hadoopHome);
+        return configurationMap.get(hadoopConfDir);
     }
 
 }
