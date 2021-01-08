@@ -120,8 +120,8 @@ public class PlinkSqlParser {
                     node.setType(SqlParseNodeTypeEnum.TABLE);
                     List<SqlParseColumn> sqlParseColumnList = sqlCreateTable.getColumnList().getList().stream().map(c -> {
                         SqlParseColumn sqlParseColumn = new SqlParseColumn();
-                        if (c instanceof SqlTableColumn) {
-                            SqlTableColumn sqlTableColumn = (SqlTableColumn) c;
+                        if (c instanceof SqlTableColumn.SqlRegularColumn) {
+                            SqlTableColumn.SqlRegularColumn sqlTableColumn = (SqlTableColumn.SqlRegularColumn) c;
                             sqlParseColumn.setName(sqlTableColumn.getName().getSimple());
                             sqlParseColumn.setType(sqlTableColumn.getType().toString());
                             sqlParseColumn.setNullable(sqlTableColumn.getType().getNullable());
@@ -131,11 +131,24 @@ public class PlinkSqlParser {
                             if (sqlTableColumn.getComment().isPresent()) {
                                 sqlParseColumn.setComment(sqlTableColumn.getComment().get().toString());
                             }
-                        } else if (c instanceof SqlBasicCall && ((SqlBasicCall) c).getOperator() instanceof SqlAsOperator) {
-                            SqlNode[] operands = ((SqlBasicCall) c).getOperands();
-                            sqlParseColumn.setName(operands[1].toString());
-                            sqlParseColumn.setType(operands[0].toString());
-                            sqlParseColumn.setComment(c.toString());
+                        } else if (c instanceof SqlTableColumn.SqlComputedColumn) {
+                            SqlTableColumn.SqlComputedColumn sqlTableColumn = (SqlTableColumn.SqlComputedColumn) c;
+                            sqlParseColumn.setName(sqlTableColumn.getName().toString());
+                            sqlParseColumn.setType(sqlTableColumn.getExpr().toString());
+                            if (sqlTableColumn.getComment().isPresent()) {
+                                sqlParseColumn.setComment(sqlTableColumn.getComment().get().toString());
+                            }
+                            sqlParseColumn.setIsPhysical(false);
+                        } else if (c instanceof SqlTableColumn.SqlMetadataColumn) {
+                            SqlTableColumn.SqlMetadataColumn sqlTableColumn = (SqlTableColumn.SqlMetadataColumn) c;
+                            sqlParseColumn.setName(sqlTableColumn.getName().toString());
+                            sqlParseColumn.setType(sqlTableColumn.getType().toString());
+                            if (sqlTableColumn.getComment().isPresent()) {
+                                sqlParseColumn.setComment(sqlTableColumn.getComment().get().toString());
+                            }
+                            if (sqlTableColumn.getMetadataAlias().isPresent()) {
+                                sqlParseColumn.setComment("FROM:" + sqlTableColumn.getMetadataAlias().get());
+                            }
                             sqlParseColumn.setIsPhysical(false);
                         } else {
                             throw new RuntimeException("not support operation: " + c.getClass().getSimpleName());
