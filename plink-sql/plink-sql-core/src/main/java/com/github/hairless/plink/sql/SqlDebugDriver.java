@@ -93,7 +93,8 @@ public class SqlDebugDriver {
             newTableOptions.add(newSqlTableOption(FactoryUtil.CONNECTOR.key(), DataGenTableSourceFactory.IDENTIFIER));
             Integer limit = sourceConfig.getLimit();
             assert limit != null;
-            newTableOptions.add(newSqlTableOption(DataGenTableSourceFactory.NUMBER_OF_ROWS.key(), limit.toString()));
+            //DataGenTableSourceFactory.NUMBER_OF_ROWS.key()
+            newTableOptions.add(newSqlTableOption("number-of-rows", limit.toString()));
         } else {
             newTableOptions.addAll(tableOptions.stream().filter(node -> ((SqlTableOption) node).getKeyString().startsWith(FactoryUtil.FORMAT.key())).collect(Collectors.toList()));
             newTableOptions.add(newSqlTableOption(FactoryUtil.CONNECTOR.key(), CollectionTableFactory.COLLECTION));
