@@ -37,7 +37,30 @@ public class SqlDebugDriverTest {
         ).map(JsonUtil::toJSONString).collect(Collectors.toList());
         SqlDebugConfig sqlDebugConfig = new SqlDebugConfig();
         HashMap<String, SqlDebugConfig.SourceConfig> sourceConfigMap = new HashMap<>();
-        sourceConfigMap.put("t1", new SqlDebugConfig.SourceConfig(sourceData));
+        SqlDebugConfig.SourceConfig sourceConfig = new SqlDebugConfig.SourceConfig();
+        sourceConfig.setData(sourceData);
+        sourceConfigMap.put("t1", sourceConfig);
+        sqlDebugConfig.setSourceConfigMap(sourceConfigMap);
+        sqlDebugConfig.setSql(sql);
+        log.info("sqlDebugConfig={}", JsonUtil.toJSONString(sqlDebugConfig));
+        Map<String, List<String>> debugResult = SqlDebugDriver.debug(sqlDebugConfig);
+        assert MapUtils.isNotEmpty(debugResult);
+    }
+
+    @Test
+    public void debugDatagen() throws Exception {
+        String sql =
+                "create table t1( a int,b string, c int) with ( 'connector' = 'collection','data'='[]');" +
+                        "create table t2(a int comment '测试',b string,c int) with ( 'connector' = 'print');" +
+                        "create view temp_view as select * from t1;" +
+                        "insert into t2(a,b,c) select a,b,c from temp_view t1;" +
+                        "insert into t2(a,b,c) select a,b,c from temp_view t1;";
+        SqlDebugConfig sqlDebugConfig = new SqlDebugConfig();
+        HashMap<String, SqlDebugConfig.SourceConfig> sourceConfigMap = new HashMap<>();
+        SqlDebugConfig.SourceConfig sourceConfig = new SqlDebugConfig.SourceConfig();
+        sourceConfig.setDatagen(true);
+        sourceConfig.setLimit(10);
+        sourceConfigMap.put("t1", sourceConfig);
         sqlDebugConfig.setSourceConfigMap(sourceConfigMap);
         sqlDebugConfig.setSql(sql);
         log.info("sqlDebugConfig={}", JsonUtil.toJSONString(sqlDebugConfig));
@@ -62,7 +85,9 @@ public class SqlDebugDriverTest {
         ).map(JsonUtil::toJSONString).collect(Collectors.toList());
         SqlDebugConfig sqlDebugConfig = new SqlDebugConfig();
         HashMap<String, SqlDebugConfig.SourceConfig> sourceConfigMap = new HashMap<>();
-        sourceConfigMap.put("t1", new SqlDebugConfig.SourceConfig(sourceData));
+        SqlDebugConfig.SourceConfig sourceConfig = new SqlDebugConfig.SourceConfig();
+        sourceConfig.setData(sourceData);
+        sourceConfigMap.put("t1", sourceConfig);
         sqlDebugConfig.setSourceConfigMap(sourceConfigMap);
         sqlDebugConfig.setSql(sql);
         log.info("sqlDebugConfig={}", JsonUtil.toJSONString(sqlDebugConfig));
