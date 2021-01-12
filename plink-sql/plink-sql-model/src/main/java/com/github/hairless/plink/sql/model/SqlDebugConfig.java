@@ -1,6 +1,5 @@
 package com.github.hairless.plink.sql.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -17,10 +16,16 @@ public class SqlDebugConfig {
     private String sql;
     private Map<String, SourceConfig> sourceConfigMap;
 
+    /**
+     * datagen:开启数据自动生成，需结合limit使用
+     * <p>
+     * data：显示提供样例数据
+     */
     @Data
     @NoArgsConstructor
-    @AllArgsConstructor
     public static class SourceConfig {
+        private Boolean datagen = false;
+        private Integer limit;
         private List<String> data;
     }
 }
