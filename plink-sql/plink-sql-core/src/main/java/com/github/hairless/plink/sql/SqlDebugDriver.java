@@ -16,12 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.calcite.sql.SqlInsert;
 import org.apache.calcite.sql.SqlLiteral;
 import org.apache.calcite.sql.SqlNode;
-import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.sql.parser.ddl.SqlCreateTable;
 import org.apache.flink.sql.parser.ddl.SqlCreateView;
 import org.apache.flink.sql.parser.ddl.SqlTableOption;
+import org.apache.flink.table.factories.DataGenTableSourceFactory;
 import org.apache.flink.table.factories.FactoryUtil;
 import org.apache.flink.util.Preconditions;
 
@@ -59,6 +59,9 @@ public class SqlDebugDriver {
         sourceTableList.forEach(sourceTable -> {
             SqlDebugConfig.SourceConfig sourceConfig = sqlDebugConfig.getSourceConfigMap().get(sourceTable.getName());
             sqlBuilder.append(buildDebugSourceSql(sourceTable, sourceConfig));
+            String sourceTableOutName = sourceTable.getName() + CollectionTableSink.OUT_SUFFIX;
+            sqlBuilder.append(buildDebugSinkSql(identifier, sourceTable, sourceTableOutName));
+            sqlBuilder.append(buildDebugInsertSql(sourceTable, sourceTableOutName));
         });
         List<SqlParseNode> sinkTableList = plinkSqlParser.getTableList(SqlParseNodeActionEnum.SINK);
         sinkTableList.forEach(sinkTable -> {
@@ -86,9 +89,17 @@ public class SqlDebugDriver {
     private static String buildDebugSourceSql(SqlParseNode sourceTable, SqlDebugConfig.SourceConfig sourceConfig) {
         List<SqlNode> tableOptions = ((SqlCreateTable) sourceTable.getCalciteSqlNode()).getPropertyList().getList();
         List<SqlNode> newTableOptions = new ArrayList<>();
-        newTableOptions.addAll(tableOptions.stream().filter(node -> ((SqlTableOption) node).getKeyString().startsWith(FactoryUtil.FORMAT.key())).collect(Collectors.toList()));
-        newTableOptions.add(newSqlTableOption(FactoryUtil.CONNECTOR.key(), CollectionTableFactory.COLLECTION));
-        newTableOptions.add(newSqlTableOption(CollectionTableFactory.DATA.key(), JsonUtil.toJSONString(sourceConfig.getData())));
+        if (sourceConfig.getDatagen()) {
+            newTableOptions.add(newSqlTableOption(FactoryUtil.CONNECTOR.key(), DataGenTableSourceFactory.IDENTIFIER));
+            Integer limit = sourceConfig.getLimit();
+            assert limit != null;
+            //DataGenTableSourceFactory.NUMBER_OF_ROWS.key()
+            newTableOptions.add(newSqlTableOption("number-of-rows", limit.toString()));
+        } else {
+            newTableOptions.addAll(tableOptions.stream().filter(node -> ((SqlTableOption) node).getKeyString().startsWith(FactoryUtil.FORMAT.key())).collect(Collectors.toList()));
+            newTableOptions.add(newSqlTableOption(FactoryUtil.CONNECTOR.key(), CollectionTableFactory.COLLECTION));
+            newTableOptions.add(newSqlTableOption(CollectionTableFactory.DATA.key(), JsonUtil.toJSONString(sourceConfig.getData())));
+        }
         tableOptions.clear();
         tableOptions.addAll(newTableOptions);
         return ((SqlNode) sourceTable.getCalciteSqlNode()).toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql() + ";";
@@ -122,8 +133,10 @@ public class SqlDebugDriver {
             query = ((SqlCreateView) calciteSqlNode).getQuery().toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();
         } else if (calciteSqlNode instanceof SqlInsert) {
             query = ((SqlInsert) calciteSqlNode).getSource().toSqlString(SkipAnsiCheckSqlDialect.DEFAULT).getSql();
+        } else if (calciteSqlNode instanceof SqlCreateTable) {
+            query = "select * from " + fromTable.getName();
         } else {
-            throw new RuntimeException(calciteSqlNode.getClass().getSimpleName() + "not support");
+            throw new RuntimeException(calciteSqlNode.getClass().getSimpleName() + " not support");
         }
         return SqlBuilder.insertBuilder().query(query).targetTableName(targetTableName).columnList(fromTable.getColumnList()).build();
     }

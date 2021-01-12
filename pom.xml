@@ -35,7 +35,7 @@
         <spring.boot.version>2.2.2.RELEASE</spring.boot.version>
 
         <scala.binary.version>2.11</scala.binary.version>
-        <flink.version>1.11.0</flink.version>
+        <flink.version>1.12.0</flink.version>
         <hadoop.version>2.7.3</hadoop.version>
 
         <junit.version>4.13.1</junit.version>

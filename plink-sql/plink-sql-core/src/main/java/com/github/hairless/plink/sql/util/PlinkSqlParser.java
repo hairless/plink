@@ -10,7 +10,6 @@ import org.apache.calcite.sql.parser.SqlParser;
 import org.apache.calcite.sql.parser.SqlParserPos;
 import org.apache.flink.sql.parser.ddl.SqlCreateTable;
 import org.apache.flink.sql.parser.ddl.SqlCreateView;
-import org.apache.flink.sql.parser.ddl.SqlTableColumn;
 import org.apache.flink.sql.parser.ddl.SqlTableOption;
 import org.apache.flink.sql.parser.dml.RichSqlInsert;
 import org.apache.flink.sql.parser.impl.FlinkSqlParserImpl;
@@ -18,9 +17,11 @@ import org.apache.flink.sql.parser.validate.FlinkSqlConformance;
 import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
+import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 import org.apache.flink.table.api.internal.TableEnvironmentImpl;
 import org.apache.flink.table.operations.CatalogSinkModifyOperation;
+import org.apache.flink.table.operations.ddl.CreateTableOperation;
 import org.apache.flink.table.operations.ddl.CreateViewOperation;
 import org.apache.flink.util.ExceptionUtils;
 
@@ -118,43 +119,8 @@ public class PlinkSqlParser {
                     node.setSql(splitSql);
                     node.setName(sqlCreateTable.getTableName().getSimple());
                     node.setType(SqlParseNodeTypeEnum.TABLE);
-                    List<SqlParseColumn> sqlParseColumnList = sqlCreateTable.getColumnList().getList().stream().map(c -> {
-                        SqlParseColumn sqlParseColumn = new SqlParseColumn();
-                        if (c instanceof SqlTableColumn.SqlRegularColumn) {
-                            SqlTableColumn.SqlRegularColumn sqlTableColumn = (SqlTableColumn.SqlRegularColumn) c;
-                            sqlParseColumn.setName(sqlTableColumn.getName().getSimple());
-                            sqlParseColumn.setType(sqlTableColumn.getType().toString());
-                            sqlParseColumn.setNullable(sqlTableColumn.getType().getNullable());
-                            if (sqlTableColumn.getConstraint().isPresent()) {
-                                sqlParseColumn.setConstraint(sqlTableColumn.getConstraint().get().toString());
-                            }
-                            if (sqlTableColumn.getComment().isPresent()) {
-                                sqlParseColumn.setComment(sqlTableColumn.getComment().get().toString());
-                            }
-                        } else if (c instanceof SqlTableColumn.SqlComputedColumn) {
-                            SqlTableColumn.SqlComputedColumn sqlTableColumn = (SqlTableColumn.SqlComputedColumn) c;
-                            sqlParseColumn.setName(sqlTableColumn.getName().toString());
-                            sqlParseColumn.setType(sqlTableColumn.getExpr().toString());
-                            if (sqlTableColumn.getComment().isPresent()) {
-                                sqlParseColumn.setComment(sqlTableColumn.getComment().get().toString());
-                            }
-                            sqlParseColumn.setIsPhysical(false);
-                        } else if (c instanceof SqlTableColumn.SqlMetadataColumn) {
-                            SqlTableColumn.SqlMetadataColumn sqlTableColumn = (SqlTableColumn.SqlMetadataColumn) c;
-                            sqlParseColumn.setName(sqlTableColumn.getName().toString());
-                            sqlParseColumn.setType(sqlTableColumn.getType().toString());
-                            if (sqlTableColumn.getComment().isPresent()) {
-                                sqlParseColumn.setComment(sqlTableColumn.getComment().get().toString());
-                            }
-                            if (sqlTableColumn.getMetadataAlias().isPresent()) {
-                                sqlParseColumn.setComment("FROM:" + sqlTableColumn.getMetadataAlias().get());
-                            }
-                            sqlParseColumn.setIsPhysical(false);
-                        } else {
-                            throw new RuntimeException("not support operation: " + c.getClass().getSimpleName());
-                        }
-                        return sqlParseColumn;
-                    }).collect(Collectors.toList());
+                    CreateTableOperation operation = (CreateTableOperation) tEnv.getParser().parse(splitSql).get(0);
+                    List<SqlParseColumn> sqlParseColumnList = getColumnListFromTableSchema(operation.getCatalogTable().getSchema());
                     node.setColumnList(sqlParseColumnList);
                     Map<String, String> properties = sqlCreateTable.getPropertyList().getList().stream().map(x -> ((SqlTableOption) x))
                             .collect(Collectors.toMap(SqlTableOption::getKeyString, SqlTableOption::getValueString));
@@ -174,12 +140,7 @@ public class PlinkSqlParser {
                     node.setSql(splitSql);
                     node.setName(viewName);
                     node.setType(SqlParseNodeTypeEnum.VIEW);
-                    List<SqlParseColumn> sqlParseColumnList = createViewOperation.getCatalogView().getSchema().getTableColumns().stream().map(tableColumn -> {
-                        SqlParseColumn sqlParseColumn = new SqlParseColumn();
-                        sqlParseColumn.setName(tableColumn.getName());
-                        sqlParseColumn.setType(tableColumn.getType().getLogicalType().asSummaryString());
-                        return sqlParseColumn;
-                    }).collect(Collectors.toList());
+                    List<SqlParseColumn> sqlParseColumnList = getColumnListFromTableSchema(createViewOperation.getCatalogView().getSchema());
                     node.setColumnList(sqlParseColumnList);
                     node.setCalciteSqlNode(sqlNode);
                     node.setComment(viewName);
@@ -213,12 +174,7 @@ public class PlinkSqlParser {
                     node.setType(SqlParseNodeTypeEnum.INSERT);
                     node.setName(insertName);
                     CatalogSinkModifyOperation catalogSinkModifyOperation = (CatalogSinkModifyOperation) tEnv.getParser().parse(splitSql).get(0);
-                    List<SqlParseColumn> sqlParseColumnList = catalogSinkModifyOperation.getChild().getTableSchema().getTableColumns().stream().map(tableColumn -> {
-                        SqlParseColumn sqlParseColumn = new SqlParseColumn();
-                        sqlParseColumn.setName(tableColumn.getName());
-                        sqlParseColumn.setType(tableColumn.getType().getLogicalType().asSummaryString());
-                        return sqlParseColumn;
-                    }).collect(Collectors.toList());
+                    List<SqlParseColumn> sqlParseColumnList = getColumnListFromTableSchema(catalogSinkModifyOperation.getChild().getTableSchema());
                     node.setColumnList(sqlParseColumnList);
                     node.setCalciteSqlNode(sqlNode);
                     nodeMap.put(node.getName(), node);
@@ -272,6 +228,17 @@ public class PlinkSqlParser {
             }
             throw new RuntimeException(e);
         }
+    }
+
+    private static List<SqlParseColumn> getColumnListFromTableSchema(TableSchema tableSchema) {
+        return tableSchema.getTableColumns().stream().map(tableColumn -> {
+            SqlParseColumn sqlParseColumn = new SqlParseColumn();
+            sqlParseColumn.setName(tableColumn.getName());
+            sqlParseColumn.setType(tableColumn.getType().getLogicalType().asSummaryString());
+            sqlParseColumn.setNullable(tableColumn.getType().getLogicalType().isNullable());
+            //sqlParseColumn.setIsPhysical(tableColumn.isPhysical());
+            return sqlParseColumn;
+        }).collect(Collectors.toList());
     }
 
     private static String getStringFromPos(String[] lines, SqlParserPos pos) {
