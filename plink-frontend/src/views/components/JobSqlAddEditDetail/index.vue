@@ -1,4 +1,4 @@
-编辑<template>
+<template>
   <div>
     <!-- Page Header -->
     <div>
@@ -101,24 +101,22 @@ flink.conf.key3=value3"
         </span>
 
         <a-row class="head">
-          <a-alert v-if="alertMessage!==''" type="error" closable @close="alertMessage=''"
-                   style="margin-bottom: 5px;white-space:pre-wrap">
+          <a-alert v-if="alertMessage !== ''" type="error" closable @close="alertMessage = ''" style="margin-bottom: 5px;white-space:pre-wrap">
             <div slot="message">
-              {{alertMessage}}
-              <a v-if="alertException" @click="showAlertException=!showAlertException">查看异常信息</a>
-              <span v-if="showAlertException" style="white-space:pre-wrap"><br>{{alertException}}</span>
+              {{ alertMessage }}
+              <a v-if="alertException" @click="showAlertException = !showAlertException">查看异常信息</a>
+              <span v-if="showAlertException" style="white-space:pre-wrap"><br />{{ alertException }}</span>
             </div>
           </a-alert>
-            <a-button-group style="float: right">
-              <a-button type="primary" icon="medicine-box" @click="sqlParse">SQL校验</a-button>
-              <a-button type="primary" icon="medicine-box" @click="sqlFormat">格式化</a-button>
-            </a-button-group>
+          <a-button-group style="float: right">
+            <a-button type="primary" icon="medicine-box" @click="sqlGraph">拓扑图</a-button>
+            <a-button type="primary" icon="medicine-box" @click="sqlParse">SQL校验</a-button>
+            <a-button type="primary" icon="medicine-box" @click="sqlFormat">格式化</a-button>
+          </a-button-group>
         </a-row>
         <a-row>
           <SqlCMEditor ref="sqlEditor" v-model="data.extraConfig.sql" height="650" :read-only="usageModeHelper.editorReadOnly" />
         </a-row>
-
-
       </a-tab-pane>
 
       <a-tab-pane key="instList" v-if="['detail'].includes(usageMode)">
@@ -130,6 +128,38 @@ flink.conf.key3=value3"
         <InstList ref="refInstList" :job-id="dataId" :is-auto-flush="true" />
       </a-tab-pane>
     </a-tabs>
+
+    <!-- 拓扑图 -->
+    <a-modal title="拓扑图" :visible="graph.isVisible" @ok="handleGraphOk" @cancel="handleGraphCancel" width="80%">
+      <div style="height: 600px">
+        <div id="flowGraph" class="graph-flow" />
+        <div style="display: flex" v-if="graphHelper.activeNode">
+          <div class="graph-node">
+            <div class="graph-node-title">基础信息</div>
+            <div class="graph-node-info">节点名称 : {{ graphHelper.activeNode.name }}</div>
+            <div class="graph-node-info">节点类型 : {{ graphHelper.activeNode.c_type }}</div>
+            <div class="graph-node-info">节点描述 : {{ graphHelper.activeNode.comment }}</div>
+          </div>
+          <div class="graph-node" style="margin: 0 10px 0 10px">
+            <div class="graph-node-title">列信息</div>
+            <a-table
+              :columns="graphHelper.activeNodeColumnList"
+              :data-source="graphHelper.activeNode.columnList"
+              :row-key="(row, index) => index"
+              :pagination="false"
+              size="middle"
+              :scroll="{ y: 210 }"
+            >
+            </a-table>
+          </div>
+          <div class="graph-node">
+            <div class="graph-node-title">SQL</div>
+            <a-textarea v-model="graphHelper.activeNode.sql" :autosize="{ minRows: 10, maxRows: 10}" :readonly="true" style="min-height: 250px"></a-textarea>
+          </div>
+        </div>
+        <div id="test_length" style="position:absolute;visibility: hidden; white-space: nowrap;z-index: -100"></div>
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -139,6 +169,7 @@ import * as sqlApi from "@/api/sql";
 import * as helperApi from "@/api/helper";
 import InstList from "@/views/inst/list";
 import SqlCMEditor from "@/components/SqlCMEditor";
+import G6 from "@antv/g6";
 export default {
   components: {
     InstList,
@@ -239,7 +270,38 @@ export default {
         activeKey: "job",
         defaultFlinkConfs: {}
       },
-      dataTimer: null
+      dataTimer: null,
+
+      // 拓扑图
+      graph: {
+        data: {
+          nodeList: [],
+          linkList: []
+        },
+        isVisible: false
+      },
+      graphHelper: {
+        graph: null,
+        activeNode: null,
+        activeNodeColumnList: [
+          {
+            title: "列名",
+            dataIndex: "name"
+          },
+          {
+            title: "类型",
+            dataIndex: "type"
+          },
+          {
+            title: "允许空",
+            dataIndex: "nullable"
+          },
+          {
+            title: "描述",
+            dataIndex: "comment"
+          }
+        ]
+      }
     };
   },
   methods: {
@@ -252,24 +314,159 @@ export default {
         this.alertException = null;
       }
     },
-    sqlFormat(){
+    sqlFormat() {
       this.$refs.sqlEditor.formatSql();
     },
-    sqlParse(){
-      this.$refs.sqlEditor.clearMarker();
-      sqlApi.sqlParse(this.data.extraConfig.sql).then(res => {
-        if(res.code===10004){
-          this.$refs.sqlEditor.markText(res.data.lineNumber-1,res.data.columnNumber-1,res.data.endLineNumber-1,res.data.endColumnNumber);
-          this.showAlert(res.msg);
-        }else {
-          this.$Notice.success({
-            title: "SQL校验成功！"
-          });
-        }
-      }).catch(res => {
-        console.log(res)
-        this.showAlert(res.msg,res.exceptionStackTrace);
+    buildNodeType(node) {
+      let type = "cycle";
+      switch (node.type) {
+        case "TABLE":
+          type = "ellipse";
+          break;
+        case "VIEW":
+          type = "rect";
+          break;
+        case "INSERT":
+          type = "diamond";
+          break;
+        default:
+      }
+      return type;
+    },
+    drawGraph() {
+      let data = {};
+
+      data.nodes = this.graph.data.nodeList.map(node => {
+        return {
+          id: node.name,
+          label: node.name,
+          name: node.name,
+          type: this.buildNodeType(node),
+          c_type: node.type,
+          comment: node.comment,
+          columnList: node.columnList,
+          sql: node.sql,
+          size: [this.getTextVisualLength(node.name, "14px") + 10, 20]
+        };
       });
+      data.edges = this.graph.data.linkList.map(edge => {
+        return {
+          source: edge.sourceName,
+          target: edge.targetName
+        };
+      });
+      let width = document.getElementById("flowGraph").scrollWidth;
+      let height = 250;
+      if (this.graphHelper.graph) {
+        this.graphHelper.graph.changeData(data);
+        this.graphHelper.graph.refresh();
+        return;
+      } else {
+        this.graphHelper.graph = new G6.Graph({
+          container: "flowGraph", // String | HTMLElement，必须，在 Step 1 中创建的容器 id 或容器本身
+          width: width,
+          height: height,
+          fitView: true,
+          fitViewPadding: 30,
+          modes: {
+            default: ["drag-canvas", "drag-node", "zoom-canvas"]
+          },
+          layout: {
+            type: "dagre",
+            rankdir: "LR",
+            align: "UL",
+            controlPoints: true,
+            nodesepFunc: () => 1,
+            ranksepFunc: () => 1
+          },
+          defaultNode: {
+            size: [30, 20],
+            type: "ellipse",
+            style: {
+              lineWidth: 1,
+              stroke: "#5B8FF9",
+              fill: "#C6E5FF"
+            },
+            labelCfg: {
+              position: "center",
+              style: {
+                fontSize: 11,
+                cursor: "pointer"
+              }
+            }
+          },
+          defaultEdge: {
+            type: "cubic-horizontal",
+            size: 1,
+            color: "#56e25e",
+            style: {
+              endArrow: {
+                path: "M 0,0 L 8,4 L 8,-4 Z",
+                fill: "#e2e2e2"
+              },
+              radius: 20
+            }
+          },
+          nodeStateStyles: {
+            click: {
+              stroke: "#008aff",
+              lineWidth: 2
+            }
+          }
+        });
+        this.graphHelper.graph.data(data); // load data
+        this.graphHelper.graph.render(); // render
+
+        // 监听事件
+        // 监听鼠标点击节点
+        this.graphHelper.graph.on("node:click", e => {
+          // 先将所有当前有 click 状态的节点的 click 状态置为 false
+          const clickNodes = this.graphHelper.graph.findAllByState("node", "click");
+          clickNodes.forEach(cn => {
+            this.graphHelper.graph.setItemState(cn, "click", false);
+          });
+          const nodeItem = e.item;
+          // 设置目标节点的 click 状态 为 true
+          this.graphHelper.graph.setItemState(nodeItem, "click", true);
+          this.graphHelper.activeNode = nodeItem._cfg.model;
+        });
+      }
+    },
+    sqlGraph() {
+      this.graph.isVisible = true;
+      this.$nextTick(() => {
+        sqlApi.sqlParse(this.data.extraConfig.sql).then(resp => {
+          this.graph.data = resp.data;
+          this.drawGraph();
+        });
+        // this.drawGraph();
+      });
+    },
+    handleGraphOk() {
+      this.graph.isVisible = false;
+    },
+    handleGraphCancel() {
+      this.graph.isVisible = false;
+    },
+    sqlParse() {
+      this.alertMessage = "";
+      this.$refs.sqlEditor.clearMarker();
+      sqlApi
+        .sqlParse(this.data.extraConfig.sql)
+        .then(res => {
+          if (res.code === 10004) {
+            this.$refs.sqlEditor.markText(res.data.lineNumber - 1, res.data.columnNumber - 1, res.data.endLineNumber - 1, res.data.endColumnNumber);
+            this.showAlert(res.msg);
+          } else {
+            this.$Notice.success({
+              title: "SQL校验成功！"
+            });
+          }
+        })
+        .catch(res => {
+          console.log(res);
+          this.showAlert(res.msg, res.exceptionStackTrace);
+        });
     },
     onAdd() {
       this.$refs.ruleForm.validate(valid => {
@@ -503,6 +700,13 @@ export default {
         this.helper.jobJarList = resp.data;
       });
     },
+    //工具方法获取文字的像素宽度
+    getTextVisualLength(text, size) {
+      let ruler = document.getElementById("test_length");
+      ruler.style.fontSize = size || "inherit";
+      ruler.innerText = text;
+      return ruler.clientWidth;
+    },
     initHelper() {
       helperApi.getJobTypeList().then(resp => {
         this.helper.jobTypeList = resp.data;
@@ -546,8 +750,31 @@ export default {
 </script>
 
 <style scoped>
-  .head {
-    background: rgba(242, 241, 244, 0.95);
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .12), 0 0 6px 0 rgba(0, 0, 0, .04)
-  }
+.head {
+  background: rgba(242, 241, 244, 0.95);
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12), 0 0 6px 0 rgba(0, 0, 0, 0.04);
+}
+.graph-flow {
+  border: 1px solid #008aff;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+.graph-node {
+  border: 1px solid #19d0ff;
+  padding: 10px;
+  width: 33.3%;
+  height: 310px;
+}
+.graph-node-title {
+  border-left: 3px solid #00ff9c;
+  padding-left: 3px;
+  color: rgba(0, 0, 0, 0.85);
+  font-weight: bold;
+  font-size: 16px;
+  line-height: 1.3;
+  margin-bottom: 15px;
+}
+.graph-node-info {
+  line-height: 3;
+}
 </style>

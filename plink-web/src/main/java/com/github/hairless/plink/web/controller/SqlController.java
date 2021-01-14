@@ -1,5 +1,6 @@
 package com.github.hairless.plink.web.controller;
 
+import com.github.hairless.plink.model.req.SqlReq;
 import com.github.hairless.plink.model.resp.Result;
 import com.github.hairless.plink.model.resp.ResultCode;
 import com.github.hairless.plink.service.PlinkSqlService;
@@ -28,12 +29,12 @@ public class SqlController {
     /**
      * parse sql
      *
-     * @param sql
+     * @param sqlReq SqlReq
      * @return
      */
     @RequestMapping("/parse")
-    public Result<SqlParseInfo> parse(String sql) {
-        return new Result<>(ResultCode.SUCCESS, plinkSqlService.parse(sql));
+    public Result<SqlParseInfo> parse(@RequestBody SqlReq sqlReq) {
+        return new Result<>(ResultCode.SUCCESS, plinkSqlService.parse(sqlReq.getSql()));
     }
 
     /**

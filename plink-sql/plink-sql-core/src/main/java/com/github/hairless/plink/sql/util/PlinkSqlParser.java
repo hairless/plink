@@ -254,7 +254,7 @@ public class PlinkSqlParser {
             for (int i = lineNum; i < endLineNum - 1; i++) {
                 sb.append(lines[i]).append("\n");
             }
-            sb.append(lines[endLineNum - 1], 0, endColumnNum + 1);
+            sb.append(lines[endLineNum - 1], 0, endColumnNum);
         }
         return sb.toString();
     }
