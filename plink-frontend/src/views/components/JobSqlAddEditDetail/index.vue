@@ -1,4 +1,4 @@
-编辑<template>
+<template>
   <div>
     <!-- Page Header -->
     <div>
@@ -449,6 +449,7 @@ export default {
       this.graph.isVisible = false;
     },
     sqlParse() {
+      this.alertMessage = "";
       this.$refs.sqlEditor.clearMarker();
       sqlApi
         .sqlParse(this.data.extraConfig.sql)
