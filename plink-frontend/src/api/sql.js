@@ -5,6 +5,6 @@ export function sqlParse(sql) {
   return request({
     url: "/mng/sql/parse",
     method: "post",
-    params: {"sql": sql}
+    data: { sql: sql }
   });
 }

@@ -1,2 +1,0 @@
-(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d0cbcb2"],{"4ad3":function(n,s,r){"use strict";r.r(s),r.d(s,"sqlParse",(function(){return c}));var t=r("b775");function c(n){return Object(t["default"])({url:"/mng/sql/parse",method:"post",params:{sql:n}})}}}]);
-//# sourceMappingURL=chunk-2d0cbcb2.65b4334f.js.map
