@@ -8,7 +8,9 @@ import com.github.hairless.plink.service.JobStateInfoService;
 import com.github.pagehelper.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -39,7 +41,27 @@ public class JobStateInfoController {
     @RequestMapping("/queryJobStateInfo")
     public Result<JobStateInfoDTO> queryJobStateInfo(Long jobStateInfoId) {
         log.info("the method is queryJobStateInfo, params is {}",jobStateInfoId);
-        JobStateInfoDTO jobStateInfoDTOPageInfo = jobStateInfoService.queryJobStateInfo(jobStateInfoId);
-        return new Result<>(ResultCode.SUCCESS, jobStateInfoDTOPageInfo);
+        JobStateInfoDTO jobStateInfoDTO = jobStateInfoService.queryJobStateInfo(jobStateInfoId);
+        return new Result<>(ResultCode.SUCCESS, jobStateInfoDTO);
+    }
+
+    /**
+     * 新增状态
+     */
+    @RequestMapping(value = "/addJobStateInfo",method = RequestMethod.POST)
+    public Result<JobStateInfoDTO> addJobStateInfo(@RequestBody JobStateInfoDTO jobStateInfoDTO) {
+        log.info("the method is addJobStateInfo, params is {}",jobStateInfoDTO.toString());
+        JobStateInfoDTO jobStateInfo = jobStateInfoService.addJobStateInfo(jobStateInfoDTO);
+        return new Result<>(ResultCode.SUCCESS, jobStateInfo);
+    }
+
+    /**
+     * 删除状态
+     */
+    @RequestMapping("/deleteJobStateInfo")
+    public Result deleteJobStateInfo(Long jobStateInfoId) {
+        log.info("the method is queryJobStateInfo, params is {}",jobStateInfoId);
+        jobStateInfoService.deleteJobStateInfo(jobStateInfoId);
+        return new Result<>(ResultCode.SUCCESS);
     }
 }

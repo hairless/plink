@@ -47,11 +47,20 @@ public class JobStateInfoTransform implements Transform<JobStateInfoDTO, JobStat
 
     @Override
     public JobStateInfo inverseTransform(JobStateInfoDTO dto) {
-        return null;
+        JobStateInfo jobStateInfo = new JobStateInfo();
+        BeanUtils.copyProperties(dto, jobStateInfo);
+        return inverseTransform(Collections.singletonList(dto)).stream().findFirst().orElse(null);
     }
 
     @Override
     public Collection<JobStateInfo> inverseTransform(Collection<JobStateInfoDTO> dtoList) {
-        return null;
+        if (CollectionUtils.isEmpty(dtoList)) {
+            return Collections.emptyList();
+        }
+        return dtoList.stream().map(dto -> {
+            JobStateInfo jobStateInfo = new JobStateInfo();
+            BeanUtils.copyProperties(dto, jobStateInfo);
+            return jobStateInfo;
+        }).collect(Collectors.toList());
     }
 }
