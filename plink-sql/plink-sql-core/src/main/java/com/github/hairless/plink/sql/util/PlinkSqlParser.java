@@ -193,7 +193,9 @@ public class PlinkSqlParser {
                         }
                     });
                     SqlParseNode sinkNode = nodeMap.get(sinkTableName);
-                    sinkNode.getActions().add(SqlParseNodeActionEnum.SINK);
+                    if (sinkNode != null) {
+                        sinkNode.getActions().add(SqlParseNodeActionEnum.SINK);
+                    }
                 } else if (sqlNode instanceof SqlSetOption) {
                     String name = ((SqlSetOption) sqlNode).getName().getSimple();
                     String value = ((SqlSetOption) sqlNode).getValue().toString();

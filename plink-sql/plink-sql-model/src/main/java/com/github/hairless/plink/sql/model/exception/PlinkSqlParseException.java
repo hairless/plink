@@ -12,7 +12,7 @@ public class PlinkSqlParseException extends Exception {
     private SqlParsePos pos;
 
     public PlinkSqlParseException(String message, int lineNumber, int columnNumber, int endLineNumber, int endColumnNumber) {
-        super(message);
+        super(message + " at line " + lineNumber + ", column " + columnNumber + " to line " + endLineNumber + ", column " + endColumnNumber);
         this.pos = new SqlParsePos(lineNumber, columnNumber, endLineNumber, endColumnNumber);
     }
 
