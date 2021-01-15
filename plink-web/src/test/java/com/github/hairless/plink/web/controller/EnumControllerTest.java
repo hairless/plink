@@ -25,4 +25,9 @@ public class EnumControllerTest extends BaseControllerTest {
     public void jobType() throws Exception {
         getTest("/mng/enum/jobType");
     }
+
+    @Test
+    public void jobStateInfoType() throws Exception {
+        getTest("/mng/enum/jobStateInfoType");
+    }
 }
