@@ -109,7 +109,7 @@ flink.conf.key3=value3"
             </div>
           </a-alert>
           <a-button-group style="float: right">
-            <a-button type="primary" icon="medicine-box" @click="sqlGraph">拓扑图</a-button>
+            <a-button type="primary" icon="medicine-box" @click="sqlGraph">SQL拓扑</a-button>
             <a-button type="primary" icon="medicine-box" @click="sqlParse">SQL校验</a-button>
             <a-button type="primary" icon="medicine-box" @click="sqlFormat">格式化</a-button>
           </a-button-group>
@@ -127,10 +127,44 @@ flink.conf.key3=value3"
 
         <InstList ref="refInstList" :job-id="dataId" :is-auto-flush="true" />
       </a-tab-pane>
+
+      <a-tab-pane key="state" v-if="['detail'].includes(usageMode)">
+        <span slot="tab">
+          <a-icon type="database" />
+          状态列表
+        </span>
+
+        <!-- Data Filter -->
+        <div style="margin-bottom: 10px; padding: 5px; background-image: linear-gradient(100deg, rgba(60, 213, 255, 0.5), rgba(60, 213, 255, 0.3));">
+          <a-row :gutter="16">
+            <a-col class="gutter-row" :span="20" style="padding-left: 20px">
+              <div class="gutter-box">
+                <span style="margin-left: 10px">
+                  类型 :
+                  <a-select v-model="state.filter.type" style="width: 110px" size="small" allowClear @change="getJobStateInfoList">
+                    <a-select-option v-for="(item, index) in state.helper.stateEnumList" :key="index" :value="item.code">
+                      {{ item.desc }}
+                    </a-select-option>
+                  </a-select>
+                </span>
+              </div>
+            </a-col>
+            <a-col class="gutter-row" :span="4" align="right">
+              <div class="gutter-box">
+                <a-button type="primary" size="small" class="filter-tool" @click="getJobStateInfoList">查询</a-button>
+              </div>
+            </a-col>
+          </a-row>
+        </div>
+
+        <a-table :columns="state.columnList" :data-source="state.dataList" :row-key="(row, index) => index" :pagination="true">
+          <!---->
+        </a-table>
+      </a-tab-pane>
     </a-tabs>
 
     <!-- 拓扑图 -->
-    <a-modal title="拓扑图" :visible="graph.isVisible" @ok="handleGraphOk" @cancel="handleGraphCancel" width="80%">
+    <a-modal title="拓扑图" v-model="graph.isVisible" :footer="null" width="80%">
       <div style="height: 600px">
         <div id="flowGraph" class="graph-flow" />
         <div style="display: flex" v-if="graphHelper.activeNode">
@@ -154,7 +188,7 @@ flink.conf.key3=value3"
           </div>
           <div class="graph-node">
             <div class="graph-node-title">SQL</div>
-            <a-textarea v-model="graphHelper.activeNode.sql" :autosize="{ minRows: 10, maxRows: 10}" :readonly="true" style="min-height: 250px"></a-textarea>
+            <a-textarea v-model="graphHelper.activeNode.sql" :autoSize="{ minRows: 10, maxRows: 10 }" :readonly="true" style="min-height: 250px"></a-textarea>
           </div>
         </div>
         <div id="test_length" style="position:absolute;visibility: hidden; white-space: nowrap;z-index: -100"></div>
@@ -280,6 +314,46 @@ export default {
         },
         isVisible: false
       },
+      state: {
+        columnList: [
+          {
+            title: "ID",
+            dataIndex: "id"
+          },
+          {
+            title: "实例ID",
+            dataIndex: "instanceId"
+          },
+          {
+            title: "类型",
+            dataIndex: "type"
+          },
+          {
+            title: "状态保存耗时",
+            dataIndex: "duration"
+          },
+          {
+            title: "状态保存路径",
+            dataIndex: "externalPath"
+          },
+          {
+            title: "状态存储大小",
+            dataIndex: "size"
+          },
+          {
+            title: "上报时间",
+            dataIndex: "reportTimestamp"
+          }
+        ],
+        dataList: [],
+        filter: {
+          jobId: this.dataId,
+          type: null
+        },
+        helper: {
+          stateEnumList: []
+        }
+      },
       graphHelper: {
         graph: null,
         activeNode: null,
@@ -335,9 +409,10 @@ export default {
     },
     drawGraph() {
       let data = {};
+      this.graphHelper.activeNode = null;
 
       data.nodes = this.graph.data.nodeList.map(node => {
-        return {
+        let data = {
           id: node.name,
           label: node.name,
           name: node.name,
@@ -348,6 +423,16 @@ export default {
           sql: node.sql,
           size: [this.getTextVisualLength(node.name, "14px") + 10, 20]
         };
+
+        if (!this.graphHelper.activeNode) {
+          node.actions.forEach(action => {
+            if (action === "SOURCE") {
+              this.graphHelper.activeNode = data; // 默认选择第一个
+            }
+          });
+        }
+
+        return data;
       });
       data.edges = this.graph.data.linkList.map(edge => {
         return {
@@ -355,6 +440,7 @@ export default {
           target: edge.targetName
         };
       });
+
       let width = document.getElementById("flowGraph").scrollWidth;
       let height = 250;
       if (this.graphHelper.graph) {
@@ -417,6 +503,11 @@ export default {
         this.graphHelper.graph.data(data); // load data
         this.graphHelper.graph.render(); // render
 
+        let activeNode = this.graphHelper.graph.findById(this.graphHelper.activeNode.id);
+        if (activeNode) {
+          this.graphHelper.graph.setItemState(activeNode, "click", true);
+        }
+
         // 监听事件
         // 监听鼠标点击节点
         this.graphHelper.graph.on("node:click", e => {
@@ -433,20 +524,26 @@ export default {
       }
     },
     sqlGraph() {
-      this.graph.isVisible = true;
-      this.$nextTick(() => {
-        sqlApi.sqlParse(this.data.extraConfig.sql).then(resp => {
-          this.graph.data = resp.data;
-          this.drawGraph();
+      this.alertMessage = "";
+      this.$refs.sqlEditor.clearMarker();
+      sqlApi
+        .sqlParse(this.data.extraConfig.sql)
+        .then(resp => {
+          if (resp.code === 10004) {
+            this.$refs.sqlEditor.markText(resp.data.lineNumber - 1, resp.data.columnNumber - 1, resp.data.endLineNumber - 1, resp.data.endColumnNumber);
+            this.showAlert(resp.msg);
+          } else {
+            this.graph.data = resp.data;
+            this.graph.isVisible = true;
+            this.$nextTick(() => {
+              this.drawGraph();
+            });
+          }
+        })
+        .catch(res => {
+          console.log(res);
+          this.showAlert(res.msg, res.exceptionStackTrace);
         });
-        // this.drawGraph();
-      });
-    },
-    handleGraphOk() {
-      this.graph.isVisible = false;
-    },
-    handleGraphCancel() {
-      this.graph.isVisible = false;
     },
     sqlParse() {
       this.alertMessage = "";
@@ -629,6 +726,12 @@ export default {
           this.$refs.refInstList.getDataList();
         }
       }
+      if (activeKey === "state") {
+        if (this.state.helper.stateEnumList.length === 0) {
+          this.getJobStateInfoType();
+        }
+        this.getJobStateInfoList();
+      }
     },
     initAddUsageModel() {
       this.usageModeHelper.showAddButton = true;
@@ -698,6 +801,16 @@ export default {
     getJobUploadJarList() {
       jobApi.getJobJarList(this.dataId).then(resp => {
         this.helper.jobJarList = resp.data;
+      });
+    },
+    getJobStateInfoType() {
+      helperApi.getJobStateInfoType().then(resp => {
+        this.state.helper.stateEnumList = resp.data;
+      });
+    },
+    getJobStateInfoList() {
+      jobApi.getJobStateInfoList(this.state.filter).then(resp => {
+        this.state.dataList = resp.data.list;
       });
     },
     //工具方法获取文字的像素宽度

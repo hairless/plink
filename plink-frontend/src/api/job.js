@@ -109,3 +109,11 @@ export function stopJobList(idList) {
     data: idList
   });
 }
+
+export function getJobStateInfoList(params) {
+  return request({
+    url: "/mng/jobStateInfo/queryJobStateInfos",
+    method: "get",
+    params: params
+  });
+}

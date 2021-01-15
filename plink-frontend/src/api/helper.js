@@ -22,6 +22,13 @@ export function getJobClientVersionList() {
   });
 }
 
+export function getJobStateInfoType() {
+  return request({
+    url: "/mng/enum/jobStateInfoType",
+    method: "get"
+  });
+}
+
 export function getDefaultFlinkConfs() {
   return request({
     url: "/mng/util/defaultFlinkConfs",
