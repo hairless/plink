@@ -1,7 +1,6 @@
 package com.github.hairless.plink.common.builder;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.hairless.plink.common.conf.FlinkAutoConfig;
 import com.github.hairless.plink.common.util.FileUtil;
 import com.github.hairless.plink.common.util.JsonUtil;
 import com.github.hairless.plink.common.util.PlinkSqlUtil;
@@ -16,9 +15,7 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.flink.util.Preconditions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,7 +23,7 @@ import java.util.stream.Stream;
  * @author: silence
  * @date: 2020/10/13
  */
-public class SqlJobBuilder implements JobBuilder {
+public class SqlJobBuilder extends JobBuilder {
 
     @Override
     public void validate(JobDTO jobDTO) {
@@ -42,7 +39,7 @@ public class SqlJobBuilder implements JobBuilder {
     }
 
     @Override
-    public FlinkSubmitOptions buildFlinkSubmitOption(JobInstanceDTO jobInstanceDTO) {
+    public FlinkSubmitOptions buildFlinkSubmitOptionInternal(JobInstanceDTO jobInstanceDTO) {
         String jobName = "PLINK_SQL_" + jobInstanceDTO.getJob().getName();
         FlinkSubmitOptions flinkSubmitOptions = new FlinkSubmitOptions();
         flinkSubmitOptions.setJobName(jobName);
@@ -69,13 +66,6 @@ public class SqlJobBuilder implements JobBuilder {
         args.add("\"-c\"");
         args.add('"' + StringEscapeUtils.escapeJava(JsonUtil.toJSONString(sqlConfig)) + '"');
         flinkConfig.setArgs(String.join(" ", args).replace("`", "\\`"));
-        Map<String, String> defaultConfs = FlinkAutoConfig.defaultConfs;
-        Map<String, String> configs = flinkConfig.getConfigs() == null ? new HashMap<>() : flinkConfig.getConfigs();
-        defaultConfs.forEach((k, v) -> {
-            if (!configs.containsKey(k)) {
-                configs.put(k, v);
-            }
-        });
         flinkSubmitOptions.setFlinkConfig(flinkConfig);
         return flinkSubmitOptions;
     }
