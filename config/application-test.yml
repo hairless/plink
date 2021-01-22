@@ -56,7 +56,7 @@ kerberos:
 
 #'yarn' or 'standalone'
 cluster:
-  mode: yarn
+  mode: standalone
   queue:
 
 #平台flink任务的默认配置，优先级小于任务的flink conf，大于flink客户端conf
