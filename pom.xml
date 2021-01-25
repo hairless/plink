@@ -25,6 +25,7 @@
 
         <!-- should be last -->
         <module>plink-dist</module>
+        <module>plink-opt/plink-reporter-checkpoint</module>
     </modules>
 
     <properties>
