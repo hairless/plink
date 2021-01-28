@@ -68,3 +68,5 @@ flink:
   defaultConfs:
     execution.checkpointing.interval: 60000
     execution.checkpointing.timeout: 120000
+    metrics.reporter.remote.jobId: ${jobId}
+    metrics.reporter.remote.instanceId: ${instanceId}

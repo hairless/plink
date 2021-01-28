@@ -10,4 +10,6 @@ import lombok.Data;
 @Data
 public class JobStateInfoDTO extends JobStateInfo {
     private String typeDesc;
+    private String mode;
+    private String jobName;
 }
