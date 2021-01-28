@@ -1,14 +1,11 @@
-package com.github.hairless.plink.metrics.remote;
+package com.github.hairless.plink.metrics.checkpoint;
 
 import org.apache.flink.annotation.docs.Documentation;
 import org.apache.flink.configuration.ConfigOption;
 import org.apache.flink.configuration.ConfigOptions;
-import org.apache.flink.configuration.description.Description;
-import org.apache.flink.configuration.description.LinkElement;
-import org.apache.flink.configuration.description.TextElement;
 
 @Documentation.SuffixOption
-public class RemoteReporterOptions {
+public class PlinkCheckpointReporterOptions {
 
     public static final ConfigOption<String> MODE =
             ConfigOptions.key("mode")

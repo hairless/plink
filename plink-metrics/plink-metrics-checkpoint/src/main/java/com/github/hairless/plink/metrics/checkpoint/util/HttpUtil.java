@@ -1,4 +1,4 @@
-package com.github.hairless.plink.metrics.remote.util;
+package com.github.hairless.plink.metrics.checkpoint.util;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.config.RequestConfig;

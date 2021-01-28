@@ -84,7 +84,7 @@ public class JobStateInfoServiceImpl implements JobStateInfoService {
         if(ClusterModeEnum.STANDALONE.getDesc().equalsIgnoreCase(jobStateInfoDTO.getMode())){
             Boolean aBoolean = setStateJobIdInstanceId(jobStateInfoDTO);
             if(!aBoolean){
-                throw new PlinkMessageException("Job Name is null");
+                throw new PlinkMessageException("Set State jobId and instanceId error .");
             }
         }
         JobStateInfo jobStateInfo = jobStateInfoTransform.inverseTransform(jobStateInfoDTO);

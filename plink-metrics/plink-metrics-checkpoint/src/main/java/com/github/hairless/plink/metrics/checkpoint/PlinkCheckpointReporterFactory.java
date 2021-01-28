@@ -1,4 +1,4 @@
-package com.github.hairless.plink.metrics.remote;
+package com.github.hairless.plink.metrics.checkpoint;
 
 import org.apache.flink.metrics.reporter.InterceptInstantiationViaReflection;
 import org.apache.flink.metrics.reporter.MetricReporter;
@@ -12,11 +12,11 @@ import java.util.Properties;
  * @author: thorntree
  * @create: 2021-01-26 15:48
  */
-@InterceptInstantiationViaReflection(reporterClassName = "com.github.hairless.plink.metrics.remote.RemoteReporter")
-public class RemoteReporterFactory implements MetricReporterFactory {
+@InterceptInstantiationViaReflection(reporterClassName = "com.github.hairless.plink.metrics.checkpoint.PlinkCheckpointReporter")
+public class PlinkCheckpointReporterFactory implements MetricReporterFactory {
 
     @Override
     public MetricReporter createMetricReporter(Properties properties) {
-        return new RemoteReporter();
+        return new PlinkCheckpointReporter();
     }
 }

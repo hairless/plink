@@ -12,7 +12,7 @@
     <artifactId>plink-metrics</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>plink-metrics-remote</module>
+        <module>plink-metrics-checkpoint</module>
     </modules>
 
     <properties>

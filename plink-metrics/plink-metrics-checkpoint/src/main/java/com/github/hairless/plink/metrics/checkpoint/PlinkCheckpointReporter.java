@@ -1,6 +1,6 @@
-package com.github.hairless.plink.metrics.remote;
+package com.github.hairless.plink.metrics.checkpoint;
 
-import com.github.hairless.plink.metrics.remote.util.HttpUtil;
+import com.github.hairless.plink.metrics.checkpoint.util.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.metrics.Gauge;
@@ -12,7 +12,7 @@ import org.apache.flink.metrics.reporter.Scheduled;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.hairless.plink.metrics.remote.RemoteReporterOptions.*;
+import static com.github.hairless.plink.metrics.checkpoint.PlinkCheckpointReporterOptions.*;
 
 /**
  * @description: Remote Reporter
@@ -20,8 +20,8 @@ import static com.github.hairless.plink.metrics.remote.RemoteReporterOptions.*;
  * @create: 2021-01-26 15:44
  */
 @Slf4j
-@InstantiateViaFactory(factoryClassName = "com.github.hairless.plink.metrics.remote.RemoteReporterFactory")
-public class RemoteReporter extends AbstractReporter implements Scheduled {
+@InstantiateViaFactory(factoryClassName = "com.github.hairless.plink.metrics.checkpoint.PlinkCheckpointReporterFactory")
+public class PlinkCheckpointReporter extends AbstractReporter implements Scheduled {
 
 
     public static final String METRICS_CHECKPOINT_EXTERNAL_PATH = "lastCheckpointExternalPath";
