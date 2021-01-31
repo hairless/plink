@@ -1,4 +1,4 @@
-package com.github.hairless.plink.metrics.checkpoint;
+package com.github.hairless.plink.checkpoint.reporter;
 
 import org.apache.flink.metrics.reporter.InterceptInstantiationViaReflection;
 import org.apache.flink.metrics.reporter.MetricReporter;
@@ -12,7 +12,7 @@ import java.util.Properties;
  * @author: thorntree
  * @create: 2021-01-26 15:48
  */
-@InterceptInstantiationViaReflection(reporterClassName = "com.github.hairless.plink.metrics.checkpoint.PlinkCheckpointReporter")
+@InterceptInstantiationViaReflection(reporterClassName = "com.github.hairless.plink.checkpoint.reporter.PlinkCheckpointReporter")
 public class PlinkCheckpointReporterFactory implements MetricReporterFactory {
 
     @Override

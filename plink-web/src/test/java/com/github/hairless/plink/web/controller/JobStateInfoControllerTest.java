@@ -2,7 +2,6 @@ package com.github.hairless.plink.web.controller;
 
 import com.github.hairless.plink.TestBootStrapApp;
 import com.github.hairless.plink.model.dto.JobStateInfoDTO;
-import com.github.hairless.plink.model.enums.ClusterModeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,8 +35,6 @@ public class JobStateInfoControllerTest extends  BaseControllerTest{
     @Test
     public void addJobStateInfoTest() throws Exception{
         JobStateInfoDTO jobStateInfoDTO = new JobStateInfoDTO();
-        jobStateInfoDTO.setMode(ClusterModeEnum.STANDALONE.getDesc());
-        jobStateInfoDTO.setJobName("SQL TUMBLE Test");
         jobStateInfoDTO.setJobId(1L);
         jobStateInfoDTO.setInstanceId(1L);
         jobStateInfoDTO.setExternalPath("file:/Users/liuxiaoshuai/vdb1/flink_cp/39c709ceabea69dd74d84c4916b49e5f/chk-29");

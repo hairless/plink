@@ -22,7 +22,7 @@
         <module>plink-rpc</module>
         <module>plink-schedule</module>
         <module>plink-sql</module>
-        <module>plink-metrics</module>
+        <module>plink-opt</module>
 
         <!-- should be last -->
         <module>plink-dist</module>
@@ -86,6 +86,11 @@
             <dependency>
                 <groupId>com.github.hairless</groupId>
                 <artifactId>plink-sql-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.hairless</groupId>
+                <artifactId>plink-opt</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

@@ -1,4 +1,4 @@
-package com.github.hairless.plink.metrics.checkpoint.util;
+package com.github.hairless.plink.checkpoint.reporter.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;

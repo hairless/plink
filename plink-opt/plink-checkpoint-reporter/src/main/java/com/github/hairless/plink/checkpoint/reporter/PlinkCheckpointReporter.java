@@ -1,6 +1,6 @@
-package com.github.hairless.plink.metrics.checkpoint;
+package com.github.hairless.plink.checkpoint.reporter;
 
-import com.github.hairless.plink.metrics.checkpoint.util.HttpUtil;
+import com.github.hairless.plink.checkpoint.reporter.util.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.metrics.Gauge;
@@ -12,7 +12,7 @@ import org.apache.flink.metrics.reporter.Scheduled;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.hairless.plink.metrics.checkpoint.PlinkCheckpointReporterOptions.*;
+import static com.github.hairless.plink.checkpoint.reporter.PlinkCheckpointReporterOptions.*;
 
 /**
  * @description: Remote Reporter
@@ -20,7 +20,7 @@ import static com.github.hairless.plink.metrics.checkpoint.PlinkCheckpointReport
  * @create: 2021-01-26 15:44
  */
 @Slf4j
-@InstantiateViaFactory(factoryClassName = "com.github.hairless.plink.metrics.checkpoint.PlinkCheckpointReporterFactory")
+@InstantiateViaFactory(factoryClassName = "com.github.hairless.plink.checkpoint.reporter.PlinkCheckpointReporterFactory")
 public class PlinkCheckpointReporter extends AbstractReporter implements Scheduled {
 
 
@@ -28,10 +28,8 @@ public class PlinkCheckpointReporter extends AbstractReporter implements Schedul
     public static final String METRICS_CHECKPOINT_DURATION = "lastCheckpointDuration";
     public static final String METRICS_CHECKPOINT_SIZE = "lastCheckpointSize";
 
-    public static final String FILED_MODE = "mode";
     public static final String FILED_JOB_ID = "jobId";
     public static final String FILED_JOB_INSTANCE_ID = "instanceId";
-    public static final String FILED_JOB_NAME = "jobName";
     public static final String FILED_EXTERNAL_PATH = "externalPath";
     public static final String FILED_DURATION = "duration";
     public static final String FILED_SIZE = "size";
@@ -43,7 +41,6 @@ public class PlinkCheckpointReporter extends AbstractReporter implements Schedul
     public static final String METRICS_CHECKPOINT_NONE = "-1";
     public static final String METRICS_CHECKPOINT_NULL = "n/a";
 
-    private String mode;
     private String remoteService;
     private String plinkJobId;
     private String plinkInstanceId;
@@ -57,7 +54,6 @@ public class PlinkCheckpointReporter extends AbstractReporter implements Schedul
     @Override
     public void open(MetricConfig metricConfig) {
         try {
-            this.mode =  metricConfig.getString(MODE.key(),MODE.defaultValue());
             this.remoteService =  metricConfig.getString(SERVICE.key(),SERVICE.defaultValue());
             if(StringUtils.isBlank(this.remoteService)){
                 throw new RuntimeException("Service is null. ");
@@ -117,11 +113,9 @@ public class PlinkCheckpointReporter extends AbstractReporter implements Schedul
                 jobNameMetric.get(jobName).put(filed,metric.getKey().getValue());
             }else{
                 Map<String,Object> map = new HashMap<>();
-                map.put(FILED_MODE,mode);
                 map.put(FILED_TYPE,0);
                 map.put(FILED_JOB_ID,plinkJobId);
                 map.put(FILED_JOB_INSTANCE_ID,plinkInstanceId);
-                map.put(FILED_JOB_NAME,jobName);
                 map.put(FILED_REPORT_TIMESTAMP,System.currentTimeMillis()/1000);
                 map.put(filed,metric.getKey().getValue());
                 jobNameMetric.put(jobName,map);
