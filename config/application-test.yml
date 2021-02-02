@@ -70,6 +70,6 @@ flink:
     execution.checkpointing.timeout: 120000
     metrics.reporter.checkpoint.factory.class: com.github.hairless.plink.checkpoint.reporter.PlinkCheckpointReporterFactory
     metrics.reporter.checkpoint.interval: 30 SECONDS
-    metrics.reporter.checkpoint.service: http://ip:8666/mng/jobStateInf/addJobStateInfo
+    metrics.reporter.checkpoint.service: http://${host}:8666/mng/jobStateInf/addJobStateInfo
     metrics.reporter.checkpoint.jobId: ${jobId}
     metrics.reporter.checkpoint.instanceId: ${instanceId}
