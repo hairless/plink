@@ -7,17 +7,11 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * @Author: liuxiaoshuai
- * @Date: 2021/2/2
- * @Description: Abstract Reporter
+ * @description: Remote Reporter
+ * @author: thorntree
+ * @create: 2021-02-02 15:48
  */
 public abstract class AbstractReporter implements MetricReporter, CharacterFilter {
-
-    public static final String METRICS_EXTERNAL_PATH = "lastCheckpointExternalPath";
-    public static final String METRICS_DURATION = "lastCheckpointDuration";
-    public static final String METRICS_SIZE = "lastCheckpointSize";
-    public static final String METRICS_JOB_ID = "job_id";
-
 
     private static final Pattern UNALLOWED_CHAR_PATTERN = Pattern.compile("[^a-zA-Z0-9:_]");
     private static final CharacterFilter CHARACTER_FILTER =
@@ -27,8 +21,6 @@ public abstract class AbstractReporter implements MetricReporter, CharacterFilte
                     return replaceInvalidChars(input);
                 }
             };
-
-    private static final char SCOPE_SEPARATOR = '_';
 
     static String replaceInvalidChars(final String input) {
         return UNALLOWED_CHAR_PATTERN.matcher(input).replaceAll("_");
@@ -42,12 +34,12 @@ public abstract class AbstractReporter implements MetricReporter, CharacterFilte
     public void notifyOfAddedMetric(Metric metric, String metricName, MetricGroup group) {
         synchronized (this) {
             if (metric instanceof Gauge
-                    && (METRICS_EXTERNAL_PATH.equals(metricName)
-                    || METRICS_DURATION.equals(metricName)
-                    || METRICS_SIZE.equals(metricName))) {
+                    && (Constants.METRIC_EXTERNAL_PATH.equals(metricName)
+                    || Constants.METRIC_DURATION.equals(metricName)
+                    || Constants.METRIC_SIZE.equals(metricName))) {
                 String job_id = getFlinkJobId(group);
                 final String name = group.getMetricIdentifier(metricName, this);
-                String lastName = name+SCOPE_SEPARATOR+job_id;
+                String lastName = name+"_"+job_id;
                 gauges.put((Gauge<?>) metric, lastName);
             }
         }
@@ -71,7 +63,7 @@ public abstract class AbstractReporter implements MetricReporter, CharacterFilte
     private String getFlinkJobId(MetricGroup group){
         for (final Map.Entry<String, String> dimension : group.getAllVariables().entrySet()) {
             final String key = dimension.getKey();
-            if(METRICS_JOB_ID.equals(CHARACTER_FILTER.filterCharacters(key.substring(1, key.length() - 1)))){
+            if(Constants.METRIC_JOB_ID.equals(CHARACTER_FILTER.filterCharacters(key.substring(1, key.length() - 1)))){
                 return labelValueCharactersFilter.filterCharacters(dimension.getValue());
             }
         }

@@ -37,7 +37,7 @@ public class JobStateInfoControllerTest extends  BaseControllerTest{
         JobStateInfoDTO jobStateInfoDTO = new JobStateInfoDTO();
         jobStateInfoDTO.setJobId(1L);
         jobStateInfoDTO.setInstanceId(1L);
-        jobStateInfoDTO.setExternalPath("file:/Users/liuxiaoshuai/vdb1/flink_cp/39c709ceabea69dd74d84c4916b49e5f/chk-29");
+        jobStateInfoDTO.setExternalPath("/aa/bb/cc");
         jobStateInfoDTO.setType(0);
         jobStateInfoDTO.setDuration(10000l);
         jobStateInfoDTO.setSize(1000l);

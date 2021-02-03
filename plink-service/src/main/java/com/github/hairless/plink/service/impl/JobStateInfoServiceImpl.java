@@ -13,7 +13,6 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -56,13 +55,6 @@ public class JobStateInfoServiceImpl implements JobStateInfoService {
     @Override
     public JobStateInfoDTO addJobStateInfo(JobStateInfoDTO jobStateInfoDTO) {
         this.checkJobState(jobStateInfoDTO);
-        //Make sure state is idempotent
-        JobStateInfo jobStateInfoParam = new JobStateInfo();
-        jobStateInfoParam.setExternalPath(jobStateInfoDTO.getExternalPath());
-        List<JobStateInfo> jobStateInfoList = jobStateInfoMapper.select(jobStateInfoParam);
-        if(CollectionUtils.isNotEmpty(jobStateInfoList)){
-            return jobStateInfoTransform.transform(jobStateInfoList.get(0));
-        }
         JobStateInfo jobStateInfo = jobStateInfoTransform.inverseTransform(jobStateInfoDTO);
         try {
             jobStateInfoMapper.insertSelective(jobStateInfo);

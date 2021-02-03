@@ -22,10 +22,6 @@ import static com.github.hairless.plink.checkpoint.reporter.PlinkCheckpointRepor
 @InstantiateViaFactory(factoryClassName = "com.github.hairless.plink.checkpoint.reporter.PlinkCheckpointReporterFactory")
 public class PlinkCheckpointReporter extends AbstractReporter implements Scheduled {
 
-    public static final String METRICS_CHECKPOINT_EXTERNAL_PATH = "lastCheckpointExternalPath";
-    public static final String METRICS_CHECKPOINT_DURATION = "lastCheckpointDuration";
-    public static final String METRICS_CHECKPOINT_SIZE = "lastCheckpointSize";
-
     public static final String FILED_JOB_ID = "jobId";
     public static final String FILED_JOB_INSTANCE_ID = "instanceId";
     public static final String FILED_EXTERNAL_PATH = "externalPath";
@@ -34,10 +30,8 @@ public class PlinkCheckpointReporter extends AbstractReporter implements Schedul
     public static final String FILED_TYPE = "type";
     public static final String FILED_REPORT_TIMESTAMP = "reportTimestamp";
 
-    public static final String DELIMITER = "_";
-
-    public static final String METRICS_CHECKPOINT_NONE = "-1";
-    public static final String METRICS_CHECKPOINT_NULL = "n/a";
+    public static final String METRIC_CHECKPOINT_NONE = "-1";
+    public static final String METRIC_CHECKPOINT_NULL = "n/a";
 
     private String remoteService;
     private String plinkJobId;
@@ -78,9 +72,9 @@ public class PlinkCheckpointReporter extends AbstractReporter implements Schedul
         Map<String,Map<String,Object>> flinkJobIdMetric = new HashMap<>();
         try {
             for (Map.Entry<Gauge<?>, String> metric : gauges.entrySet()) {
-                putMetricToMap(metric,METRICS_CHECKPOINT_EXTERNAL_PATH,FILED_EXTERNAL_PATH,flinkJobIdMetric);
-                putMetricToMap(metric,METRICS_CHECKPOINT_DURATION,FILED_DURATION,flinkJobIdMetric);
-                putMetricToMap(metric,METRICS_CHECKPOINT_SIZE,FILED_SIZE,flinkJobIdMetric);
+                putMetricToMap(metric,Constants.METRIC_EXTERNAL_PATH,FILED_EXTERNAL_PATH,flinkJobIdMetric);
+                putMetricToMap(metric,Constants.METRIC_DURATION,FILED_DURATION,flinkJobIdMetric);
+                putMetricToMap(metric,Constants.METRIC_SIZE,FILED_SIZE,flinkJobIdMetric);
             }
             for(Map.Entry<String,Map<String,Object>> map:flinkJobIdMetric.entrySet()){
                 HttpUtil.doPost(remoteService,map.getValue());
@@ -94,15 +88,16 @@ public class PlinkCheckpointReporter extends AbstractReporter implements Schedul
     /**
      * Put Metric to Map
      * @param metric
-     * @param metricsFilter
+     * @param metricName
      * @param filed
      * @param flinkJobIdMetric
      */
-    private void putMetricToMap(Map.Entry<Gauge<?>, String> metric,String metricsFilter,String filed,Map<String,Map<String,Object>> flinkJobIdMetric){
-        if(metric.getValue().contains(metricsFilter)
-            && !METRICS_CHECKPOINT_NONE.equals(String.valueOf(metric.getKey().getValue()))
-            && !METRICS_CHECKPOINT_NULL.equals(String.valueOf(metric.getKey().getValue()))){
-            String[] valueArray = metric.getValue().split(DELIMITER);
+    private void putMetricToMap(Map.Entry<Gauge<?>, String> metric,String metricName,String filed,Map<String,Map<String,Object>> flinkJobIdMetric){
+        if(metric.getValue().contains(metricName)
+            && !METRIC_CHECKPOINT_NONE.equals(String.valueOf(metric.getKey().getValue()))
+            && !METRIC_CHECKPOINT_NULL.equals(String.valueOf(metric.getKey().getValue()))){
+
+            String[] valueArray = metric.getValue().split("_");
             if(valueArray.length<2){
                 return;
             }

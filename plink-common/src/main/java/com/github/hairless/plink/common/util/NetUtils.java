@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 import static java.util.Collections.emptyList;
 
 /**
- * @Author: liuxiaoshuai
- * @Date: 2021/2/2
- * @Description: NetUtils
+ * @description: Constants
+ * @author: thorntree
+ * @create: 2021-02-02 14:44
  */
 public class NetUtils {
 
