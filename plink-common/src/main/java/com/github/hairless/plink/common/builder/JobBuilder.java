@@ -2,6 +2,7 @@ package com.github.hairless.plink.common.builder;
 
 import com.github.hairless.plink.common.conf.FlinkAutoConfig;
 import com.github.hairless.plink.common.util.MapUtils;
+import com.github.hairless.plink.common.util.NetUtils;
 import com.github.hairless.plink.model.common.FlinkConfig;
 import com.github.hairless.plink.model.common.FlinkSubmitOptions;
 import com.github.hairless.plink.model.dto.JobDTO;
@@ -36,6 +37,7 @@ public abstract class JobBuilder {
         Map<String, Object> valueMap = new HashMap<>();
         valueMap.put("jobId", jobInstanceDTO.getJob().getId());
         valueMap.put("instanceId", jobInstanceDTO.getId());
+        valueMap.put("host", NetUtils.getHost());
         StringSubstitutor substitutor = new StringSubstitutor(valueMap);
         mergeConfig.replaceAll((k, v) -> substitutor.replace(v));
 

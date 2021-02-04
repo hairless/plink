@@ -41,7 +41,7 @@ public class JobStateInfoControllerTest extends  BaseControllerTest{
         jobStateInfoDTO.setType(0);
         jobStateInfoDTO.setDuration(10000l);
         jobStateInfoDTO.setSize(1000l);
-        jobStateInfoDTO.setReportTimestamp(System.currentTimeMillis());
+        jobStateInfoDTO.setReportTimestamp(System.currentTimeMillis()/1000);
         postMvcResult("/mng/jobStateInfo/addJobStateInfo",jobStateInfoDTO);
     }
 

@@ -38,7 +38,7 @@ public class FlinkShellSubmitAssist {
         FlinkSubmitOptions flinkSubmitOptions = jobBuilder.buildFlinkSubmitOption(jobInstanceDTO);
         String runCommand = flinkShellCommandBuilder.buildRunCommand(flinkSubmitOptions);
         String command = format("{0} >> {1} 2>&1", runCommand, logFile);
-        log.debug("command:{}", command);
+        log.info("command:{}", command);
         log.info("jobInstance {} logging to file {}", jobInstanceDTO.getId(), logFile);
         int exitCode = syncExecShellCommand(command);
         if (exitCode != 0) {
