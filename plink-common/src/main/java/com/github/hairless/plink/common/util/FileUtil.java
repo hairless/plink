@@ -15,6 +15,11 @@ import java.util.stream.Collectors;
 
 public class FileUtil {
 
+    public static boolean exists(String filePath) {
+        File file = new File(filePath);
+        return file.exists();
+    }
+
     public static String resolvePath(String parent, String child) throws PlinkException {
         File file = new File(parent, child);
         if (!file.exists()) {
