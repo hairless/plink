@@ -13,6 +13,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,10 +54,7 @@ public class JobStateInfoServiceImpl implements JobStateInfoService {
 
     @Override
     public JobStateInfoDTO addJobStateInfo(JobStateInfoDTO jobStateInfoDTO) {
-        //check jobId or instanceId
-        if (jobStateInfoDTO.getJobId() == null || jobStateInfoDTO.getInstanceId() == null){
-            throw new PlinkMessageException("the jobStateInfoDTO id or instanceId is not exist");
-        }
+        this.checkJobState(jobStateInfoDTO);
         JobStateInfo jobStateInfo = jobStateInfoTransform.inverseTransform(jobStateInfoDTO);
         try {
             jobStateInfoMapper.insertSelective(jobStateInfo);
@@ -64,6 +62,22 @@ public class JobStateInfoServiceImpl implements JobStateInfoService {
             log.info("add jobStateInfo is fail , {}",e);
         }
         return jobStateInfoTransform.transform(jobStateInfo);
+    }
+
+    /**
+     * Check Job State
+     * @param jobStateInfoDTO
+     */
+    private void checkJobState(JobStateInfoDTO jobStateInfoDTO){
+        if(jobStateInfoDTO.getJobId()==null || jobStateInfoDTO.getJobId()==-1){
+            throw new PlinkMessageException("Checkpoint jobId is null");
+        }
+        if(jobStateInfoDTO.getInstanceId()==null || jobStateInfoDTO.getInstanceId()==-1){
+            throw new PlinkMessageException("Checkpoint instanceId is null");
+        }
+        if(StringUtils.isBlank(jobStateInfoDTO.getExternalPath())){
+            throw new PlinkMessageException("Checkpoint ExternalPath is null");
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
