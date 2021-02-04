@@ -16,8 +16,6 @@ import org.apache.flink.util.Preconditions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author: silence
@@ -44,17 +42,22 @@ public class SqlJobBuilder extends JobBuilder {
         FlinkSubmitOptions flinkSubmitOptions = new FlinkSubmitOptions();
         flinkSubmitOptions.setJobName(jobName);
         flinkSubmitOptions.setMainJarPath(PlinkSqlUtil.SQL_JAR_FILE);
-        //设置依赖
-        flinkSubmitOptions.setShapefiles(Stream.of(
-                PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH,
-                PlinkSqlUtil.SQL_FORMATS_DIR_PATH,
-                PlinkSqlUtil.SQL_UDF_DIR_PATH
-        ).collect(Collectors.toList()));
-        //设置本地classpath
+        //设置依赖&本地classpath
+        List<String> shapeFiles = new ArrayList<>();
         List<String> classPaths = new ArrayList<>();
-        classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH));
-        classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_FORMATS_DIR_PATH));
-        classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_UDF_DIR_PATH));
+        if (FileUtil.exists(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH)) {
+            shapeFiles.add(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH);
+            classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH));
+        }
+        if (FileUtil.exists(PlinkSqlUtil.SQL_FORMATS_DIR_PATH)) {
+            shapeFiles.add(PlinkSqlUtil.SQL_FORMATS_DIR_PATH);
+            classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_FORMATS_DIR_PATH));
+        }
+        if (FileUtil.exists(PlinkSqlUtil.SQL_UDF_DIR_PATH)) {
+            shapeFiles.add(PlinkSqlUtil.SQL_UDF_DIR_PATH);
+            classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_UDF_DIR_PATH));
+        }
+        flinkSubmitOptions.setShapefiles(shapeFiles);
         flinkSubmitOptions.setLocalClasspath(classPaths);
 
         FlinkConfig flinkConfig = jobInstanceDTO.getFlinkConfig();
