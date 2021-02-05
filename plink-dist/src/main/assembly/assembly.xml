@@ -48,5 +48,11 @@
             <directory>../docs</directory>
             <outputDirectory>/docs</outputDirectory>
         </fileSet>
+
+        <!-- opt -->
+        <fileSet>
+            <directory>../opt</directory>
+            <outputDirectory>/opt</outputDirectory>
+        </fileSet>
     </fileSets>
 </assembly>
