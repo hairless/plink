@@ -1,7 +1,6 @@
 package com.github.hairless.plink.common.builder;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.github.hairless.plink.common.conf.FlinkAutoConfig;
 import com.github.hairless.plink.common.util.FileUtil;
 import com.github.hairless.plink.common.util.JsonUtil;
 import com.github.hairless.plink.common.util.PlinkSqlUtil;
@@ -16,17 +15,13 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.apache.flink.util.Preconditions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author: silence
  * @date: 2020/10/13
  */
-public class SqlJobBuilder implements JobBuilder {
+public class SqlJobBuilder extends JobBuilder {
 
     @Override
     public void validate(JobDTO jobDTO) {
@@ -42,22 +37,27 @@ public class SqlJobBuilder implements JobBuilder {
     }
 
     @Override
-    public FlinkSubmitOptions buildFlinkSubmitOption(JobInstanceDTO jobInstanceDTO) {
+    public FlinkSubmitOptions buildFlinkSubmitOptionInternal(JobInstanceDTO jobInstanceDTO) {
         String jobName = "PLINK_SQL_" + jobInstanceDTO.getJob().getName();
         FlinkSubmitOptions flinkSubmitOptions = new FlinkSubmitOptions();
         flinkSubmitOptions.setJobName(jobName);
         flinkSubmitOptions.setMainJarPath(PlinkSqlUtil.SQL_JAR_FILE);
-        //设置依赖
-        flinkSubmitOptions.setShapefiles(Stream.of(
-                PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH,
-                PlinkSqlUtil.SQL_FORMATS_DIR_PATH,
-                PlinkSqlUtil.SQL_UDF_DIR_PATH
-        ).collect(Collectors.toList()));
-        //设置本地classpath
+        //设置依赖&本地classpath
+        List<String> shapeFiles = new ArrayList<>();
         List<String> classPaths = new ArrayList<>();
-        classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH));
-        classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_FORMATS_DIR_PATH));
-        classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_UDF_DIR_PATH));
+        if (FileUtil.exists(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH)) {
+            shapeFiles.add(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH);
+            classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH));
+        }
+        if (FileUtil.exists(PlinkSqlUtil.SQL_FORMATS_DIR_PATH)) {
+            shapeFiles.add(PlinkSqlUtil.SQL_FORMATS_DIR_PATH);
+            classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_FORMATS_DIR_PATH));
+        }
+        if (FileUtil.exists(PlinkSqlUtil.SQL_UDF_DIR_PATH)) {
+            shapeFiles.add(PlinkSqlUtil.SQL_UDF_DIR_PATH);
+            classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_UDF_DIR_PATH));
+        }
+        flinkSubmitOptions.setShapefiles(shapeFiles);
         flinkSubmitOptions.setLocalClasspath(classPaths);
 
         FlinkConfig flinkConfig = jobInstanceDTO.getFlinkConfig();
@@ -69,13 +69,6 @@ public class SqlJobBuilder implements JobBuilder {
         args.add("\"-c\"");
         args.add('"' + StringEscapeUtils.escapeJava(JsonUtil.toJSONString(sqlConfig)) + '"');
         flinkConfig.setArgs(String.join(" ", args).replace("`", "\\`"));
-        Map<String, String> defaultConfs = FlinkAutoConfig.defaultConfs;
-        Map<String, String> configs = flinkConfig.getConfigs() == null ? new HashMap<>() : flinkConfig.getConfigs();
-        defaultConfs.forEach((k, v) -> {
-            if (!configs.containsKey(k)) {
-                configs.put(k, v);
-            }
-        });
         flinkSubmitOptions.setFlinkConfig(flinkConfig);
         return flinkSubmitOptions;
     }
