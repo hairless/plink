@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `job_instance`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8 COMMENT ='作业实例表';
 
---job_state_info
+-- job_state_info
 CREATE TABLE IF NOT EXISTS `job_state_info`
 (
   `id`                  BIGINT(20) PRIMARY KEY  NOT NULL AUTO_INCREMENT COMMENT '主键',
