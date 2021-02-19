@@ -31,7 +31,7 @@ public class SubmitJobTask {
 
     @Async("commonThreadExecutor")
     public void asyncSubmitJobTask(JobInstanceDTO jobInstanceDTO) {
-        String logFile = jobInstanceService.getStartLogFilePath(jobInstanceDTO);
+        String logFile = jobInstanceService.getClientLogFilePath(jobInstanceDTO);
         LoggerUtil.registerThreadFileAppender(String.valueOf(jobInstanceDTO.getId()), logFile);
 
         log.info("prepare starting job instance, jobId={}, instanceId={}", jobInstanceDTO.getJobId(), jobInstanceDTO.getId());
@@ -52,7 +52,7 @@ public class SubmitJobTask {
             try {
                 //提交平台实例（flink job）到flink集群
                 FlinkClusterService defaultFlinkClusterService = flinkClusterServiceFactory.getDefaultFlinkClusterService();
-                appId = defaultFlinkClusterService.submitJob(jobInstanceDTO, logFile);
+                appId = defaultFlinkClusterService.submitJob(jobInstanceDTO);
                 if (StringUtils.isBlank(appId)) {
                     throw new PlinkMessageException("appId is empty");
                 }
@@ -60,7 +60,7 @@ public class SubmitJobTask {
                 //提交成功状态为 '运行中'
                 jobInstanceSubmitted.setStatus(JobInstanceStatusEnum.RUNNING.getValue());
                 log.info("start success!!!,jobInstance is running, jobId={}, instanceId={}", jobInstanceDTO.getJobId(), jobInstanceDTO.getId());
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 //提交失败状态为 '启动失败'
                 jobInstanceSubmitted.setStatus(JobInstanceStatusEnum.START_FAILED.getValue());
                 jobInstanceSubmitted.setStopTime(new Date());

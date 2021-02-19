@@ -6,6 +6,7 @@ import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.rpc.FlinkRestRpcService;
 import com.github.hairless.plink.service.FlinkClusterService;
+import com.github.hairless.plink.service.JobInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,12 +18,15 @@ import org.springframework.stereotype.Service;
 public class StandaloneFlinkClusterServiceImpl implements FlinkClusterService {
     @Autowired
     private FlinkRestRpcService flinkRestRpcService;
+    @Autowired
+    private JobInstanceService jobInstanceService;
 
     private final FlinkShellSubmitAssist flinkShellSubmitAssist =
             new FlinkShellSubmitAssist(StandaloneCommandBuilder.INSTANCE, "Job has been submitted with JobID ([a-zA-Z0-9]+)");
 
     @Override
-    public String submitJob(JobInstanceDTO jobInstanceDTO, String logFile) throws Exception {
+    public String submitJob(JobInstanceDTO jobInstanceDTO) throws Exception {
+        String logFile = jobInstanceService.getClientLogFilePath(jobInstanceDTO);
         return flinkShellSubmitAssist.submitJob(jobInstanceDTO, logFile);
     }
 
@@ -46,8 +50,8 @@ public class StandaloneFlinkClusterServiceImpl implements FlinkClusterService {
     }
 
     @Override
-    public void stopJob(String appId) throws Exception {
-        flinkRestRpcService.stopJob(appId);
+    public void stopJob(JobInstanceDTO jobInstanceDTO) throws Exception {
+        flinkRestRpcService.stopJob(jobInstanceDTO.getAppId());
     }
 
     @Override

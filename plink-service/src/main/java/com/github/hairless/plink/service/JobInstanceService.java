@@ -16,5 +16,5 @@ public interface JobInstanceService {
 
     String startLog(Long jobInstanceId);
 
-    String getStartLogFilePath(JobInstanceDTO jobInstanceDTO);
+    String getClientLogFilePath(JobInstanceDTO jobInstanceDTO);
 }
