@@ -8,45 +8,25 @@ Plink 进行独立单机部署，可以在 linux 上进行部署，以下是部�
     1. Java 1.8 +
     2. MySQL 5.7 +
 
-## 安装 Java
+## 1、安装 Java
 
 * 版本: java 1.8+
 * JAVA_HOME 配置
 * 安装详情: 略 。。。
 
-## 安装 Mysql
-
-* 版本: mysql 5.7+
-* 安装建议: 建议 Docker 安装，命令如下:
-    ```shell
-    docker run -p 3306:3306 --name plink-mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7
-    ```
-* 初始化脚本
-
-    进入 docker mysql 中，执行如下的 sql 语句，创建库和表。
-    ```
-    https://github.com/hairless/plink/blob/master/plink-web/src/main/resources/META-INF/sql/mysql/plink_init.sql
-    ```
-* 远程授权
-    ```shell
-    -- CREATE USER 'root'@'%' IDENTIFIED BY '1234567';
-    GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
-    FLUSH PRIVILEGES;
-    ```
-
-## 安装 Plink
+## 2、安装 Plink
 
 ### 获取plink二进制压缩包
 
 可通过 自行编译 和 直接下载两种方式获取plink二进制安装包
 
 #### 1、自行编译
-    ```shell
-    git clone https://github.com/hairless/plink.git
-    cd plink
-    mvn clean package -Dmaven.test.skip=true
-    ```
-    成功后在 plink/plink-dist/target/ 下会有一个 plink-${version}-bin.tar.gz 文件
+```shell
+git clone https://github.com/hairless/plink.git
+cd plink
+mvn clean package -Dmaven.test.skip=true
+```
+成功后在 plink/plink-dist/target/ 下会有一个 plink-${version}-bin.tar.gz 文件
 
 #### 2、直接下载
 
@@ -62,7 +42,25 @@ tar -zxvf plink-${version}-bin.tar.gz
 cd plink-${version}-bin
 ```
 
-### 配置
+## 3、安装 Mysql
+
+* 版本: mysql 5.7+
+* 安装建议: 建议 Docker 安装，命令如下:
+    ```shell
+    docker run -p 3306:3306 --name plink-mysql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7
+    ```
+* 初始化脚本
+
+    使用PLINK_HOME/config/plink_init.sql初始化mysql库表
+    
+* 远程授权
+    ```shell
+    -- CREATE USER 'root'@'%' IDENTIFIED BY '1234567';
+    GRANT ALL PRIVILEGES ON *.* TO 'root'@'%';
+    FLUSH PRIVILEGES;
+    ```
+
+## 4、配置及启动
 进入 config 文件夹，可以编辑 application-prod.yml(默认)，application-test.yml  等配置文件
     
 1. 配置 mysql
