@@ -54,9 +54,9 @@ Plink 进行独立单机部署，可以在 linux 上进行部署，以下是部�
 * 选择最新release中的bin.tar.gz结尾的文件进行下载
 
 ### 解压
-找到上面的 plink-${version}-bin.tar.gz 文件，复制或移动到一个合适的目录进行解压
-解压后会生成plink-${version}-bin的目录，该目录即为PLINK_HOME
-进入PLINK_HOME目录
+- 找到上面的 plink-${version}-bin.tar.gz 文件，复制或移动到一个合适的目录进行解压
+- 解压后会生成 plink-${version}-bin 的目录，该目录即为PLINK_HOME
+- 进入PLINK_HOME目录，目录结构详见[部署目录结构说明](manual/manual-deployment-structure.md)
 ```shell
 tar -zxvf plink-${version}-bin.tar.gz
 cd plink-${version}-bin
@@ -68,10 +68,11 @@ cd plink-${version}-bin
 1. 配置 mysql
     编辑 application-prod.yml，配置 spring.datasource.xxx 等属性。如: 默认的 mysql url 地址为 jdbc:mysql://localhost:3306/plink?useUnicode=true&characterEncoding=utf-8
 2. 配置flink集群模式
-    plink默认为local模式,开箱即用不需要安装flink客户端，详见[集群模式说明](submit_cluster_mode.md)
+    plink默认为local模式,开箱即用不需要安装flink客户端，详见[集群模式说明](manual/manual-cluster-mode.md)
+3. 更多配置详见[plink配置说明](manual/manual-config.md)
 
-### 启动
-打开 cmd 命令提示符，切换到 PLINK_HOME 目录
+### 启动plink
+打开命令行，切换到 PLINK_HOME 目录
 
 ```shell
 bin/run.sh start
@@ -79,8 +80,8 @@ bin/run.sh start
 
 访问默认地址: <http://127.0.0.1:8666>，可参考 [使用手册](manual/manual-home.md)
 
-### 关闭
-打开 cmd 命令提示符，切换到 PLINK_HOME 目录
+### 停止plink
+打开命令行，切换到 PLINK_HOME 目录
 
 ```shell
 bin/run.sh stop
