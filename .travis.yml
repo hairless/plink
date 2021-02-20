@@ -1,15 +1,9 @@
 language: java
 jdk:
   - openjdk8
-install: mvn install -DskipTests=true -Dmaven.javadoc.skip=true
 script:
-  # the following command line builds the project, runs the tests with coverage and then execute the SonarCloud analysis
-  - mvn test -Dspring.profiles.active=test org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=hairless_plink
+  - mvn clean package
 cache:
   directories:
     - "$HOME/.m2"
-    - "$HOME/flink-1.11.1"
-before_install:
-  - export FLINK_HOME=$HOME/flink-1.12.1
-  - if [ ! -d $FLINK_HOME/bin ]; then curl https://mirrors.bfsu.edu.cn/apache/flink/flink-1.12.1/flink-1.12.1-bin-scala_2.11.tgz
-    | tar zxf - -C $HOME; fi
+
