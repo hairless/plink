@@ -14,8 +14,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.flink.util.Preconditions;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author: silence
@@ -44,18 +47,18 @@ public class SqlJobBuilder extends JobBuilder {
         flinkSubmitOptions.setMainJarPath(PlinkSqlUtil.SQL_JAR_FILE);
         //设置依赖&本地classpath
         List<String> shapeFiles = new ArrayList<>();
-        List<String> classPaths = new ArrayList<>();
+        List<URL> classPaths = new ArrayList<>();
         if (FileUtil.exists(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH)) {
             shapeFiles.add(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH);
-            classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH));
+            classPaths.addAll(FileUtil.listFileURLs(PlinkSqlUtil.SQL_CONNECTORS_DIR_PATH));
         }
         if (FileUtil.exists(PlinkSqlUtil.SQL_FORMATS_DIR_PATH)) {
             shapeFiles.add(PlinkSqlUtil.SQL_FORMATS_DIR_PATH);
-            classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_FORMATS_DIR_PATH));
+            classPaths.addAll(FileUtil.listFileURLs(PlinkSqlUtil.SQL_FORMATS_DIR_PATH));
         }
         if (FileUtil.exists(PlinkSqlUtil.SQL_UDF_DIR_PATH)) {
             shapeFiles.add(PlinkSqlUtil.SQL_UDF_DIR_PATH);
-            classPaths.addAll(FileUtil.listFileNames(PlinkSqlUtil.SQL_UDF_DIR_PATH));
+            classPaths.addAll(FileUtil.listFileURLs(PlinkSqlUtil.SQL_UDF_DIR_PATH));
         }
         flinkSubmitOptions.setShapefiles(shapeFiles);
         flinkSubmitOptions.setLocalClasspath(classPaths);
@@ -65,10 +68,12 @@ public class SqlJobBuilder extends JobBuilder {
         SqlConfig sqlConfig = new SqlConfig();
         sqlConfig.setJobName(jobName);
         sqlConfig.setSql(jobInstanceDTO.getExtraConfig().get("sql").textValue());
-        List<String> args = new ArrayList<>();
-        args.add("\"-c\"");
-        args.add('"' + StringEscapeUtils.escapeJava(JsonUtil.toJSONString(sqlConfig)) + '"');
-        flinkConfig.setArgs(String.join(" ", args).replace("`", "\\`"));
+        String[] args = new String[]{"-c", JsonUtil.toJSONString(sqlConfig)};
+        flinkConfig.setPrepArgs(args);
+        String strArgs = Arrays.stream(args)
+                .map(s -> "\"" + StringEscapeUtils.escapeJava(s.replace("`", "\\`")) + "\"")
+                .collect(Collectors.joining(" "));
+        flinkConfig.setArgs(strArgs);
         flinkSubmitOptions.setFlinkConfig(flinkConfig);
         return flinkSubmitOptions;
     }

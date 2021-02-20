@@ -32,6 +32,10 @@ public class FlinkConfig implements Serializable {
      */
     private String args;
     /**
+     * 处理后的main方法参数
+     */
+    private transient String[] prepArgs;
+    /**
      * jobManager 内存
      */
     private String jobManagerMemory;

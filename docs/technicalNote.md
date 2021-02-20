@@ -9,7 +9,7 @@ js语法      |es6        |       |           |
 打包工具    |webpack    |       |           |
 包管理工具  |npm        |       |           |
 前端框架    |vue        |       |           |
-ui组件      |view ui    |       |https://www.iviewui.com/docs/introduce|
+ui组件      |ant ui    |       |https://ant.design/components/tabs-cn/|
 强类型语言  |typeScript |       |           |
 
 ## 后端
