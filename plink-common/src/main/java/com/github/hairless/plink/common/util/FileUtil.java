@@ -1,6 +1,7 @@
 package com.github.hairless.plink.common.util;
 
 import com.github.hairless.plink.model.exception.PlinkException;
+import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
@@ -61,14 +62,18 @@ public class FileUtil {
         return Collections.emptyList();
     }
 
-    public static List<URL> listFileURLs(String dirPath) throws MalformedURLException {
+    public static List<URL> listFileURLs(String dirPath) {
         List<URL> urls = new ArrayList<>();
         File dir = new File(dirPath);
         if (dir.exists() && dir.isDirectory()) {
             File[] files = dir.listFiles();
             if (files != null) {
                 for (File file : files) {
-                    urls.add(file.toURI().toURL());
+                    try {
+                        urls.add(file.toURI().toURL());
+                    } catch (MalformedURLException e) {
+                        throw new PlinkRuntimeException(e);
+                    }
                 }
             }
         }

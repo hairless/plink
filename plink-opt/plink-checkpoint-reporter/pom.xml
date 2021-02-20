@@ -90,7 +90,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy todir="../../module/opt" overwrite="true">
+                                <copy todir="../../opt" overwrite="true">
                                     <fileset dir="${project.build.directory}" erroronmissingdir="false">
                                         <include name="${jar.name}.jar"/>
                                     </fileset>
@@ -108,7 +108,7 @@
                 <configuration>
                     <filesets>
                         <fileset>
-                            <directory>../../module/opt</directory>
+                            <directory>../../opt</directory>
                         </fileset>
                     </filesets>
                 </configuration>

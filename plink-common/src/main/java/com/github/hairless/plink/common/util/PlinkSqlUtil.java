@@ -1,6 +1,7 @@
 package com.github.hairless.plink.common.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.hairless.plink.common.conf.ClusterAutoConfig;
 import com.github.hairless.plink.model.exception.PlinkDataException;
 import com.github.hairless.plink.model.exception.PlinkRuntimeException;
 import com.github.hairless.plink.sql.model.SqlDebugConfig;
@@ -56,13 +57,21 @@ public class PlinkSqlUtil {
             //plink sql udf jars
             sqlClassPathUrlList.addAll(FileUtil.listFileURLs(SQL_UDF_DIR_PATH));
 
-            //flink dependency jars
-            sqlClassPathUrlList.addAll(FileUtil.listFileURLs(FlinkConfigUtil.getFlinkHome() + FlinkConfigUtil.LIB_SUFFIX));
+            ClassLoader sqlParentClassLoader;
+            if ("local".equals(ClusterAutoConfig.mode)) {
+                //local模式使用appClassLoader，内部包含flink相关依赖
+                sqlParentClassLoader = ClassLoader.getSystemClassLoader();
+            } else {
+                //非local模式使用扩展类加载器extClassLoader，flink相关依赖从flink客户端lib加载，防止和内部flink依赖冲突
 
-            //获取扩展类加载器
-            ClassLoader extClassLoader = ClassLoader.getSystemClassLoader().getParent();
-            //将扩展类加载器设置为sql类加载器的父加载器，防止sql 插件引入第3方依赖冲突
-            sqlBaseClassLoader = new URLClassLoader(sqlClassPathUrlList.toArray(new URL[0]), extClassLoader);
+                //flink dependency jars
+                sqlClassPathUrlList.addAll(FileUtil.listFileURLs(FlinkConfigUtil.getFlinkHome() + FlinkConfigUtil.LIB_SUFFIX));
+
+                //获取扩展类加载器
+                sqlParentClassLoader = ClassLoader.getSystemClassLoader().getParent();
+            }
+
+            sqlBaseClassLoader = new URLClassLoader(sqlClassPathUrlList.toArray(new URL[0]), sqlParentClassLoader);
         }
     }
 

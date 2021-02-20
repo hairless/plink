@@ -7,6 +7,7 @@ import com.github.hairless.plink.common.util.ValidatorUtil;
 import com.github.hairless.plink.dao.mapper.JobInstanceMapper;
 import com.github.hairless.plink.dao.mapper.JobMapper;
 import com.github.hairless.plink.model.dto.JobDTO;
+import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.model.enums.JobTypeEnum;
 import com.github.hairless.plink.model.exception.PlinkMessageException;
@@ -245,7 +246,8 @@ public class JobServiceImpl implements JobService {
             throw new PlinkMessageException("instance not found");
         }
         try {
-            flinkClusterServiceFactory.getDefaultFlinkClusterService().stopJob(jobInstance.getAppId());
+            JobInstanceDTO jobInstanceDTO = jobInstanceTransform.transform(jobInstance);
+            flinkClusterServiceFactory.getDefaultFlinkClusterService().stopJob(jobInstanceDTO);
         } catch (Exception e) {
             throw new PlinkRuntimeException("stop job fail", e);
         }
