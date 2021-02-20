@@ -83,7 +83,7 @@ public class JobInstanceServiceImpl implements JobInstanceService {
             return null;
         }
         JobInstanceDTO jobInstanceDTO = jobInstanceTransform.transform(jobInstance);
-        String startLogFilePath = getStartLogFilePath(jobInstanceDTO);
+        String startLogFilePath = getClientLogFilePath(jobInstanceDTO);
         try {
             return FileUtil.readFileToString(startLogFilePath);
         } catch (FileNotFoundException e) {
@@ -94,7 +94,7 @@ public class JobInstanceServiceImpl implements JobInstanceService {
     }
 
     @Override
-    public String getStartLogFilePath(JobInstanceDTO jobInstanceDTO) {
+    public String getClientLogFilePath(JobInstanceDTO jobInstanceDTO) {
         return String.format(instanceLogDir + instanceLogPattern, jobInstanceDTO.getJobId(), jobInstanceDTO.getId());
     }
 }

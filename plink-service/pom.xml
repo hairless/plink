@@ -26,6 +26,25 @@
             <artifactId>plink-rpc</artifactId>
         </dependency>
 
+        <!--flink dep-->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-runtime_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-clients_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-runtime-web_${scala.binary.version}</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hairless</groupId>
+            <artifactId>plink-sql-flink-dependency</artifactId>
+            <type>pom</type>
+        </dependency>
+
         <!--spring boot jars-->
         <dependency>
             <groupId>org.springframework.boot</groupId>

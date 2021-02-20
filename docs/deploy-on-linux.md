@@ -4,24 +4,14 @@ Plink 进行独立单机部署，可以在 linux 上进行部署，以下是部�
 ## 环境需求
 1. 操作系统
     1. linux
-2. 编译环境(非必须)
+2. 运行环境
     1. Java 1.8 +
-    2. Maven 3.3 + （编译代码）
-3. 运行环境
-    1. Apache Flink 1.11 + （Standalone 模式）
     2. MySQL 5.7 +
-    3. Java 1.8 +
 
 ## 安装 Java
 
 * 版本: java 1.8+
 * JAVA_HOME 配置
-* 安装详情: 略 。。。
-
-## 安装 Maven(自行编译时需要安装)
-
-* 版本: maven 3.3 +
-* MAVEN_HOME 配置
 * 安装详情: 略 。。。
 
 ## 安装 Mysql
@@ -44,37 +34,13 @@ Plink 进行独立单机部署，可以在 linux 上进行部署，以下是部�
     FLUSH PRIVILEGES;
     ```
 
-## 安装 Apache Flink(已安装的可跳过)
-
-* 版本: flink 1.11+(老版本只能提交flink jar，不能使用flink sql任务)
-* 下载: <https://flink.apache.org/downloads.html>
-* 解压到合适的目录，假设该目录为 FLINK_HOME
-* 环境变量配置 FLINK_HOME（必须，Plink 会用到该环境变量）
-
-### 使用flink standalone
-
-* Flink 配置: jobManager默认地址为<http://127.0.0.1:8081>，可根据需要自行修改
-* 启动: 执行 bin 目录下的脚本
-    ```shell
-    start-cluster.sh
-    ```
-* 测试: 访问standalone集群(jobManager)正常即可，默认地址<http://127.0.0.1:8081> 
-
-### 使用flink on yarn
-
-* hadoop版本: 2.x+
-* 配置环境变量HADOOP_HOME
-
 ## 安装 Plink
 
 ### 获取plink二进制压缩包
 
-#### 直接下载
+可通过 自行编译 和 直接下载两种方式获取plink二进制安装包
 
-* release地址 <https://github.com/hairless/plink/releases>
-* 选择最新release中的bin.tar.gz结尾的文件进行下载
-
-#### 自行编译
+#### 1、自行编译
     ```shell
     git clone https://github.com/hairless/plink.git
     cd plink
@@ -82,14 +48,27 @@ Plink 进行独立单机部署，可以在 linux 上进行部署，以下是部�
     ```
     成功后在 plink/plink-dist/target/ 下会有一个 plink-${version}-bin.tar.gz 文件
 
+#### 2、直接下载
+
+* release地址 <https://github.com/hairless/plink/releases>
+* 选择最新release中的bin.tar.gz结尾的文件进行下载
+
 ### 解压
-找到上面的 plink-${version}-bin.tar.gz 文件，找一个合适的目录，假设该目录为 PLINK_HOME 鼠标右键解压，然后切换到 PLINK_HOME 目录。
+找到上面的 plink-${version}-bin.tar.gz 文件，复制或移动到一个合适的目录进行解压
+解压后会生成plink-${version}-bin的目录，该目录即为PLINK_HOME
+进入PLINK_HOME目录
+```shell
+tar -zxvf plink-${version}-bin.tar.gz
+cd plink-${version}-bin
+```
 
 ### 配置
 进入 config 文件夹，可以编辑 application-prod.yml(默认)，application-test.yml  等配置文件
     
 1. 配置 mysql
     编辑 application-prod.yml，配置 spring.datasource.xxx 等属性。如: 默认的 mysql url 地址为 jdbc:mysql://localhost:3306/plink?useUnicode=true&characterEncoding=utf-8
+2. 配置flink集群模式
+    plink默认为local模式,开箱即用不需要安装flink客户端，详见[集群模式说明](submit_cluster_mode.md)
 
 ### 启动
 打开 cmd 命令提示符，切换到 PLINK_HOME 目录

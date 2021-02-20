@@ -6,6 +6,7 @@ import com.github.hairless.plink.model.dto.JobInstanceDTO;
 import com.github.hairless.plink.model.enums.JobInstanceStatusEnum;
 import com.github.hairless.plink.rpc.YarnClientRpcService;
 import com.github.hairless.plink.service.FlinkClusterService;
+import com.github.hairless.plink.service.JobInstanceService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.yarn.api.records.YarnApplicationState;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 public class YarnFlinkClusterServiceImpl implements FlinkClusterService {
     @Autowired
     private YarnClientRpcService yarnClientRpcService;
+    @Autowired
+    private JobInstanceService jobInstanceService;
     @Value("${cluster.queue}")
     private String defaultQueue;
 
@@ -27,7 +30,8 @@ public class YarnFlinkClusterServiceImpl implements FlinkClusterService {
             new FlinkShellSubmitAssist(YarnCommandBuilder.INSTANCE, "Submitting application master (application_[0-9_]+)");
 
     @Override
-    public String submitJob(JobInstanceDTO jobInstanceDTO, String logFile) throws Exception {
+    public String submitJob(JobInstanceDTO jobInstanceDTO) throws Exception {
+        String logFile = jobInstanceService.getClientLogFilePath(jobInstanceDTO);
         if (StringUtils.isNotBlank(defaultQueue)) {
             jobInstanceDTO.getFlinkConfig().setQueue(defaultQueue);
         }
@@ -63,8 +67,8 @@ public class YarnFlinkClusterServiceImpl implements FlinkClusterService {
     }
 
     @Override
-    public void stopJob(String appId) throws Exception {
-        yarnClientRpcService.killApplication(appId);
+    public void stopJob(JobInstanceDTO jobInstanceDTO) throws Exception {
+        yarnClientRpcService.killApplication(jobInstanceDTO.getAppId());
     }
 
     @Override

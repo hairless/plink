@@ -90,6 +90,12 @@
             </dependency>
             <dependency>
                 <groupId>com.github.hairless</groupId>
+                <artifactId>plink-sql-flink-dependency</artifactId>
+                <type>pom</type>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.hairless</groupId>
                 <artifactId>plink-opt</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -141,6 +147,21 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-core</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-runtime_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-clients_${scala.binary.version}</artifactId>
+                <version>${flink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-runtime-web_${scala.binary.version}</artifactId>
                 <version>${flink.version}</version>
             </dependency>
 
