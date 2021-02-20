@@ -44,6 +44,7 @@ public class SqlDebugDriverTest {
         sqlDebugConfig.setSql(sql);
         log.info("sqlDebugConfig={}", JsonUtil.toJSONString(sqlDebugConfig));
         Map<String, List<String>> debugResult = SqlDebugDriver.debug(sqlDebugConfig);
+        log.info("sqlDebugResult={}", JsonUtil.toJSONString(debugResult));
         assert MapUtils.isNotEmpty(debugResult);
     }
 
