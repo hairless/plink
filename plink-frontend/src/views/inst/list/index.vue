@@ -59,9 +59,7 @@
           <span :style="{ color: [3, 4, -1].includes(row.status) ? 'red' : 'green' }">{{ current }}</span>
         </span>
         <span slot="action" slot-scope="row">
-          <a @click="onLog(row)">日志</a>
-          <a-divider type="vertical" />
-          <router-link :to="{ path: 'inst/instDetail', query: { instId: row.id } }" disabled>详情</router-link>
+          <a @click="onLog(row)">启动日志</a>
         </span>
       </a-table>
     </div>
@@ -234,9 +232,7 @@ export default {
       this.getDataList();
     },
     getDataList() {
-      this.isLoading = true;
       instApi.getInstPageList(utils.objectDeleteBlankVK(this.dataFilter)).then(resp => {
-        this.isLoading = false;
         this.dataList = resp.data.list;
         this.page.total = resp.data.total;
 
