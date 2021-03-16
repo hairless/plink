@@ -6,7 +6,6 @@
         <artifactId>plink-sql</artifactId>
         <groupId>com.github.hairless</groupId>
         <version>0.2.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -17,19 +16,7 @@
     <modules>
         <module>flink-connector-kafka</module>
         <module>flink-connector-jdbc</module>
+        <module>plink-sql-connectors-dep</module>
     </modules>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.github.hairless</groupId>
-            <artifactId>flink-connector-kafka</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.hairless</groupId>
-            <artifactId>flink-connector-jdbc</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
 
 </project>

@@ -27,13 +27,13 @@
             <groupId>com.github.hairless</groupId>
             <artifactId>plink-sql-flink-dependency</artifactId>
             <type>pom</type>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
 
         <!--内置的flink connector-->
         <dependency>
             <groupId>com.github.hairless</groupId>
-            <artifactId>plink-sql-connectors</artifactId>
+            <artifactId>plink-sql-connectors-dep</artifactId>
             <type>pom</type>
             <scope>test</scope>
         </dependency>
