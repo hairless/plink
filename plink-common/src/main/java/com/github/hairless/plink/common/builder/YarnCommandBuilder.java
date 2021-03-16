@@ -24,17 +24,13 @@ public class YarnCommandBuilder implements FlinkShellCommandBuilder {
 
     private static final String exportHadoopClasspath = "export HADOOP_CLASSPATH=`$HADOOP_HOME/bin/hadoop classpath` && ";
     private static final String runScript = "{0}/bin/flink run ";
-    private static final String jobName = "-ynm \"{0}\" ";
-    private static final String mode = "-m yarn-cluster ";
+    private static final String mode = "-t yarn-per-job ";
     private static final String detached = "-d ";
-    private static final String queue = "-yqu {0} ";
-    private static final String jobManagerMemory = "-yjm {0} ";
-    private static final String taskManagerMemory = "-ytm {0} ";
-    private static final String taskManagerSlots = "-ys {0} ";
-    private static final String parallelism = "-p {0} ";
-    private static final String confItem = "-yD \"{0}\" ";
     private static final String classpathItem = "-C \"{0}\" ";
-    private static final String yarnShip = "-yt {0} ";
+    private static final String jobName = "-D \"yarn.application.name={0}\" ";
+    private static final String queue = "-D \"yarn.application.queue={0}\" ";
+    private static final String yarnShip = "-D \"yarn.ship-files={0}\" ";
+    private static final String confItem = "-D \"{0}\" ";
     private static final String mainClass = "-c {0} ";
     private static final String mainJarPath = "{0} ";
     private static final String args = "{0}";
@@ -49,18 +45,6 @@ public class YarnCommandBuilder implements FlinkShellCommandBuilder {
         }
         if (StringUtils.isNotBlank(flinkConfig.getQueue())) {
             builder.append(format(queue, flinkConfig.getQueue()));
-        }
-        if (StringUtils.isNotBlank(flinkConfig.getJobManagerMemory())) {
-            builder.append(format(jobManagerMemory, flinkConfig.getJobManagerMemory()));
-        }
-        if (StringUtils.isNotBlank(flinkConfig.getTaskManagerMemory())) {
-            builder.append(format(taskManagerMemory, flinkConfig.getTaskManagerMemory()));
-        }
-        if (flinkConfig.getTaskManagerSlots() != null) {
-            builder.append(format(taskManagerSlots, flinkConfig.getTaskManagerSlots()));
-        }
-        if (flinkConfig.getParallelism() != null) {
-            builder.append(format(parallelism, flinkConfig.getParallelism()));
         }
         if (flinkConfig.getConfigs() != null) {
             builder.append(flinkConfig.getConfigs().entrySet().stream()

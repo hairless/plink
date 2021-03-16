@@ -24,7 +24,6 @@ public class StandaloneCommandBuilder implements FlinkShellCommandBuilder {
 
     private static final String runScript = "{0}/bin/flink run ";
     private static final String detached = "-d ";
-    private static final String parallelism = "-p {0} ";
     private static final String confItem = "-D {0} ";
     private static final String mainClass = "-c {0} ";
     private static final String mainJarPath = "{0} ";
@@ -35,9 +34,6 @@ public class StandaloneCommandBuilder implements FlinkShellCommandBuilder {
         FlinkConfig flinkConfig = flinkSubmitOptions.getFlinkConfig();
         StringBuilder builder = new StringBuilder();
         builder.append(format(runScript, FlinkConfigUtil.getFlinkHome())).append(detached);
-        if (flinkConfig.getParallelism() != null) {
-            builder.append(format(parallelism, flinkConfig.getParallelism()));
-        }
         if (flinkConfig.getConfigs() != null) {
             builder.append(flinkConfig.getConfigs().entrySet().stream()
                     .map(e -> e.getKey() + "=" + e.getValue())

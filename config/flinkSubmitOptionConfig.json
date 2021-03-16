@@ -1,0 +1,88 @@
+[
+  {
+    "key": "jobmanager.memory.process.size",
+    "name": "JM内存",
+    "uiType": "INPUT",
+    "defaultValue": "1G",
+    "desc": "job manager 内存"
+  },
+  {
+    "key": "taskmanager.memory.process.size",
+    "name": "TM内存",
+    "uiType": "INPUT",
+    "defaultValue": "1G",
+    "desc": "task manager 内存"
+  },
+  {
+    "key": "taskmanager.numberOfTaskSlots",
+    "name": "TM槽数",
+    "uiType": "NUMBER",
+    "defaultValue": "1",
+    "desc": "单个task manager中lot的个数"
+  },
+  {
+    "key": "parallelism.default",
+    "name": "并行度",
+    "uiType": "NUMBER",
+    "defaultValue": "1",
+    "desc": "默认并行度"
+  },
+  {
+    "key": "state.backend",
+    "name": "状态后端",
+    "uiType": "SELECT",
+    "defaultValue": "memory",
+    "options": [
+      {
+        "label": "内存",
+        "value": "memory"
+      },
+      {
+        "label": "文件系统",
+        "value": "filesystem"
+      },
+      {
+        "label": "rocksdb",
+        "value": "rocksdb",
+        "enable": false
+      }
+    ],
+    "desc": "状态的存储后端"
+  },
+  {
+    "key": "state.checkpoints.dir",
+    "name": "检查点路径",
+    "uiType": "INPUT",
+    "desc": "checkpoint存储路径"
+  },
+  {
+    "key": "state.savepoints.dir",
+    "name": "保持点路径",
+    "uiType": "INPUT",
+    "desc": "savepoint存储路径"
+  },
+  {
+    "key": "execution.checkpointing.interval",
+    "name": "检查点间隔",
+    "uiType": "NUMBER",
+    "defaultValue": "60000",
+    "desc": "checkPoint间隔，单位毫秒"
+  },
+  {
+    "key": "execution.checkpointing.mode",
+    "name": "检查点模式",
+    "uiType": "RADIO",
+    "defaultValue": "exactly-once",
+    "options": [
+      {
+        "label": "精确一次",
+        "value": "exactly-once"
+      },
+      {
+        "label": "至少一次",
+        "value": "at-least-once"
+      }
+    ],
+    "desc": "checkPoint模式，exactly-once or at-least-once"
+  }
+]

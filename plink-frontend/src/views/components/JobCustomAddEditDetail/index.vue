@@ -106,20 +106,21 @@
 </template>
 
 <script>
-import * as jobApi from "@/api/job";
-import * as helperApi from "@/api/helper";
-import InstList from "@/views/inst/list";
-export default {
-  name: "JobCustomAddEditDetail",
-  components: {
-    InstList
-  },
-  props: {
-    // 使用模式
-    usageMode: {
-      default: "" // add | edit | update
+  import * as jobApi from "@/api/job";
+  import * as helperApi from "@/api/helper";
+  import InstList from "@/views/inst/list";
+
+  export default {
+    name: "JobCustomAddEditDetail",
+    components: {
+      InstList
     },
-    dataId: {
+    props: {
+      // 使用模式
+      usageMode: {
+        default: "" // add | edit | update
+      },
+      dataId: {
       default: -1
     }
   },
@@ -242,6 +243,7 @@ export default {
       this.$router.push({
         path: "/page/job/jobEdit",
         query: {
+          type: this.data.type,
           jobId: this.data.id
         }
       });
@@ -250,6 +252,7 @@ export default {
       this.$router.push({
         path: "/page/job/jobDetail",
         query: {
+          type: this.data.type,
           jobId: this.data.id
         }
       });

@@ -51,7 +51,7 @@
             </dependency>
             <dependency>
                 <groupId>com.github.hairless</groupId>
-                <artifactId>plink-sql-connectors</artifactId>
+                <artifactId>plink-sql-connectors-dep</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
             </dependency>

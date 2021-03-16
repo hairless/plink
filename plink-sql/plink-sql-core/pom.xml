@@ -33,9 +33,9 @@
         <!--内置的flink connector-->
         <dependency>
             <groupId>com.github.hairless</groupId>
-            <artifactId>plink-sql-connectors</artifactId>
+            <artifactId>plink-sql-connectors-dep</artifactId>
             <type>pom</type>
-            <scope>provided</scope>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
