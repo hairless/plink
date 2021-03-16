@@ -36,22 +36,6 @@ public class FlinkConfig implements Serializable {
      */
     private transient String[] prepArgs;
     /**
-     * jobManager 内存
-     */
-    private String jobManagerMemory;
-    /**
-     * taskManager 内存
-     */
-    private String taskManagerMemory;
-    /**
-     * taskManager slot数量
-     */
-    private Integer taskManagerSlots;
-    /**
-     * 作业并行度 parallelism
-     */
-    private Integer parallelism;
-    /**
      * 其他flink配置
      */
     private Map<String, String> configs;

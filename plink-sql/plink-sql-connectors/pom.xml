@@ -19,4 +19,17 @@
         <module>flink-connector-jdbc</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.github.hairless</groupId>
+            <artifactId>flink-connector-kafka</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.hairless</groupId>
+            <artifactId>flink-connector-jdbc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
 </project>

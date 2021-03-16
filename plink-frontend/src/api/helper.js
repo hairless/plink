@@ -35,3 +35,10 @@ export function getDefaultFlinkConfs() {
     method: "get"
   });
 }
+
+export function getFlinkSubmitOptions() {
+  return request({
+    url: "/mng/util/flinkSubmitOptions",
+    method: "get"
+  });
+}
