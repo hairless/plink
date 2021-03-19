@@ -17,6 +17,7 @@
         <module>flink-connector-kafka</module>
         <module>flink-connector-jdbc</module>
         <module>plink-sql-connectors-dep</module>
+        <module>plink-sql-connector-hive</module>
     </modules>
 
 </project>
