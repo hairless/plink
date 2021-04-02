@@ -77,6 +77,8 @@ public class JobTransform implements Transform<JobDTO, Job> {
             if (job.getLastAppId() != null) {
                 try {
                     JobInstanceDTO jobInstanceDTO = new JobInstanceDTO();
+                    jobInstanceDTO.setId(job.getLastInstanceId());
+                    jobInstanceDTO.setJobId(job.getId());
                     jobInstanceDTO.setAppId(job.getLastAppId());
                     jobInstanceDTO.setStatus(job.getLastStatus());
                     jobDTO.setLastUiAddress(defaultFlinkClusterService.getJobUiAddress(jobInstanceDTO));
