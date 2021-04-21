@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,8 +18,8 @@ import java.util.List;
 public class FlinkSubmitOptions {
     private String jobName;
     private String savePointPath;
-    private List<URL> localClasspath;
-    private List<String> shapefiles;
+    private List<URL> localClasspath = new ArrayList<>();
+    private List<String> shapefiles = new ArrayList<>();
     private String mainJarPath;
     private FlinkConfig flinkConfig;
 }
