@@ -27,7 +27,7 @@ public class JarJobBuilder extends JobBuilder {
         flinkSubmitOptions.setJobName("PLINK_JAR_" + jobInstanceDTO.getJob().getName());
         flinkSubmitOptions.setMainJarPath(UploadUtil.getJobJarsPath(jobInstanceDTO.getJobId(), jobInstanceDTO.getFlinkConfig().getJarName()));
         FlinkConfig flinkConfig = jobInstanceDTO.getFlinkConfig();
-        flinkConfig.setPrepArgs(flinkConfig.getArgs().split("\n"));
+        flinkConfig.setPrepArgs(flinkConfig.getArgs() == null ? new String[0] : flinkConfig.getArgs().split("\n"));
         flinkSubmitOptions.setFlinkConfig(flinkConfig);
         return flinkSubmitOptions;
     }
