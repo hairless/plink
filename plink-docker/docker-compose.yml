@@ -1,0 +1,27 @@
+version: '3'
+services:
+  mysql-db:
+    container_name: mysql-docker
+    image: plink/mysql:latest
+    ports:
+      - "3306:3306"
+    expose:
+      - "3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_HOST: '%'
+      TZ: Asia/Shanghai     # 指定时区
+    stdin_open: true
+    tty: true
+
+  plink:
+    container_name: plink-docker
+    image: plink/plink:master
+    ports:
+      - "8081:8081"
+      - "8666:8666"
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      TZ: Asia/Shanghai     # 指定时区
+    stdin_open: true
+    tty: true
