@@ -1,4 +1,4 @@
-# Plink
+# Plink【已停止迭代】
 Platform for [Apache Flink](https://flink.apache.org)
 ## 概述
 旨在基于 [Apache Flink](https://flink.apache.org) 封装构建上层平台。  
